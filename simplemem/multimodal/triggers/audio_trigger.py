@@ -10,8 +10,8 @@ from typing import Optional, Any, Dict, Union, Tuple
 from pathlib import Path
 import numpy as np
 
-from omni_memory.triggers.base import BaseTrigger, TriggerResult, TriggerDecision
-from omni_memory.core.config import EntropyTriggerConfig
+from simplemem.multimodal.triggers.base import BaseTrigger, TriggerResult, TriggerDecision
+from simplemem.multimodal.core.config import EntropyTriggerConfig
 
 logger = logging.getLogger(__name__)
 

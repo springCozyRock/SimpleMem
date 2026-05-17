@@ -8,10 +8,10 @@ from dataclasses import dataclass, field
 from typing import Optional, Any, Dict, List
 from pathlib import Path
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.triggers.base import TriggerResult, TriggerDecision
-from omni_memory.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.triggers.base import TriggerResult, TriggerDecision
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ class BaseProcessor(ABC):
     ) -> str:
         """Call LLM for text generation."""
         client = self._get_llm_client()
-        from omni_memory.utils.model_utils import normalize_model_name
+        from simplemem.multimodal.utils.model_utils import normalize_model_name
         model = model or self.config.llm.summary_model
         model = normalize_model_name(model)
 
@@ -165,7 +165,7 @@ class BaseProcessor(ABC):
     def _get_embedding_service(self):
         """Get or create a shared EmbeddingService instance."""
         if not hasattr(self, "_embedding_service") or self._embedding_service is None:
-            from omni_memory.utils.embedding import EmbeddingService
+            from simplemem.multimodal.utils.embedding import EmbeddingService
             self._embedding_service = EmbeddingService(self.config)
         return self._embedding_service
 
@@ -199,7 +199,7 @@ class BaseProcessor(ABC):
         **kwargs
     ) -> MultimodalAtomicUnit:
         """Create a MAU with the given data."""
-        from omni_memory.core.mau import MAUMetadata, QualityMetrics
+        from simplemem.multimodal.core.mau import MAUMetadata, QualityMetrics
 
         quality = QualityMetrics()
         if trigger_result:

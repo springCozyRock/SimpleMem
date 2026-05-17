@@ -10,9 +10,9 @@ from typing import Optional, Any, Dict, Union
 from pathlib import Path
 import numpy as np
 
-from omni_memory.triggers.base import BaseTrigger, TriggerResult, TriggerDecision
-from omni_memory.core.config import EntropyTriggerConfig
-from omni_memory.utils.openvision_clip import (
+from simplemem.multimodal.triggers.base import BaseTrigger, TriggerResult, TriggerDecision
+from simplemem.multimodal.core.config import EntropyTriggerConfig
+from simplemem.multimodal.utils.openvision_clip import (
     extract_openvision_image_embedding,
     is_openvision_model,
     load_openvision_clip_model,

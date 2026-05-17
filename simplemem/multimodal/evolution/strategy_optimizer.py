@@ -79,7 +79,7 @@ class StrategyOptimizer:
     """
 
     def __init__(self, config=None, storage_path: Optional[str] = None):
-        from omni_memory.evolution.evolution_config import StrategyOptimizerConfig
+        from simplemem.multimodal.evolution.evolution_config import StrategyOptimizerConfig
         self.config = config or StrategyOptimizerConfig()
         self.storage_path = Path(storage_path or "./omni_memory_data/evolution/strategy")
         self.storage_path.mkdir(parents=True, exist_ok=True)

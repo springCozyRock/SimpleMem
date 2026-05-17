@@ -10,7 +10,7 @@ import json
 from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass, field
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
 
 logger = logging.getLogger(__name__)
 

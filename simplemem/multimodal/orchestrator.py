@@ -14,41 +14,41 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, List, Dict, Any, Union, Tuple
 from pathlib import Path
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.event import EventNode, EventLevel
-from omni_memory.core.config import OmniMemoryConfig
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.event import EventNode, EventLevel
+from simplemem.multimodal.core.config import OmniMemoryConfig
 
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.storage.mau_store import MAUStore
-from omni_memory.storage.vector_store import HybridVectorStore
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.storage.mau_store import MAUStore
+from simplemem.multimodal.storage.vector_store import HybridVectorStore
 
-from omni_memory.processors.text_processor import TextProcessor
-from omni_memory.processors.image_processor import ImageProcessor
-from omni_memory.processors.audio_processor import AudioProcessor
-from omni_memory.processors.video_processor import VideoProcessor
-from omni_memory.processors.base import ProcessingResult
+from simplemem.multimodal.processors.text_processor import TextProcessor
+from simplemem.multimodal.processors.image_processor import ImageProcessor
+from simplemem.multimodal.processors.audio_processor import AudioProcessor
+from simplemem.multimodal.processors.video_processor import VideoProcessor
+from simplemem.multimodal.processors.base import ProcessingResult
 
-from omni_memory.retrieval.pyramid_retriever import (
+from simplemem.multimodal.retrieval.pyramid_retriever import (
     PyramidRetriever,
     RetrievalResult,
     ExpansionRequest,
     RetrievalLevel,
 )
-from omni_memory.retrieval.query_processor import QueryProcessor
-from omni_memory.retrieval.expansion_manager import ExpansionManager
+from simplemem.multimodal.retrieval.query_processor import QueryProcessor
+from simplemem.multimodal.retrieval.expansion_manager import ExpansionManager
 
-from omni_memory.graph.event_store import EventStore
-from omni_memory.graph.event_manager import EventManager
+from simplemem.multimodal.graph.event_store import EventStore
+from simplemem.multimodal.graph.event_manager import EventManager
 
-from omni_memory.knowledge import KnowledgeGraph, EntityExtractor, GraphRetriever
-from omni_memory.parametric import ParametricMemoryStore, MemoryConsolidator
-from omni_memory.retrieval.bm25_store import BM25Store
+from simplemem.multimodal.knowledge import KnowledgeGraph, EntityExtractor, GraphRetriever
+from simplemem.multimodal.parametric import ParametricMemoryStore, MemoryConsolidator
+from simplemem.multimodal.retrieval.bm25_store import BM25Store
 
 # Routing imports (benchmark-safe evolution)
 _ROUTING_AVAILABLE = False
 try:
-    from omni_memory.routing import MemoryRouter, BenchmarkSafeGuard
-    from omni_memory.storage.semantic_store import SemanticStore
+    from simplemem.multimodal.routing import MemoryRouter, BenchmarkSafeGuard
+    from simplemem.multimodal.storage.semantic_store import SemanticStore
 
     _ROUTING_AVAILABLE = True
 except ImportError:
@@ -57,7 +57,7 @@ except ImportError:
 # Self-evolution imports (conditional)
 _EVOLUTION_AVAILABLE = False
 try:
-    from omni_memory.evolution import (
+    from simplemem.multimodal.evolution import (
         MetaController,
         ExperienceEngine,
         StrategyOptimizer,

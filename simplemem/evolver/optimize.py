@@ -28,7 +28,7 @@ def run_optimization(
     Returns:
         Config with optimized parameters
     """
-    from simplemem.optimizer.evolution import EvolutionEngine, EvolutionConfig
+    from simplemem.evolver.evolution import EvolutionEngine, EvolutionConfig
 
     # Set up evolution config
     evo_config = EvolutionConfig(

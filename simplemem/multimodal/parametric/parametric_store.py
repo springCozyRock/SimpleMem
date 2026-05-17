@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 
-from omni_memory.parametric.memory_distiller import MemoryDistiller, DistillationConfig
+from simplemem.multimodal.parametric.memory_distiller import MemoryDistiller, DistillationConfig
 
 logger = logging.getLogger(__name__)
 

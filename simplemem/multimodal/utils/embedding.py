@@ -20,8 +20,8 @@ import threading
 from typing import Optional, List
 import numpy as np
 
-from omni_memory.core.config import OmniMemoryConfig, EmbeddingConfig
-from omni_memory.utils.openvision_clip import (
+from simplemem.multimodal.core.config import OmniMemoryConfig, EmbeddingConfig
+from simplemem.multimodal.utils.openvision_clip import (
     extract_openvision_image_embedding,
     extract_openvision_image_embeddings_batch,
     is_openvision_model,

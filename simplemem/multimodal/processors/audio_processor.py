@@ -9,12 +9,12 @@ from typing import Optional, Any, List, Tuple
 from pathlib import Path
 import io
 
-from omni_memory.processors.base import BaseProcessor, ProcessingResult
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.triggers.audio_trigger import AudioEntropyTrigger
-from omni_memory.triggers.base import TriggerDecision
+from simplemem.multimodal.processors.base import BaseProcessor, ProcessingResult
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.triggers.audio_trigger import AudioEntropyTrigger
+from simplemem.multimodal.triggers.base import TriggerDecision
 
 logger = logging.getLogger(__name__)
 

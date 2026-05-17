@@ -10,14 +10,14 @@ from pathlib import Path
 import tempfile
 import subprocess
 
-from omni_memory.processors.base import BaseProcessor, ProcessingResult
-from omni_memory.processors.image_processor import ImageProcessor
-from omni_memory.processors.audio_processor import AudioProcessor
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.triggers.visual_trigger import VisualEntropyTriggerBatch
-from omni_memory.triggers.base import TriggerDecision, TriggerResult
+from simplemem.multimodal.processors.base import BaseProcessor, ProcessingResult
+from simplemem.multimodal.processors.image_processor import ImageProcessor
+from simplemem.multimodal.processors.audio_processor import AudioProcessor
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.triggers.visual_trigger import VisualEntropyTriggerBatch
+from simplemem.multimodal.triggers.base import TriggerDecision, TriggerResult
 
 logger = logging.getLogger(__name__)
 

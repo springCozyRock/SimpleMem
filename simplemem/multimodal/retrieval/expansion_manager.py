@@ -9,10 +9,10 @@ from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 import base64
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.storage.mau_store import MAUStore
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.storage.mau_store import MAUStore
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class ExpansionManager:
     
     def _normalize_model(self, model_name: str) -> str:
         """Normalize model name to ensure correct format."""
-        from omni_memory.utils.model_utils import normalize_model_name
+        from simplemem.multimodal.utils.model_utils import normalize_model_name
         return normalize_model_name(model_name)
 
         # Cache for expensive operations

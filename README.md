@@ -157,12 +157,12 @@ This design allows LLM agents to maintain context, recall past information effic
 
 ### 🎓 Basic Usage
 
-SimpleMem provides a **unified entry point** via `simplemem_router`. The default `mode="auto"` **automatically detects** which backend to use based on what you call — no manual configuration needed:
+SimpleMem provides a **unified entry point** via the `simplemem` package. The default `mode="auto"` **automatically detects** which backend to use based on what you call — no manual configuration needed:
 
 ```python
-import simplemem_router as simplemem
+from simplemem import SimpleMem
 
-mem = simplemem.create()  # mode="auto" — backend chosen by first call
+mem = SimpleMem()  # mode="auto" — backend chosen by first call
 ```
 
 The first method you call determines the backend:
@@ -179,9 +179,9 @@ The first method you call determines the backend:
 **📝 Auto → Text** (pure text input)
 
 ```python
-import simplemem_router as simplemem
+from simplemem import SimpleMem
 
-mem = simplemem.create()  # auto mode
+mem = SimpleMem()  # auto mode
 
 # add_dialogue() → text backend auto-selected
 mem.add_dialogue(
@@ -206,9 +206,9 @@ answer = mem.ask("When and where will Alice and Bob meet?")
 **🧠 Auto → Omni** (multimodal input)
 
 ```python
-import simplemem_router as simplemem
+from simplemem import SimpleMem
 
-mem = simplemem.create()  # auto mode
+mem = SimpleMem()  # auto mode
 
 # add_image() → omni backend auto-selected
 mem.add_text(
@@ -238,9 +238,9 @@ mem.close()
 For large-scale dialogue processing, enable parallel mode:
 
 ```python
-import simplemem_router as simplemem
+from simplemem import create
 
-mem = simplemem.create(
+mem = create(
     mode="text",
     clear_db=True,
     enable_parallel_processing=True,  # ⚡ Parallel memory building
@@ -507,8 +507,14 @@ This self-evolution constitutes an AutoResearch process: the system conducts ite
 git clone https://github.com/aiming-lab/SimpleMem.git
 cd SimpleMem
 
-# 📦 Install dependencies
+# 📦 Install dependencies (pinned versions)
 pip install -r requirements.txt
+
+# — OR — install as an editable package
+pip install -e .                  # default: text + multimodal + evolver
+pip install -e ".[server]"        # + MCP / HTTP server (fastapi + uvicorn)
+pip install -e ".[benchmark]"     # + datasets, bert-score, rouge-score for eval
+pip install -e ".[all]"           # everything (incl. dev tools)
 
 # ⚙️ Configure API settings
 cp config.py.example config.py
@@ -640,6 +646,38 @@ Use the exact configurations in `config.py`:
 - **🚀 High-capability**: GPT-4.1-mini, Qwen3-Plus
 - **⚙️ Efficient**: Qwen2.5-1.5B, Qwen2.5-3B
 - **🔍 Embedding**: Qwen3-Embedding-0.6B (1024-d)
+
+---
+
+## 📋 TODO (refactor handoff)
+
+Outstanding items from the `simplemem/` package merge. Drop these as fast as work lands; they're not visible to users of the text path but matter for finishing the unified package.
+
+### 🔴 Blocking — multimodal & evolver paths inert until fixed
+
+Two configuration modules referenced everywhere by the merged subpackages are **not yet checked in** to this repo. Without them, `mem.add_image(...)`, `mem.query(...)`, and `simplemem.optimize(...)` will `ImportError` at first use.
+
+- [ ] **Add `simplemem/evolver/config.py`** — must export `EvolveMemConfig`. Imported by `manager.py`, `replay.py`, `self_upgrade.py`, `upgrade_worker.py`.
+- [ ] **Add `simplemem/multimodal/core/config.py`** — must export `OmniMemoryConfig`, `EmbeddingConfig`, `RetrievalConfig`, `StorageConfig`, `LLMConfig`, `EventConfig`, `EntropyTriggerConfig`. Imported by `__init__.py`, `orchestrator.py`, `app.py`, `core/__init__.py`, `triggers/*_trigger.py`, `graph/event_*.py`, `utils/embedding.py`, `storage/vector_store.py`.
+- [ ] Once both files are present, run `examples/quickstart.py` for the text path (already green) **and**:
+  - `mem = SimpleMem(); mem.add_image("photo.jpg"); mem.query(...)` for the omni backend (Task #2 from the refactor)
+  - `simplemem.optimize(mem, dev_questions, max_rounds=1)` to smoke-test the evolution loop (Task #3)
+
+### 🟡 Non-blocking — legacy top-level dirs left in place
+
+The pre-refactor sources (`models/`, `utils/`, `database/`, `core/`, `EvolveMem/`, `OmniSimpleMem/`) still sit at the repo root and are imported by `main.py`, `test_locomo10.py`, `tests/`, `cross/`, `SKILL/`, `MCP/`, and `simplemem/integrations/*`. They were intentionally **not** deleted in this pass to avoid breaking those entry points. To finish cleaning up:
+
+- [ ] Rewrite each of the above to import from `simplemem.core.*` / `simplemem.evolver` / `simplemem.multimodal` instead of the top-level paths.
+- [ ] Delete the legacy top-level dirs once nothing depends on them.
+
+### 🟢 Done in this refactor pass (for context)
+
+- `simplemem/` unified package: router (`SimpleMem` / `create` / `list_modes`), `optimize`, `Config`, `load_config` — all importable.
+- Text path validated end-to-end against `examples/quickstart.py` (Qwen3-Embedding-0.6B + LanceDB + Tantivy FTS).
+- `simplemem/core/settings.py` reads user's `config.py` first, then env vars, then built-in defaults.
+- `simplemem/multimodal/` imports rewritten from `omni_memory.*` to `simplemem.multimodal.*` (38 files).
+- `simplemem/evolver/optimize.py` import path corrected (`simplemem.optimizer` → `simplemem.evolver`) and the stale `from evolvemem.multi_retriever import …` in `evolution.py` was retargeted to `simplemem.evolver.multi_retriever`.
+- `setup.py` with `install_requires` grounded in `MCP/requirements.txt`, `OmniSimpleMem/setup.py`, and commit `9686aa5`'s canonical `pyproject.toml`. `pip install --dry-run -e .` and `-e ".[server]"` both resolve cleanly.
 
 ---
 

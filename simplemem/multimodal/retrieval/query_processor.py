@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 import re
 from datetime import datetime, timedelta
 
-from omni_memory.core.mau import ModalityType
-from omni_memory.core.config import OmniMemoryConfig
+from simplemem.multimodal.core.mau import ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
 
 logger = logging.getLogger(__name__)
 

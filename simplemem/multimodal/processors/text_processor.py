@@ -7,11 +7,11 @@ Handles text input with information-based filtering.
 import logging
 from typing import Optional, Any, List
 
-from omni_memory.processors.base import BaseProcessor, ProcessingResult
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.triggers.base import TriggerResult, TriggerDecision
+from simplemem.multimodal.processors.base import BaseProcessor, ProcessingResult
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.triggers.base import TriggerResult, TriggerDecision
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ Summary:"""
 
     def generate_embedding(self, data: Any) -> List[float]:
         """Generate embedding for text (uses EmbeddingService so CLIP/Tongyi/Doubao backends work)."""
-        from omni_memory.utils.embedding import EmbeddingService
+        from simplemem.multimodal.utils.embedding import EmbeddingService
         text = str(data)
         if not text or not text.strip():
             return []

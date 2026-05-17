@@ -8,11 +8,11 @@ import logging
 import time
 from typing import Optional, List, Dict, Any
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.event import EventNode, EventLevel
-from omni_memory.core.config import OmniMemoryConfig, EventConfig
-from omni_memory.graph.event_store import EventStore
-from omni_memory.storage.mau_store import MAUStore
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.event import EventNode, EventLevel
+from simplemem.multimodal.core.config import OmniMemoryConfig, EventConfig
+from simplemem.multimodal.graph.event_store import EventStore
+from simplemem.multimodal.storage.mau_store import MAUStore
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class EventManager:
     
     def _normalize_model(self, model_name: str) -> str:
         """Normalize model name to ensure correct format."""
-        from omni_memory.utils.model_utils import normalize_model_name
+        from simplemem.multimodal.utils.model_utils import normalize_model_name
         return normalize_model_name(model_name)
 
     def _get_llm_client(self):

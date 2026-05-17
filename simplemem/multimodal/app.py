@@ -13,11 +13,11 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from omni_memory.orchestrator import OmniMemoryOrchestrator
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.retrieval.pyramid_retriever import RetrievalLevel
-from omni_memory.core.event import EventLevel
-from omni_memory.utils.logging_config import setup_logging
+from simplemem.multimodal.orchestrator import OmniMemoryOrchestrator
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.retrieval.pyramid_retriever import RetrievalLevel
+from simplemem.multimodal.core.event import EventLevel
+from simplemem.multimodal.utils.logging_config import setup_logging
 
 # Setup logging
 logger = setup_logging(log_level=os.getenv("LOG_LEVEL", "INFO"))

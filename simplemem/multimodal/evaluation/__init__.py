@@ -8,14 +8,14 @@ Provides comprehensive evaluation on standard benchmarks:
 - Custom visual memory benchmarks
 """
 
-from omni_memory.evaluation.evaluator import OmniMemoryEvaluator, EvaluationConfig
-from omni_memory.evaluation.metrics import (
+from simplemem.multimodal.evaluation.evaluator import OmniMemoryEvaluator, EvaluationConfig
+from simplemem.multimodal.evaluation.metrics import (
     compute_accuracy,
     compute_recall_at_k,
     compute_token_efficiency,
     compute_latency_metrics,
 )
-from omni_memory.evaluation.benchmarks import (
+from simplemem.multimodal.evaluation.benchmarks import (
     ScienceQABenchmark,
     LoCoMoBenchmark,
     MSRVTTBenchmark,

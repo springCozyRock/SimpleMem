@@ -5,9 +5,9 @@ These triggers implement the entropy-driven filtering that determines
 whether incoming multimodal data is worth storing.
 """
 
-from omni_memory.triggers.visual_trigger import VisualEntropyTrigger
-from omni_memory.triggers.audio_trigger import AudioEntropyTrigger
-from omni_memory.triggers.base import BaseTrigger, TriggerResult
+from simplemem.multimodal.triggers.visual_trigger import VisualEntropyTrigger
+from simplemem.multimodal.triggers.audio_trigger import AudioEntropyTrigger
+from simplemem.multimodal.triggers.base import BaseTrigger, TriggerResult
 
 __all__ = [
     "VisualEntropyTrigger",

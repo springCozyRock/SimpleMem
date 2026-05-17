@@ -1412,7 +1412,7 @@ Return ONLY the JSON array: ["q1", "q2", "q3"]"""
         if not seed_hits or not hasattr(index, "seed_entity_expand"):
             return seed_hits
         try:
-            from evolvemem.multi_retriever import analyze_query, RetrievedMemory
+            from simplemem.evolver.multi_retriever import analyze_query, RetrievedMemory
         except Exception:
             return seed_hits
         # Resolve seed memory indices via content prefix (same key used

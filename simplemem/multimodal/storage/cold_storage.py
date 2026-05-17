@@ -14,8 +14,8 @@ from typing import Optional, Dict, Any, Union, List
 from datetime import datetime
 import json
 
-from omni_memory.core.config import StorageConfig
-from omni_memory.core.mau import ModalityType
+from simplemem.multimodal.core.config import StorageConfig
+from simplemem.multimodal.core.mau import ModalityType
 
 logger = logging.getLogger(__name__)
 

@@ -11,13 +11,13 @@ import base64
 import io
 import numpy as np
 
-from omni_memory.processors.base import BaseProcessor, ProcessingResult
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.storage.cold_storage import ColdStorageManager
-from omni_memory.triggers.visual_trigger import VisualEntropyTrigger
-from omni_memory.triggers.base import TriggerDecision
-from omni_memory.utils.openvision_clip import (
+from simplemem.multimodal.processors.base import BaseProcessor, ProcessingResult
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.triggers.visual_trigger import VisualEntropyTrigger
+from simplemem.multimodal.triggers.base import TriggerDecision
+from simplemem.multimodal.utils.openvision_clip import (
     extract_openvision_image_embedding,
     is_openvision_model,
     load_openvision_clip_model,
@@ -59,7 +59,7 @@ class ImageProcessor(BaseProcessor):
     
     def _normalize_model(self, model_name: str) -> str:
         """Normalize model name to ensure correct format."""
-        from omni_memory.utils.model_utils import normalize_model_name
+        from simplemem.multimodal.utils.model_utils import normalize_model_name
         return normalize_model_name(model_name)
 
     @property

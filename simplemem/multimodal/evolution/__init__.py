@@ -7,23 +7,23 @@ Components:
 - StrategyOptimizer: Thompson Sampling-based retrieval strategy selection
 """
 
-from omni_memory.evolution.evolution_config import (
+from simplemem.multimodal.evolution.evolution_config import (
     EvolutionConfig,
     MetaControllerConfig,
     ExperienceEngineConfig,
     StrategyOptimizerConfig,
 )
-from omni_memory.evolution.meta_controller import (
+from simplemem.multimodal.evolution.meta_controller import (
     MetaController,
     AdaptiveParameters,
     EvolutionMetrics,
 )
-from omni_memory.evolution.experience_engine import (
+from simplemem.multimodal.evolution.experience_engine import (
     ExperienceEngine,
     MetaExperience,
     QueryFeatures,
 )
-from omni_memory.evolution.strategy_optimizer import (
+from simplemem.multimodal.evolution.strategy_optimizer import (
     StrategyOptimizer,
     BetaPosterior,
 )

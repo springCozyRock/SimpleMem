@@ -12,7 +12,7 @@ import numpy as np
 import json
 import threading
 
-from omni_memory.core.config import EmbeddingConfig
+from simplemem.multimodal.core.config import EmbeddingConfig
 
 logger = logging.getLogger(__name__)
 

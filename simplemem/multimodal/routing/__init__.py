@@ -5,13 +5,13 @@ Provides intelligent routing between Episodic (original MAU) and Semantic
 (derived/distilled) memory stores.
 """
 
-from omni_memory.routing.router import MemoryRouter, RouteResult
-from omni_memory.routing.policy import (
+from simplemem.multimodal.routing.router import MemoryRouter, RouteResult
+from simplemem.multimodal.routing.policy import (
     BenchmarkSafeGuard,
     RetentionPolicy,
     CircuitBreaker,
 )
-from omni_memory.routing.features import compute_route_features
+from simplemem.multimodal.routing.features import compute_route_features
 
 __all__ = [
     "MemoryRouter",

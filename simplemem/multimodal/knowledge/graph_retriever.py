@@ -9,8 +9,8 @@ import logging
 from typing import Optional, List, Dict, Any, Tuple, Set
 from dataclasses import dataclass, field
 
-from omni_memory.knowledge.knowledge_graph import KnowledgeGraph, Entity, Relation
-from omni_memory.knowledge.entity_extractor import EntityExtractor
+from simplemem.multimodal.knowledge.knowledge_graph import KnowledgeGraph, Entity, Relation
+from simplemem.multimodal.knowledge.entity_extractor import EntityExtractor
 
 logger = logging.getLogger(__name__)
 

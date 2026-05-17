@@ -5,16 +5,19 @@ Registry-based factory that routes between memory system backends.
 Inspired by Mem0's provider factory and HuggingFace's AutoModel pattern.
 
 Usage:
-    import simplemem_router as simplemem
+    from simplemem import SimpleMem, create
 
-    # Text-only mode (lightweight, single-modal)
-    mem = simplemem.create(mode="text", clear_db=True)
+    # Auto mode (backend chosen by first call)
+    mem = SimpleMem()
     mem.add_dialogue("Alice", "Let's meet at 2pm", "2025-11-15T14:30:00")
     mem.finalize()
     answer = mem.ask("When will they meet?")
 
+    # Explicit text mode
+    mem = create(mode="text", clear_db=True)
+
     # Multimodal mode (text, image, audio, video)
-    mem = simplemem.create(mode="omni", data_dir="./my_memory")
+    mem = create(mode="omni", data_dir="./my_memory")
     mem.add_text("User loves hiking.", tags=["session_id:D1"])
     result = mem.query("What does the user enjoy?", top_k=5)
     mem.close()

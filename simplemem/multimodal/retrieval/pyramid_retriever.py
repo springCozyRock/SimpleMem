@@ -17,12 +17,12 @@ from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 
-from omni_memory.core.mau import MultimodalAtomicUnit, ModalityType
-from omni_memory.core.event import EventNode, EventLevel
-from omni_memory.core.config import OmniMemoryConfig, RetrievalConfig
-from omni_memory.storage.mau_store import MAUStore
-from omni_memory.storage.vector_store import VectorStore
-from omni_memory.storage.cold_storage import ColdStorageManager
+from simplemem.multimodal.core.mau import MultimodalAtomicUnit, ModalityType
+from simplemem.multimodal.core.event import EventNode, EventLevel
+from simplemem.multimodal.core.config import OmniMemoryConfig, RetrievalConfig
+from simplemem.multimodal.storage.mau_store import MAUStore
+from simplemem.multimodal.storage.vector_store import VectorStore
+from simplemem.multimodal.storage.cold_storage import ColdStorageManager
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,7 @@ class PyramidRetriever:
         with self._embedding_lock:
             if self._embedding_service is not None:
                 return self._embedding_service
-            from omni_memory.utils.embedding import EmbeddingService
+            from simplemem.multimodal.utils.embedding import EmbeddingService
 
             self._embedding_service = EmbeddingService(self.config)
         return self._embedding_service

@@ -27,9 +27,9 @@ except ImportError:
             iterable = range(total) if total else []
         return iterable
 
-from omni_memory.orchestrator import OmniMemoryOrchestrator
-from omni_memory.core.config import OmniMemoryConfig
-from omni_memory.evaluation.benchmarks import (
+from simplemem.multimodal.orchestrator import OmniMemoryOrchestrator
+from simplemem.multimodal.core.config import OmniMemoryConfig
+from simplemem.multimodal.evaluation.benchmarks import (
     BaseBenchmark,
     BenchmarkSample,
     BenchmarkResult,
@@ -40,7 +40,7 @@ from omni_memory.evaluation.benchmarks import (
     DocBenchBenchmark,
     MMLongBenchDocBenchmark,
 )
-from omni_memory.evaluation.metrics import (
+from simplemem.multimodal.evaluation.metrics import (
     MetricResult,
     compute_accuracy,
     compute_recall_at_k,

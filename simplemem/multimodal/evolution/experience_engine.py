@@ -99,7 +99,7 @@ class ExperienceEngine:
     """
 
     def __init__(self, config=None, storage_path: Optional[str] = None):
-        from omni_memory.evolution.evolution_config import ExperienceEngineConfig
+        from simplemem.multimodal.evolution.evolution_config import ExperienceEngineConfig
         self.config = config or ExperienceEngineConfig()
         self.storage_path = Path(storage_path or "./omni_memory_data/evolution/experiences")
         self.storage_path.mkdir(parents=True, exist_ok=True)

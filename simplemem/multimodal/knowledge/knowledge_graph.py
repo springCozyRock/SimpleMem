@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from collections import defaultdict
 import threading
 
-from omni_memory.knowledge.entity_extractor import ExtractedEntity, ExtractedRelation
+from simplemem.multimodal.knowledge.entity_extractor import ExtractedEntity, ExtractedRelation
 
 logger = logging.getLogger(__name__)
 

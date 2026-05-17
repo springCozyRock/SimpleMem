@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List
 import threading
 
-from omni_memory.core.event import EventNode, EventLevel, EventHierarchy
-from omni_memory.core.config import StorageConfig
+from simplemem.multimodal.core.event import EventNode, EventLevel, EventHierarchy
+from simplemem.multimodal.core.config import StorageConfig
 
 logger = logging.getLogger(__name__)
 

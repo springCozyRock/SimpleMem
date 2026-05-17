@@ -348,7 +348,7 @@ class LoCoMoBenchmark(BaseBenchmark):
             raise ValueError("Number of predictions must match number of samples")
         
         # Compute F1 score for answer quality
-        from omni_memory.evaluation.metrics import compute_f1_score, compute_accuracy
+        from simplemem.multimodal.evaluation.metrics import compute_f1_score, compute_accuracy
         
         answers = [s.answer for s in self._samples]
         
@@ -471,7 +471,7 @@ class MSRVTTBenchmark(BaseBenchmark):
         if len(predictions) != len(self._samples):
             raise ValueError("Number of predictions must match number of samples")
         
-        from omni_memory.evaluation.metrics import compute_recall_at_k, compute_mrr
+        from simplemem.multimodal.evaluation.metrics import compute_recall_at_k, compute_mrr
         
         # Get relevant IDs (ground truth video for each caption)
         relevant_ids = [[s.answer] for s in self._samples]
@@ -571,7 +571,7 @@ class VisualMemoryBenchmark(BaseBenchmark):
         if len(predictions) != len(self._samples):
             raise ValueError("Number of predictions must match number of samples")
         
-        from omni_memory.evaluation.metrics import compute_accuracy, compute_f1_score
+        from simplemem.multimodal.evaluation.metrics import compute_accuracy, compute_f1_score
         
         answers = [s.answer for s in self._samples]
         
@@ -784,7 +784,7 @@ class DocBenchBenchmark(BaseBenchmark):
         if len(predictions) != len(self._samples):
             raise ValueError("Number of predictions must match number of samples")
         
-        from omni_memory.evaluation.metrics import compute_accuracy
+        from simplemem.multimodal.evaluation.metrics import compute_accuracy
         
         # Overall accuracy
         correct = 0
