@@ -5,9 +5,9 @@ Section 3.3: Intent-Aware Retrieval Planning
 Generates answers from the merged context C_q after multi-view retrieval
 """
 from typing import List
-from models.memory_entry import MemoryEntry
-from utils.llm_client import LLMClient
-import config
+from simplemem.core.models.memory_entry import MemoryEntry
+from simplemem.core.utils.llm_client import LLMClient
+from simplemem.core.settings import settings as config
 
 
 class AnswerGenerator:

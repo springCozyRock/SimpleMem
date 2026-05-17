@@ -7,10 +7,10 @@ Implements:
 - Result merging: C_q = R_sem ∪ R_lex ∪ R_sym
 """
 from typing import List, Optional, Dict, Any
-from models.memory_entry import MemoryEntry
-from utils.llm_client import LLMClient
-from database.vector_store import VectorStore
-import config
+from simplemem.core.models.memory_entry import MemoryEntry
+from simplemem.core.utils.llm_client import LLMClient
+from simplemem.core.database.vector_store import VectorStore
+from simplemem.core.settings import settings as config
 import re
 from datetime import datetime, timedelta
 import dateparser

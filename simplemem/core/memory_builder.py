@@ -8,10 +8,10 @@ Implements:
 - Generates compact memory units with resolved coreferences and absolute timestamps
 """
 from typing import List, Optional
-from models.memory_entry import MemoryEntry, Dialogue
-from utils.llm_client import LLMClient
-from database.vector_store import VectorStore
-import config
+from simplemem.core.models.memory_entry import MemoryEntry, Dialogue
+from simplemem.core.utils.llm_client import LLMClient
+from simplemem.core.database.vector_store import VectorStore
+from simplemem.core.settings import settings as config
 import json
 import asyncio
 import concurrent.futures
