@@ -108,7 +108,7 @@
 
 <br/>
 
-[🚀 Quick Start](#-quick-start) • [🌟 Overview](#-overview) • [📈 Results](#-results) • [📦 Installation](#-installation) • [🔌 MCP Server](#-mcp-server-text-memory) • [📝 Citation](#-citation)
+[🚀 Quick Start](#-quick-start) • [🌟 Overview](#-overview) • [📦 Installation](#-installation) • [🔌 MCP Server](#-mcp-server-text-memory) • [📝 Citation](#-citation)
 
 </div>
 
@@ -132,7 +132,6 @@
 
 - [🚀 Quick Start](#-quick-start)
 - [🌟 Overview](#-overview)
-- [📈 Results](#-results)
 - [📦 Installation](#-installation)
 - [🐳 Docker](#-run-with-docker)
 - [🔌 MCP Server](#-mcp-server-text-memory)
@@ -305,91 +304,6 @@ EvolveMem closes a blind spot shared by almost every memory system: the stored c
 ### How they fit together
 
 `from simplemem import SimpleMem` gives you the text core with automatic routing to the multimodal backend, and `simplemem.optimize(...)` taps EvolveMem to tune retrieval for your own data. One package, one mental model: compress losslessly, retrieve by intent, and let the system keep improving itself.
-
----
-
-## 📈 Results
-
-### 🏆 SimpleMem: Performance vs Efficiency
-
-<div align="center">
-
-<img src="fig/Fig_tradeoff.png" alt="Performance vs Efficiency Trade-off" width="900"/>
-
-*SimpleMem achieves superior F1 score (43.24%) with minimal token cost (~550), occupying the ideal top-left position.*
-
-**Speed Comparison Demo**
-
-<video src="https://github.com/aiming-lab/SimpleMem/raw/main/fig/simplemem-new.mp4" controls width="900"></video>
-
-*SimpleMem vs. Baseline: Real-time speed comparison demonstration*
-
-</div>
-
-<div align="center">
-
-**LoCoMo-10 Benchmark Results (GPT-4.1-mini)**
-
-| Model | ⏱️ Construction Time | 🔎 Retrieval Time | ⚡ Total Time | 🎯 Average F1 |
-|:------|:--------------------:|:-----------------:|:-------------:|:-------------:|
-| A-Mem | 5140.5s | 796.7s | 5937.2s | 32.58% |
-| LightMem | 97.8s | 577.1s | 675.9s | 24.63% |
-| Mem0 | 1350.9s | 583.4s | 1934.3s | 34.20% |
-| **SimpleMem** ⭐ | **92.6s** | **388.3s** | **480.9s** | **43.24%** |
-
-</div>
-
-### 📊 Benchmark Results (LoCoMo)
-
-<details open>
-<summary><b>🏆 Cross-Session Memory Comparison</b></summary>
-
-| System | LoCoMo Score | vs SimpleMem |
-|:-------|:------------:|:------------:|
-| **SimpleMem** | **48** | — |
-| Claude-Mem | 29.3 | **+64%** |
-
-</details>
-
-<details>
-<summary><b>🔬 High-Capability Models (GPT-4.1-mini)</b></summary>
-
-| Task Type | SimpleMem F1 | Mem0 F1 | Improvement |
-|:----------|:------------:|:-------:|:-----------:|
-| **MultiHop** | 43.46% | 30.14% | **+43.8%** |
-| **Temporal** | 58.62% | 48.91% | **+19.9%** |
-| **SingleHop** | 51.12% | 41.3% | **+23.8%** |
-
-</details>
-
-<details>
-<summary><b>⚙️ Efficient Models (Qwen2.5-1.5B)</b></summary>
-
-| Metric | SimpleMem | Mem0 | Notes |
-|:-------|:---------:|:----:|:------|
-| **Average F1** | 25.23% | 23.77% | Competitive with 99× smaller model |
-
-</details>
-
-### 🧬 EvolveMem Results
-
-| Benchmark | Backbone | EvolveMem | Best Baseline | Relative Gain |
-|-----------|----------|:---------:|:-------------:|:-------------:|
-| LoCoMo (F1) | GPT-4o | **0.543** | 0.432 (SimpleMem) | +25.7% |
-| LoCoMo (F1) | GPT-5.1 | **0.572** | 0.418 (SimpleMem) | +36.8% |
-| MemBench (Acc) | GPT-4o | **67.9%** | 57.1% | +18.9% |
-| MemBench (Acc) | GPT-5.1 | **71.4%** | 64.3% | +11.0% |
-
-### 🧠 Omni-SimpleMem Results
-
-<table>
-<tr>
-<td align="center" width="170">🏆 <b>0.613 F1</b><br><sub>LoCoMo (+47% over prev. SOTA)</sub></td>
-<td align="center" width="170">🏆 <b>0.810 F1</b><br><sub>Mem-Gallery (+51% over prev. SOTA)</sub></td>
-<td align="center" width="140">⚡ <b>3.5x faster</b><br><sub>retrieval throughput</sub></td>
-<td align="center" width="140">🧠 <b>4 modalities</b><br><sub>Text · Image · Audio · Video</sub></td>
-</tr>
-</table>
 
 ---
 
