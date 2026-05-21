@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Bắt Đầu Nhanh](#-bắt-đầu-nhanh) • [🌟 Tổng Quan](#-tổng-quan) • [📦 Cài Đặt](#-cài-đặt) • [🔌 MCP Server](#-mcp-server-bộ-nhớ-văn-bản) • [📝 Trích Dẫn](#-trích-dẫn)
+[🚀 Bắt Đầu Nhanh](#-bắt-đầu-nhanh) • [🌟 Tổng Quan](#-tổng-quan) • [📦 Cài Đặt](#-cài-đặt) • [🔌 MCP Server](#-mcp-server-bộ-nhớ-văn-bản) • [📊 Tái Tạo](#-tái-tạo-kết-quả-bài-báo) • [📝 Trích Dẫn](#-trích-dẫn)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Cài Đặt](#-cài-đặt)
 - [🐳 Docker](#-chạy-với-docker)
 - [🔌 MCP Server](#-mcp-server-bộ-nhớ-văn-bản)
-- [📊 Đánh Giá](#-đánh-giá)
+- [📊 Tái Tạo Kết Quả Bài Báo](#-tái-tạo-kết-quả-bài-báo)
 - [🗺️ Lộ Trình](#️-lộ-trình)
 - [📝 Trích Dẫn](#-trích-dẫn)
 
@@ -444,9 +444,9 @@ SimpleMem có sẵn dưới dạng **dịch vụ bộ nhớ được lưu trữ 
 
 ---
 
-## 📊 Đánh Giá
+## 📊 Tái Tạo Kết Quả Bài Báo
 
-Mỗi trụ cột có bộ chạy benchmark riêng trong thư mục riêng của nó. Cài đặt các gói benchmark trước: `pip install -e ".[benchmark]"`.
+Tái tạo các số liệu LoCoMo / MemBench / Mem-Gallery từ các bài báo. Mỗi trụ cột có bộ chạy benchmark riêng trong thư mục riêng của nó. Cài đặt các gói benchmark trước: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (văn bản) — LoCoMo
 
@@ -477,15 +477,6 @@ Chạy từ thư mục `OmniSimpleMem/` (xem [`OmniSimpleMem/README.md`](../../O
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Tái Tạo Kết Quả Bài Báo
-
-Sử dụng các cấu hình chính xác trong `config.py`:
-- **🚀 Hiệu năng cao**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Hiệu quả**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Nhúng**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

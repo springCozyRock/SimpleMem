@@ -64,7 +64,7 @@
 </td>
 
 <td align="center" width="100">
-  <sub><b>+ Cualquier<br/>Cliente MCP</b></sub>
+  <sub><b>+ Cualquier Cliente MCP</b></sub>
 </td>
 
 </tr>
@@ -95,12 +95,12 @@
 <p align="center">
   <a href="https://arxiv.org/abs/2601.02553"><img src="https://img.shields.io/badge/arXiv-2601.02553-b31b1b?style=flat&labelColor=555" alt="arXiv"></a>
   <a href="https://github.com/aiming-lab/SimpleMem"><img src="https://img.shields.io/badge/github-SimpleMem-181717?style=flat&labelColor=555&logo=github&logoColor=white" alt="GitHub"></a>
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/aiming-lab/SimpleMem?style=flat&label=license&labelColor=555&color=2EA44F" alt="License"></a>
-  <a href="https://github.com/aiming-lab/SimpleMem/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat&labelColor=555" alt="PRs Welcome"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/aiming-lab/SimpleMem?style=flat&label=license&labelColor=555&color=2EA44F" alt="Licencia"></a>
+  <a href="https://github.com/aiming-lab/SimpleMem/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat&labelColor=555" alt="PRs Bienvenidos"></a>
   <br/>
   <a href="https://pypi.org/project/simplemem/"><img src="https://img.shields.io/pypi/v/simplemem?style=flat&label=pypi&labelColor=555&color=3775A9&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="https://pypi.org/project/simplemem/"><img src="https://img.shields.io/pypi/pyversions/simplemem?style=flat&label=python&labelColor=555&color=3775A9&logo=python&logoColor=white" alt="Python"></a>
-  <a href="https://mcp.simplemem.cloud"><img src="https://img.shields.io/badge/MCP-mcp.simplemem.cloud-14B8A6?style=flat&labelColor=555" alt="MCP Server"></a>
+  <a href="https://mcp.simplemem.cloud"><img src="https://img.shields.io/badge/MCP-mcp.simplemem.cloud-14B8A6?style=flat&labelColor=555" alt="Servidor MCP"></a>
   <a href="https://github.com/aiming-lab/SimpleMem"><img src="https://img.shields.io/badge/Claude_Skills-supported-FFB000?style=flat&labelColor=555" alt="Claude Skills"></a>
   <br/>
   <a href="https://discord.gg/KA2zC32M"><img src="https://img.shields.io/badge/Discord-Unirse_al_Chat-5865F2?style=flat&labelColor=555&logo=discord&logoColor=white" alt="Discord"></a>
@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Inicio Rápido](#-inicio-rápido) • [🌟 Descripción General](#-descripción-general) • [📦 Instalación](#-instalación) • [🔌 Servidor MCP](#-servidor-mcp-memoria-de-texto) • [📝 Citación](#-citación)
+[🚀 Inicio Rápido](#-inicio-rápido) • [🌟 Descripción General](#-descripción-general) • [📦 Instalación](#-instalación) • [🔌 Servidor MCP](#-servidor-mcp-memoria-de-texto) • [📊 Reproducir](#-reproducir-resultados-del-artículo) • [📝 Citación](#-citación)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Instalación](#-instalación)
 - [🐳 Docker](#-ejecutar-con-docker)
 - [🔌 Servidor MCP](#-servidor-mcp-memoria-de-texto)
-- [📊 Evaluación](#-evaluación)
+- [📊 Reproducir Resultados del Artículo](#-reproducir-resultados-del-artículo)
 - [🗺️ Hoja de Ruta](#️-hoja-de-ruta)
 - [📝 Citación](#-citación)
 
@@ -444,9 +444,9 @@ SimpleMem está disponible como **servicio de memoria alojado en la nube** media
 
 ---
 
-## 📊 Evaluación
+## 📊 Reproducir Resultados del Artículo
 
-Cada pilar tiene su propio ejecutor de benchmark en su propio directorio. Instala primero los extras de benchmark: `pip install -e ".[benchmark]"`.
+Reproduce los números de LoCoMo / MemBench / Mem-Gallery de los artículos. Cada pilar tiene su propio ejecutor de benchmark en su propio directorio. Instala primero los extras de benchmark: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (texto) — LoCoMo
 
@@ -477,15 +477,6 @@ Ejecuta desde el directorio `OmniSimpleMem/` (consulta [`OmniSimpleMem/README.md
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Reproducir Resultados del Artículo
-
-Usa las configuraciones exactas en `config.py`:
-- **🚀 Alta capacidad**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Eficiente**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Embedding**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

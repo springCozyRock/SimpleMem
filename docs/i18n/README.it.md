@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="Logo di simplemem" src="https://github.com/user-attachments/assets/6ea54ad1-e007-442c-99d7-1174b10d1fec" width="450">
+<img alt="simplemem_logo" src="https://github.com/user-attachments/assets/6ea54ad1-e007-442c-99d7-1174b10d1fec" width="450">
 
 <div align="center">
 
@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Avvio Rapido](#-avvio-rapido) • [🌟 Panoramica](#-panoramica) • [📦 Installazione](#-installazione) • [🔌 Server MCP](#-server-mcp-memoria-testuale) • [📝 Citazione](#-citazione)
+[🚀 Avvio Rapido](#-avvio-rapido) • [🌟 Panoramica](#-panoramica) • [📦 Installazione](#-installazione) • [🔌 Server MCP](#-server-mcp-memoria-testuale) • [📊 Riproduci](#-riproduci-i-risultati-del-paper) • [📝 Citazione](#-citazione)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Installazione](#-installazione)
 - [🐳 Docker](#-esegui-con-docker)
 - [🔌 Server MCP](#-server-mcp-memoria-testuale)
-- [📊 Valutazione](#-valutazione)
+- [📊 Riproduci i Risultati del Paper](#-riproduci-i-risultati-del-paper)
 - [🗺️ Roadmap](#️-roadmap)
 - [📝 Citazione](#-citazione)
 
@@ -180,9 +180,9 @@ Il primo metodo che chiami determina il backend:
 ```python
 from simplemem import SimpleMem
 
-mem = SimpleMem()  # modalità auto
+mem = SimpleMem()  # auto mode
 
-# add_dialogue() → backend testuale selezionato automaticamente
+# add_dialogue() → text backend auto-selected
 mem.add_dialogue(
     "Alice",
     "Bob, let's meet at Starbucks tomorrow at 2pm",
@@ -207,9 +207,9 @@ answer = mem.ask("When and where will Alice and Bob meet?")
 ```python
 from simplemem import SimpleMem
 
-mem = SimpleMem()  # modalità auto
+mem = SimpleMem()  # auto mode
 
-# add_image() → backend omni selezionato automaticamente
+# add_image() → omni backend auto-selected
 mem.add_text(
     "User loves hiking in the Rocky Mountains.",
     tags=["session_id:D1"],
@@ -444,9 +444,9 @@ SimpleMem è disponibile come **servizio di memoria ospitato nel cloud** tramite
 
 ---
 
-## 📊 Valutazione
+## 📊 Riproduci i Risultati del Paper
 
-Ogni pilastro ha il proprio runner di benchmark nella propria directory. Installa prima i supplementi per i benchmark: `pip install -e ".[benchmark]"`.
+Riproduci i numeri di LoCoMo / MemBench / Mem-Gallery dai paper. Ogni pilastro ha il proprio runner di benchmark nella propria directory. Installa prima i supplementi per i benchmark: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (testo) — LoCoMo
 
@@ -477,15 +477,6 @@ Esegui dalla directory `OmniSimpleMem/` (vedi [`OmniSimpleMem/README.md`](../../
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Riproduci i Risultati del Paper
-
-Usa le configurazioni esatte in `config.py`:
-- **🚀 Alta capacità**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Efficiente**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Embedding**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

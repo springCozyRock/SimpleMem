@@ -74,6 +74,7 @@
 
 <br/>
 
+[🇬🇧 English](../../README.md) •
 [🇨🇳 中文](./README.zh-CN.md) •
 [🇯🇵 日本語](./README.ja.md) •
 [🇰🇷 한국어](./README.ko.md) •
@@ -85,8 +86,7 @@
 [🇸🇦 العربية](./README.ar.md) •
 [🇮🇹 Italiano](./README.it.md) •
 [🇻🇳 Tiếng Việt](./README.vi.md) •
-[🇹🇷 Türkçe](./README.tr.md) •
-[🇬🇧 English](../../README.md)
+[🇹🇷 Türkçe](./README.tr.md)
 
 <br/>
 
@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Démarrage rapide](#-démarrage-rapide) • [🌟 Aperçu](#-aperçu) • [📦 Installation](#-installation) • [🔌 Serveur MCP](#-serveur-mcp-mémoire-texte) • [📝 Citation](#-citation)
+[🚀 Démarrage rapide](#-démarrage-rapide) • [🌟 Aperçu](#-aperçu) • [📦 Installation](#-installation) • [🔌 Serveur MCP](#-serveur-mcp-mémoire-texte) • [📊 Reproduire](#-reproduire-les-résultats-de-larticle) • [📝 Citation](#-citation)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Installation](#-installation)
 - [🐳 Docker](#-exécuter-avec-docker)
 - [🔌 Serveur MCP](#-serveur-mcp-mémoire-texte)
-- [📊 Évaluation](#-évaluation)
+- [📊 Reproduire les résultats de l'article](#-reproduire-les-résultats-de-larticle)
 - [🗺️ Feuille de route](#️-feuille-de-route)
 - [📝 Citation](#-citation)
 
@@ -444,9 +444,9 @@ SimpleMem est disponible en tant que **service de mémoire hébergé dans le clo
 
 ---
 
-## 📊 Évaluation
+## 📊 Reproduire les résultats de l'article
 
-Chaque pilier dispose de son propre lanceur de benchmark dans son propre répertoire. Installez d'abord les extras de benchmark : `pip install -e ".[benchmark]"`.
+Reproduisez les chiffres LoCoMo / MemBench / Mem-Gallery des articles. Chaque pilier dispose de son propre lanceur de benchmark dans son propre répertoire. Installez d'abord les extras de benchmark : `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (texte) — LoCoMo
 
@@ -477,15 +477,6 @@ Exécutez depuis le répertoire `OmniSimpleMem/` (voir [`OmniSimpleMem/README.md
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Reproduire les résultats de l'article
-
-Utilisez les configurations exactes dans `config.py` :
-- **🚀 Haute capacité** : GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Efficace** : Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Embedding** : Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

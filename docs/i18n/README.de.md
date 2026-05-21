@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Schnellstart](#-schnellstart) • [🌟 Überblick](#-überblick) • [📦 Installation](#-installation) • [🔌 MCP-Server](#-mcp-server-textgedächtnis) • [📝 Zitierung](#-zitierung)
+[🚀 Schnellstart](#-schnellstart) • [🌟 Überblick](#-überblick) • [📦 Installation](#-installation) • [🔌 MCP-Server](#-mcp-server-textgedächtnis) • [📊 Reproduzieren](#-paper-ergebnisse-reproduzieren) • [📝 Zitierung](#-zitierung)
 
 </div>
 
@@ -119,7 +119,7 @@
 
 ## 🔥 Neuigkeiten
 
-- **[05/21/2026]** 📦 **Einheitliches `simplemem`-Paket — ein Import, automatisches Routing!** SimpleMem, Omni-SimpleMem und EvolveMem sind jetzt in einem einzigen Paket vereint. `from simplemem import SimpleMem` wählt automatisch das Text- oder multimodale Backend anhand des ersten aufgerufenen Methode aus, und `simplemem.optimize(...)` nutzt EvolveMems Selbstentwicklungs-Loop. Installation in einem Schritt mit `pip install -e .`.
+- **[05/21/2026]** 📦 **Einheitliches `simplemem`-Paket — ein Import, automatisches Routing!** SimpleMem, Omni-SimpleMem und EvolveMem sind jetzt in einem einzigen Paket vereint. `from simplemem import SimpleMem` wählt automatisch das Text- oder multimodale Backend anhand der ersten aufgerufenen Methode aus, und `simplemem.optimize(...)` nutzt EvolveMems Selbstentwicklungs-Loop. Installation in einem Schritt mit `pip install -e .`.
 - **[05/14/2026]** 🧬 **EvolveMem (v3.0) — Sich selbst weiterentwickelndes Gedächtnis via AutoResearch!** Die Abrufinfrastruktur selbst entwickelt sich jetzt durch LLM-gesteuerte Closed-Loop-Diagnose weiter. Auf LoCoMo übertrifft EvolveMem die stärkste Baseline um **+25,7 % relativ**; auf MemBench um **+18,9 % relativ**. Das System entdeckt völlig neue Abrufdimensionen, die im ursprünglichen Design nicht vorhanden waren. [EvolveMem ansehen →](../../EvolveMem/)
 - **[04/02/2026]** 🧠 **Omni-SimpleMem (v2.0) — Multimodales Gedächtnis ist da!** SimpleMem unterstützt jetzt **Text-, Bild-, Audio- & Video**-Gedächtnis. Erreicht **neuen SOTA auf LoCoMo (F1=0,613, +47%)** und **Mem-Gallery (F1=0,810, +51%)** gegenüber dem bisherigen Bestwert. [Omni-SimpleMem ansehen →](../../OmniSimpleMem/)
 - **[02/09/2026]** 🚀 **Sitzungsübergreifendes Gedächtnis — übertrifft Claude-Mem um 64%!** [Dokumentation zum sitzungsübergreifenden Betrieb ansehen →](../../cross/README.md)
@@ -136,7 +136,7 @@
 - [📦 Installation](#-installation)
 - [🐳 Docker](#-mit-docker-ausführen)
 - [🔌 MCP-Server](#-mcp-server-textgedächtnis)
-- [📊 Evaluierung](#-evaluierung)
+- [📊 Paper-Ergebnisse reproduzieren](#-paper-ergebnisse-reproduzieren)
 - [🗺️ Fahrplan](#️-fahrplan)
 - [📝 Zitierung](#-zitierung)
 
@@ -164,7 +164,7 @@ from simplemem import SimpleMem
 mem = SimpleMem()  # mode="auto" — Backend wird durch ersten Aufruf gewählt
 ```
 
-Der erste aufgerufene Methode bestimmt das Backend:
+Die erste aufgerufene Methode bestimmt das Backend:
 
 | Erster Aufruf | Gewähltes Backend | Warum |
 |:--|:--|:--|
@@ -444,9 +444,9 @@ SimpleMem ist als **cloudgehosteter Gedächtnisdienst** über das Model Context 
 
 ---
 
-## 📊 Evaluierung
+## 📊 Paper-Ergebnisse reproduzieren
 
-Jede Säule hat seinen eigenen Benchmark-Runner in seinem eigenen Verzeichnis. Installieren Sie zuerst die Benchmark-Extras: `pip install -e ".[benchmark]"`.
+Reproduzieren Sie die LoCoMo / MemBench / Mem-Gallery-Zahlen aus den Papers. Jede Säule hat ihren eigenen Benchmark-Runner in ihrem eigenen Verzeichnis. Installieren Sie zuerst die Benchmark-Extras: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (Text) — LoCoMo
 
@@ -477,15 +477,6 @@ Aus dem Verzeichnis `OmniSimpleMem/` ausführen (siehe [`OmniSimpleMem/README.md
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Paper-Ergebnisse reproduzieren
-
-Verwenden Sie die exakten Konfigurationen in `config.py`:
-- **🚀 Hochleistung**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Effizient**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Einbettung**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

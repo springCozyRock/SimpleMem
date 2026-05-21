@@ -74,6 +74,7 @@
 
 <br/>
 
+[🇺🇸 English](../../README.md) •
 [🇨🇳 中文](./README.zh-CN.md) •
 [🇯🇵 日本語](./README.ja.md) •
 **🇰🇷 한국어** •
@@ -85,8 +86,7 @@
 [🇸🇦 العربية](./README.ar.md) •
 [🇮🇹 Italiano](./README.it.md) •
 [🇻🇳 Tiếng Việt](./README.vi.md) •
-[🇹🇷 Türkçe](./README.tr.md) •
-[🇺🇸 English](../../README.md)
+[🇹🇷 Türkçe](./README.tr.md)
 
 <br/>
 
@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 빠른 시작](#-빠른-시작) • [🌟 개요](#-개요) • [📦 설치](#-설치) • [🔌 MCP 서버](#-mcp-서버-텍스트-기억) • [📝 인용](#-인용)
+[🚀 빠른 시작](#-빠른-시작) • [🌟 개요](#-개요) • [📦 설치](#-설치) • [🔌 MCP 서버](#-mcp-서버-텍스트-기억) • [📊 재현](#-논문-결과-재현) • [📝 인용](#-인용)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 설치](#-설치)
 - [🐳 Docker](#-docker로-실행)
 - [🔌 MCP 서버](#-mcp-서버-텍스트-기억)
-- [📊 평가](#-평가)
+- [📊 논문 결과 재현](#-논문-결과-재현)
 - [🗺️ 로드맵](#️-로드맵)
 - [📝 인용](#-인용)
 
@@ -444,9 +444,9 @@ SimpleMem은 Model Context Protocol (MCP)을 통해 **클라우드 호스팅 기
 
 ---
 
-## 📊 평가
+## 📊 논문 결과 재현
 
-각 기둥은 자체 디렉토리에 자체 벤치마크 실행기를 가지고 있습니다. 먼저 벤치마크 추가 기능을 설치하세요: `pip install -e ".[benchmark]"`.
+논문의 LoCoMo / MemBench / Mem-Gallery 수치를 재현합니다. 각 기둥은 자체 디렉토리에 자체 벤치마크 실행기를 가지고 있습니다. 먼저 벤치마크 추가 기능을 설치하세요: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (텍스트) — LoCoMo
 
@@ -477,15 +477,6 @@ python run_benchmark.py membench --agent FirstAgent --max-rounds 3
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 논문 결과 재현
-
-`config.py`의 정확한 구성을 사용하세요:
-- **🚀 고성능**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ 효율적**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 임베딩**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

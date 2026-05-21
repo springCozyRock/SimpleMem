@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Hızlı Başlangıç](#-hızlı-başlangıç) • [🌟 Genel Bakış](#-genel-bakış) • [📦 Kurulum](#-kurulum) • [🔌 MCP Sunucusu](#-mcp-sunucusu-metin-belleği) • [📝 Alıntı](#-alıntı)
+[🚀 Hızlı Başlangıç](#-hızlı-başlangıç) • [🌟 Genel Bakış](#-genel-bakış) • [📦 Kurulum](#-kurulum) • [🔌 MCP Sunucusu](#-mcp-sunucusu-metin-belleği) • [📊 Yeniden Üret](#-makale-sonuçlarını-yeniden-üretme) • [📝 Alıntı](#-alıntı)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Kurulum](#-kurulum)
 - [🐳 Docker](#-docker-ile-çalıştırma)
 - [🔌 MCP Sunucusu](#-mcp-sunucusu-metin-belleği)
-- [📊 Değerlendirme](#-değerlendirme)
+- [📊 Makale Sonuçlarını Yeniden Üretme](#-makale-sonuçlarını-yeniden-üretme)
 - [🗺️ Yol Haritası](#️-yol-haritası)
 - [📝 Alıntı](#-alıntı)
 
@@ -444,9 +444,9 @@ SimpleMem, Model Context Protocol (MCP) aracılığıyla **bulut barındırmalı
 
 ---
 
-## 📊 Değerlendirme
+## 📊 Makale Sonuçlarını Yeniden Üretme
 
-Her sütunun kendi dizininde kendi kıyaslama çalıştırıcısı bulunur. Önce kıyaslama ekstralarını yükleyin: `pip install -e ".[benchmark]"`.
+Makalelerdeki LoCoMo / MemBench / Mem-Gallery sayılarını yeniden üretin. Her sütunun kendi dizininde kendi kıyaslama çalıştırıcısı bulunur. Önce kıyaslama ekstralarını yükleyin: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (metin) — LoCoMo
 
@@ -477,15 +477,6 @@ python run_benchmark.py membench --agent FirstAgent --max-rounds 3
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Makale Sonuçlarını Yeniden Üretme
-
-`config.py` dosyasındaki tam yapılandırmaları kullanın:
-- **🚀 Yüksek kapasiteli**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Verimli**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Gömme**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

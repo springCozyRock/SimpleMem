@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 Início Rápido](#-início-rápido) • [🌟 Visão Geral](#-visão-geral) • [📦 Instalação](#-instalação) • [🔌 Servidor MCP](#-servidor-mcp-memória-de-texto) • [📝 Citação](#-citação)
+[🚀 Início Rápido](#-início-rápido) • [🌟 Visão Geral](#-visão-geral) • [📦 Instalação](#-instalação) • [🔌 Servidor MCP](#-servidor-mcp-memória-de-texto) • [📊 Reproduzir](#-reproduzir-resultados-do-artigo) • [📝 Citação](#-citação)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 Instalação](#-instalação)
 - [🐳 Docker](#-executar-com-docker)
 - [🔌 Servidor MCP](#-servidor-mcp-memória-de-texto)
-- [📊 Avaliação](#-avaliação)
+- [📊 Reproduzir Resultados do Artigo](#-reproduzir-resultados-do-artigo)
 - [🗺️ Roteiro](#️-roteiro)
 - [📝 Citação](#-citação)
 
@@ -444,9 +444,9 @@ O SimpleMem está disponível como um **serviço de memória hospedado na nuvem*
 
 ---
 
-## 📊 Avaliação
+## 📊 Reproduzir Resultados do Artigo
 
-Cada pilar tem seu próprio executor de benchmark em seu próprio diretório. Instale os extras de benchmark primeiro: `pip install -e ".[benchmark]"`.
+Reproduza os números do LoCoMo / MemBench / Mem-Gallery dos artigos. Cada pilar tem seu próprio executor de benchmark em seu próprio diretório. Instale os extras de benchmark primeiro: `pip install -e ".[benchmark]"`.
 
 ### 📝 SimpleMem (texto) — LoCoMo
 
@@ -477,15 +477,6 @@ Execute do diretório `OmniSimpleMem/` (veja [`OmniSimpleMem/README.md`](../../O
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 Reproduzir Resultados do Artigo
-
-Use as configurações exatas em `config.py`:
-- **🚀 Alta capacidade**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Eficiente**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Embedding**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 

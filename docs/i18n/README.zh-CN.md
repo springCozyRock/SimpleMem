@@ -75,6 +75,7 @@
 <br/>
 
 [🇬🇧 English](../../README.md) •
+**🇨🇳 中文** •
 [🇯🇵 日本語](./README.ja.md) •
 [🇰🇷 한국어](./README.ko.md) •
 [🇪🇸 Español](./README.es.md) •
@@ -85,8 +86,7 @@
 [🇸🇦 العربية](./README.ar.md) •
 [🇮🇹 Italiano](./README.it.md) •
 [🇻🇳 Tiếng Việt](./README.vi.md) •
-[🇹🇷 Türkçe](./README.tr.md) •
-**🇨🇳 中文**
+[🇹🇷 Türkçe](./README.tr.md)
 
 <br/>
 
@@ -109,7 +109,7 @@
 
 <br/>
 
-[🚀 快速开始](#-快速开始) • [🌟 概述](#-概述) • [📦 安装](#-安装) • [🔌 MCP 服务器](#-mcp-服务器文本记忆) • [📝 引用](#-引用)
+[🚀 快速开始](#-快速开始) • [🌟 概述](#-概述) • [📦 安装](#-安装) • [🔌 MCP 服务器](#-mcp-服务器文本记忆) • [📊 复现](#-复现论文结果) • [📝 引用](#-引用)
 
 </div>
 
@@ -136,7 +136,7 @@
 - [📦 安装](#-安装)
 - [🐳 Docker](#-使用-docker-运行)
 - [🔌 MCP 服务器](#-mcp-服务器文本记忆)
-- [📊 评估](#-评估)
+- [📊 复现论文结果](#-复现论文结果)
 - [🗺️ 路线图](#️-路线图)
 - [📝 引用](#-引用)
 
@@ -444,9 +444,9 @@ SimpleMem 通过模型上下文协议（MCP）提供**云托管记忆服务**，
 
 ---
 
-## 📊 评估
+## 📊 复现论文结果
 
-每个支柱在其各自目录中都有独立的基准运行器。请先安装基准扩展：`pip install -e ".[benchmark]"`。
+复现论文中 LoCoMo / MemBench / Mem-Gallery 的实验数据。每个支柱在其各自目录中都有独立的基准运行器。请先安装基准扩展：`pip install -e ".[benchmark]"`。
 
 ### 📝 SimpleMem（文本）— LoCoMo
 
@@ -477,15 +477,6 @@ python run_benchmark.py membench --agent FirstAgent --max-rounds 3
 cd OmniSimpleMem
 python benchmarks/locomo/run_locomo.py --data-path /path/to/locomo10.json --model gpt-4o
 ```
-
----
-
-### 🔬 复现论文结果
-
-使用 `config.py` 中的精确配置：
-- **🚀 高能力**：GPT-4.1-mini、Qwen3-Plus
-- **⚙️ 高效**：Qwen2.5-1.5B、Qwen2.5-3B
-- **🔍 嵌入**：Qwen3-Embedding-0.6B（1024 维）
 
 ---
 
