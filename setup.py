@@ -2,6 +2,7 @@
 Setup script for SimpleMem — Efficient Lifelong Memory for LLM Agents.
 """
 
+import re
 from pathlib import Path
 from setuptools import setup, find_packages
 
@@ -9,6 +10,15 @@ from setuptools import setup, find_packages
 _HERE = Path(__file__).parent
 readme = (_HERE / "README.md")
 long_description = readme.read_text(encoding="utf-8") if readme.exists() else ""
+
+
+def _read_version() -> str:
+    """Single source of truth: simplemem/__init__.py __version__."""
+    init = (_HERE / "simplemem" / "__init__.py").read_text(encoding="utf-8")
+    match = re.search(r'^__version__\s*=\s*["\']([^"\']+)["\']', init, re.M)
+    if not match:
+        raise RuntimeError("Unable to find __version__ in simplemem/__init__.py")
+    return match.group(1)
 
 
 # Default install: text path + Omni-SimpleMem multimodal + EvolveMem self-evolution.
@@ -72,7 +82,7 @@ EXTRAS["all"] = sorted({pkg for group in EXTRAS.values() for pkg in group})
 
 setup(
     name="simplemem",
-    version="0.1.0",
+    version=_read_version(),
     author="SimpleMem Team",
     description="Efficient Lifelong Memory for LLM Agents — unified text + multimodal.",
     long_description=long_description,

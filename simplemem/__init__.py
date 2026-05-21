@@ -50,5 +50,5 @@ def optimize(mem, dev_questions, max_rounds=7, **kwargs):
     return run_optimization(mem, dev_questions, max_rounds, **kwargs)
 
 
-__version__ = "3.0.0"
+__version__ = "0.3.0"
 __all__ = ["SimpleMem", "create", "list_modes", "optimize", "Config", "load_config"]
