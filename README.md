@@ -255,6 +255,31 @@ mem = create(
 
 ---
 
+### 🧬 Advanced: Optimize Retrieval Config
+
+Tune retrieval hyperparameters offline on your own dev set, then deploy the resulting `Config` for inference. This is a thin wrapper around EvolveMem's self-evolution loop:
+
+```python
+import simplemem
+from simplemem import SimpleMem, load_config
+
+# mem is a finalized SimpleMem instance with memories already built
+dev_questions = [
+    ("When is the meeting?", "2pm tomorrow at Starbucks"),
+    ("What should Bob prepare?", "market analysis report"),
+]
+config = simplemem.optimize(mem, dev_questions, max_rounds=3)
+config.save("my_config.json")
+
+# Later, deploy with the optimized config
+config = load_config("my_config.json")
+mem = SimpleMem(config=config)
+```
+
+> EvolveMem runs an LLM-driven Evaluate → Diagnose → Propose → Guard cycle over your dev questions, adjusting global retrieval flags (top_k, fusion mode, answer verification, reflection rounds, ...). For the full standalone version with benchmark adapters and per-category overrides, see [`EvolveMem/`](EvolveMem/).
+
+---
+
 ## 🌟 Overview
 
 **SimpleMem** is a family of efficient memory frameworks — **SimpleMem** for text and **Omni-SimpleMem** for multimodal (text, image, audio, video) — based on **semantic lossless compression** that addresses the fundamental challenge of **efficient long-term memory for LLM agents**. Unlike existing systems that either passively accumulate redundant context or rely on expensive iterative reasoning loops, SimpleMem maximizes **information density** and **token utilization** through a three-stage pipeline:
