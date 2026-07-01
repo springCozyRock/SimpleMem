@@ -1,0 +1,4 @@
+# Copy to scripts/llm_env.local and fill in (gitignored).
+# Used by simplemem_mm_defaults.sh for GPT backbone runs.
+export MEMEYE_LLM_API_KEY="sk-..."
+export MEMEYE_LLM_BASE_URL="http://your-proxy-host:port/v1"

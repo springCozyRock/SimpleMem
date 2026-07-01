@@ -1,0 +1,7 @@
+name: qwen3_vl_8b_dashscope
+provider: openai_api
+model: qwen3-vl-8b-instruct
+api_key_env: DASHSCOPE_API_KEY
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+max_new_tokens: 128
+timeout: 120

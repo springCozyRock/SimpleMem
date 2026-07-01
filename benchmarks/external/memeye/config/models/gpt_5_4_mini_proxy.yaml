@@ -1,0 +1,7 @@
+name: gpt_5_4_mini_proxy
+provider: openai_api
+model: gpt-5.4-mini
+api_key_env: MEMEYE_LLM_API_KEY
+base_url: http://35.164.11.19:3887/v1
+max_new_tokens: 128
+timeout: 120

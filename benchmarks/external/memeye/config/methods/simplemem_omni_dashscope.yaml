@@ -1,0 +1,28 @@
+name: simplemem
+
+ingestion_mode: caption
+modality: multimodal
+
+llm_model: ""
+llm_api_key: ""
+llm_api_key_env: DASHSCOPE_API_KEY
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+retrieve_k: 20
+enable_hybrid_search: true
+enable_graph_traversal: true
+enable_multi_query_retrieval: false
+reuse_existing_memory: true
+
+embedding_model: text-embedding-v4
+embedding_dim: 1024
+
+caption_preprocessed: false
+
+temperature: 0.0
+max_tokens: 1000
+
+enable_self_evolution: false
+summarize_on_close: false
+
+qa_parallel_workers: 3

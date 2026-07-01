@@ -1,0 +1,27 @@
+name: simplemem
+
+ingestion_mode: caption
+modality: multimodal
+
+llm_model: ""
+llm_api_key: ""
+# Inherit api_key_env / base_url from --model-config (qwen3_vl_8b_openrouter.yaml).
+
+retrieve_k: 20
+enable_hybrid_search: true
+enable_graph_traversal: true
+enable_multi_query_retrieval: false
+reuse_existing_memory: true
+
+embedding_model: all-MiniLM-L6-v2
+embedding_dim: 384
+
+caption_preprocessed: false
+
+temperature: 0.0
+max_tokens: 1000
+
+enable_self_evolution: false
+summarize_on_close: false
+
+qa_parallel_workers: 1

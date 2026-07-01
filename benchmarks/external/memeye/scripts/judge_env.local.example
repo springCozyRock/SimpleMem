@@ -1,0 +1,6 @@
+# Copy to scripts/judge_env.local and fill in (gitignored).
+export MEMEYE_JUDGE_API_KEY="sk-..."
+export MEMEYE_JUDGE_BASE_URL="http://your-proxy-host:port/v1"
+export JUDGE_MODEL="gpt-5.2"
+export JUDGE_SLEEP="1.5"
+export JUDGE_MAX_RETRIES="5"

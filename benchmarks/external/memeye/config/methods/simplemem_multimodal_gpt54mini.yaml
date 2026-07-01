@@ -1,0 +1,31 @@
+name: simplemem
+
+# SimpleMem-MM on MemEye: caption ingest + vision_on_demand answering (GPT-5.4-mini proxy).
+ingestion_mode: caption
+modality: multimodal
+
+llm_model: gpt-5.4-mini
+llm_api_key: ""
+llm_api_key_env: MEMEYE_LLM_API_KEY
+base_url: http://35.164.11.19:3887/v1
+
+retrieve_k: 20
+enable_hybrid_search: true
+enable_graph_traversal: true
+enable_multi_query_retrieval: false
+# Isolated from Qwen cache at runs/simplemem/<scenario>/ (legacy path).
+memory_namespace: gpt_5_4_mini_proxy
+reuse_existing_memory: false
+
+embedding_model: all-MiniLM-L6-v2
+embedding_dim: 384
+
+caption_preprocessed: false
+
+temperature: 0.0
+max_tokens: 1000
+
+enable_self_evolution: false
+summarize_on_close: false
+
+qa_parallel_workers: 1
