@@ -203,3 +203,93 @@ class TestQuery:
         orchestrator.query("test", top_k=5)
         call_kwargs = orchestrator.retriever.retrieve_preview.call_args
         assert call_kwargs[1].get("top_k", call_kwargs[0][1] if len(call_kwargs[0]) > 1 else None) is not None
+
+    def test_query_expands_details_by_theta(self, orchestrator):
+        from omni_memory.retrieval.pyramid_retriever import RetrievalLevel
+
+        orchestrator.config.retrieval.auto_expand_threshold = 0.4
+        retrieval = MagicMock()
+        retrieval.items = [
+            {"id": "low", "summary": "low", "score": 0.35},
+            {"id": "high", "summary": "high", "score": 0.45},
+        ]
+        orchestrator.retriever.retrieve_preview.return_value = retrieval
+        expansion = MagicMock()
+        expansion.items = [
+            {"id": "high", "summary": "high", "details": {"full_text": "expanded"}}
+        ]
+        orchestrator.retriever.expand.return_value = expansion
+        orchestrator.query_processor.determine_retrieval_strategy.return_value = {
+            "top_k": 10,
+            "require_expansion": False,
+        }
+
+        result = orchestrator.query("test", auto_expand=True)
+
+        request = orchestrator.retriever.expand.call_args.args[0]
+        assert request.mau_ids == ["high"]
+        assert request.level == RetrievalLevel.DETAILS
+        assert result.items[1]["details"]["full_text"] == "expanded"
+        assert result.items[1]["score"] == 0.45
+
+    def test_expand_evidence_with_budget_uses_score_per_token(self, orchestrator):
+        from omni_memory.retrieval.pyramid_retriever import RetrievalLevel
+
+        orchestrator.config.retrieval.evidence_token_budget = 700
+        retrieval = MagicMock()
+        retrieval.items = [
+            {
+                "id": "a",
+                "score": 0.9,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 900},
+            },
+            {
+                "id": "b",
+                "score": 0.6,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 200},
+            },
+            {
+                "id": "c",
+                "score": 0.7,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 500},
+            },
+        ]
+
+        def expand_side_effect(request):
+            token_estimates = {"b": 200, "c": 500}
+            mau_id = request.mau_ids[0]
+            result = MagicMock()
+            result.items = [
+                {
+                    "id": mau_id,
+                    "summary": mau_id,
+                    "raw_content": {
+                        "type": "image",
+                        "base64": mau_id,
+                        "token_estimate": token_estimates[mau_id],
+                    },
+                }
+            ]
+            return result
+
+        orchestrator.retriever.expand.side_effect = expand_side_effect
+
+        orchestrator._expand_evidence_with_budget(retrieval)
+
+        expanded_ids = [
+            call.args[0].mau_ids[0] for call in orchestrator.retriever.expand.call_args_list
+        ]
+        levels = [
+            call.args[0].level for call in orchestrator.retriever.expand.call_args_list
+        ]
+        assert expanded_ids == ["b", "c"]
+        assert levels == [RetrievalLevel.EVIDENCE, RetrievalLevel.EVIDENCE]
+        assert retrieval.items[1]["raw_content"]["base64"] == "b"
+        assert retrieval.items[2]["raw_content"]["base64"] == "c"
+        assert retrieval.items[0]["raw_content"].get("base64") is None

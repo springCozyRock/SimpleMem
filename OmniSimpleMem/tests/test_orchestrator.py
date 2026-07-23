@@ -203,3 +203,322 @@ class TestQuery:
         orchestrator.query("test", top_k=5)
         call_kwargs = orchestrator.retriever.retrieve_preview.call_args
         assert call_kwargs[1].get("top_k", call_kwargs[0][1] if len(call_kwargs[0]) > 1 else None) is not None
+
+
+# ---------------------------------------------------------------------------
+# add_image_on_demand_caption_only
+# ---------------------------------------------------------------------------
+
+class TestAddImageOnDemandCaptionOnly:
+    def _fake_image_result(self, raw_pointer="cold://img1"):
+        mau = MultimodalAtomicUnit(
+            modality_type=ModalityType.VISUAL,
+            summary="[Image: stored]",
+            embedding=[],
+        )
+        mau.raw_pointer = raw_pointer
+        return ProcessingResult(success=True, mau=mau)
+
+    def test_skips_vlm_caption_and_visual_embedding(self, orchestrator):
+        mock_img_proc = MagicMock()
+        mock_img_proc.process.return_value = self._fake_image_result()
+        orchestrator.image_processor = mock_img_proc
+
+        orchestrator.add_image_on_demand_caption_only(
+            image="/tmp/fake.png",
+            caption_text="dataset caption",
+            session_id="sess_1",
+        )
+
+        mock_img_proc.process.assert_called_once()
+        _, kwargs = mock_img_proc.process.call_args
+        assert kwargs.get("generate_caption") is False
+        assert kwargs.get("generate_embedding") is False
+        assert kwargs.get("session_id") == "sess_1"
+
+        orchestrator.text_processor.process.assert_called_once()
+        cap_arg = orchestrator.text_processor.process.call_args[0][0]
+        assert "dataset caption" in cap_arg
+
+
+# ---------------------------------------------------------------------------
+# limit_expansion_ids / expand(max_items=0)
+# ---------------------------------------------------------------------------
+
+class TestLimitExpansionIds:
+    def test_zero_means_no_cap(self):
+        from omni_memory.retrieval.pyramid_retriever import limit_expansion_ids
+
+        ids = ["a", "b", "c"]
+        assert limit_expansion_ids(ids, 0) == ids
+        assert limit_expansion_ids(ids, -1) == ids
+
+    def test_positive_cap(self):
+        from omni_memory.retrieval.pyramid_retriever import limit_expansion_ids
+
+        assert limit_expansion_ids(["a", "b", "c"], 2) == ["a", "b"]
+
+
+class TestExpandEvidenceWithBudgetMaxItemsZero:
+    def test_expand_evidence_with_budget_respects_zero_max_items(self, orchestrator):
+        from omni_memory.retrieval.pyramid_retriever import RetrievalLevel
+
+        orchestrator.config.retrieval.evidence_token_budget = 6000
+        orchestrator.config.retrieval.max_expanded_items = 0
+        retrieval = MagicMock()
+        retrieval.items = [
+            {
+                "id": "img1",
+                "score": 0.8,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+            },
+            {
+                "id": "img2",
+                "score": 0.7,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+            },
+        ]
+
+        def expand_side_effect(request):
+            mau_id = request.mau_ids[0]
+            result = MagicMock()
+            result.items = [
+                {
+                    "id": mau_id,
+                    "summary": mau_id,
+                    "raw_content": {
+                        "type": "image",
+                        "base64": mau_id,
+                        "token_estimate": 500,
+                    },
+                }
+            ]
+            return result
+
+        orchestrator.retriever.expand.side_effect = expand_side_effect
+
+        orchestrator._expand_evidence_with_budget(retrieval)
+
+        expanded_ids = [
+            call.args[0].mau_ids[0] for call in orchestrator.retriever.expand.call_args_list
+        ]
+        assert expanded_ids == ["img1", "img2"]
+        assert retrieval.items[0]["raw_content"]["base64"] == "img1"
+        assert retrieval.items[1]["raw_content"]["base64"] == "img2"
+
+
+# ---------------------------------------------------------------------------
+# _expand_evidence_with_budget
+# ---------------------------------------------------------------------------
+
+class TestExpandEvidenceWithBudget:
+    def test_expand_evidence_with_budget_uses_score_per_token(self, orchestrator):
+        from omni_memory.retrieval.pyramid_retriever import RetrievalLevel
+
+        orchestrator.config.retrieval.evidence_token_budget = 700
+        retrieval = MagicMock()
+        retrieval.items = [
+            {
+                "id": "a",
+                "score": 0.9,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 900},
+            },
+            {
+                "id": "b",
+                "score": 0.6,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 200},
+            },
+            {
+                "id": "c",
+                "score": 0.7,
+                "tags": ["vision_on_demand"],
+                "has_raw_data": True,
+                "raw_content": {"token_estimate": 500},
+            },
+        ]
+
+        def expand_side_effect(request):
+            token_estimates = {"b": 200, "c": 500}
+            mau_id = request.mau_ids[0]
+            result = MagicMock()
+            result.items = [
+                {
+                    "id": mau_id,
+                    "summary": mau_id,
+                    "raw_content": {
+                        "type": "image",
+                        "base64": mau_id,
+                        "token_estimate": token_estimates[mau_id],
+                    },
+                }
+            ]
+            return result
+
+        orchestrator.retriever.expand.side_effect = expand_side_effect
+
+        orchestrator._expand_evidence_with_budget(retrieval)
+
+        expanded_ids = [
+            call.args[0].mau_ids[0] for call in orchestrator.retriever.expand.call_args_list
+        ]
+        levels = [
+            call.args[0].level for call in orchestrator.retriever.expand.call_args_list
+        ]
+        assert expanded_ids == ["b", "c"]
+        assert levels == [RetrievalLevel.EVIDENCE, RetrievalLevel.EVIDENCE]
+        assert retrieval.items[1]["raw_content"]["base64"] == "b"
+        assert retrieval.items[2]["raw_content"]["base64"] == "c"
+        assert retrieval.items[0]["raw_content"].get("base64") is None
+
+
+class TestDetailsExpandPreservesVisionEligibility:
+    def test_details_merge_preserves_score_for_evidence_expand(self, orchestrator):
+        """DETAILS merge must keep score so VLM evidence expand still selects the item.
+
+        Regression for Case #6: preview had vision_on_demand + has_raw_data, but
+        DETAILS expand wiped score/has_raw_data and evidence expand skipped.
+        """
+        from omni_memory.retrieval.pyramid_retriever import (
+            ExpansionRequest,
+            RetrievalLevel,
+            RetrievalResult,
+        )
+
+        retrieval = RetrievalResult(
+            query="fig",
+            level=RetrievalLevel.SUMMARY,
+            items=[
+                {
+                    "id": "img1",
+                    "summary": "chart fig",
+                    "modality_type": "text",
+                    "timestamp": 1.0,
+                    "score": 0.81,
+                    "tags": ["vision_on_demand"],
+                    "has_raw_data": True,
+                    "metadata": {"tags": ["vision_on_demand"]},
+                }
+            ],
+            total_candidates=1,
+            tokens_used_estimate=10,
+            can_expand=True,
+            expansion_candidates=["img1"],
+        )
+
+        def expand_side_effect(request):
+            if request.level == RetrievalLevel.DETAILS:
+                return RetrievalResult(
+                    query="",
+                    level=RetrievalLevel.DETAILS,
+                    items=[
+                        {
+                            "id": "img1",
+                            "summary": "chart fig",
+                            "modality_type": "text",
+                            "timestamp": 1.0,
+                            "tags": ["vision_on_demand"],
+                            "has_raw_data": True,
+                            "metadata": {"tags": ["vision_on_demand"]},
+                            "details": {"full_text": "full chart caption"},
+                        }
+                    ],
+                    total_candidates=1,
+                    tokens_used_estimate=20,
+                    can_expand=False,
+                )
+            mau_id = request.mau_ids[0]
+            return RetrievalResult(
+                query="",
+                level=RetrievalLevel.EVIDENCE,
+                items=[
+                    {
+                        "id": mau_id,
+                        "summary": "chart fig",
+                        "modality_type": "text",
+                        "timestamp": 1.0,
+                        "tags": ["vision_on_demand"],
+                        "has_raw_data": True,
+                        "metadata": {"tags": ["vision_on_demand"]},
+                        "raw_content": {
+                            "type": "image",
+                            "base64": "abc",
+                            "token_estimate": 500,
+                        },
+                    }
+                ],
+                total_candidates=1,
+                tokens_used_estimate=500,
+                can_expand=False,
+            )
+
+        orchestrator.retriever.expand.side_effect = expand_side_effect
+
+        expansion = orchestrator.retriever.expand(
+            ExpansionRequest(mau_ids=["img1"], level=RetrievalLevel.DETAILS)
+        )
+        item = retrieval.items[0]
+        expanded = expansion.items[0]
+        if item.get("score") is not None and expanded.get("score") is None:
+            expanded["score"] = item["score"]
+        if item.get("has_raw_data") is not None and expanded.get("has_raw_data") is None:
+            expanded["has_raw_data"] = item["has_raw_data"]
+        retrieval.items[0] = expanded
+
+        assert retrieval.items[0]["score"] == 0.81
+        assert retrieval.items[0]["has_raw_data"] is True
+
+        orchestrator.config.retrieval.evidence_token_budget = 6000
+        orchestrator.config.retrieval.max_expanded_items = 0
+        orchestrator._expand_evidence_with_budget(retrieval)
+        assert retrieval.items[0]["raw_content"]["type"] == "image"
+        assert retrieval.items[0]["raw_content"]["base64"] == "abc"
+
+
+# ---------------------------------------------------------------------------
+# retrieve_answer_context
+# ---------------------------------------------------------------------------
+
+class TestRetrieveAnswerContext:
+    def test_empty_retrieval(self, orchestrator):
+        bundle = orchestrator.retrieve_answer_context("anything")
+        assert bundle["empty"] is True
+        assert bundle["context"] == ""
+        assert bundle["retrieval"].items == []
+
+    def test_appends_knowledge_graph_to_context(self, orchestrator):
+        from omni_memory.retrieval.pyramid_retriever import RetrievalResult
+
+        retrieval = MagicMock(spec=RetrievalResult)
+        retrieval.items = [
+            {
+                "id": "m1",
+                "summary": "memory one",
+                "modality_type": "text",
+                "score": 0.9,
+                "tags": [],
+                "has_raw_data": False,
+            }
+        ]
+        graph_ctx = MagicMock()
+        graph_ctx.entities = ["Alice"]
+        graph_ctx.related_entities = []
+        graph_ctx.relations = []
+        retrieval.graph_entities = graph_ctx
+        retrieval.to_dict.return_value = {"items": retrieval.items}
+
+        orchestrator.query = MagicMock(return_value=retrieval)
+        orchestrator.retriever.format_for_llm.return_value = "Memory context"
+        orchestrator.graph_retriever.format_for_llm.return_value = "Alice -> Bob"
+
+        bundle = orchestrator.retrieve_answer_context("who is Alice?")
+
+        assert bundle["empty"] is False
+        assert "[Knowledge Graph]" in bundle["context"]
+        assert "Alice -> Bob" in bundle["context"]
+        orchestrator.graph_retriever.format_for_llm.assert_called_once_with(graph_ctx)

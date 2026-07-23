@@ -8,4 +8,7 @@ llm_model: gemini-2.5-flash-lite
 max_tokens: 1000
 name: simplemem
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 temperature: 0.0

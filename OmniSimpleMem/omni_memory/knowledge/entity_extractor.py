@@ -7,6 +7,7 @@ Supports text, image captions, and video descriptions.
 
 import logging
 import json
+import re
 from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass, field
 
@@ -171,6 +172,7 @@ class EntityExtractor:
             from openai import OpenAI
             import httpx
             import os
+            from omni_memory.utils.usage import wrap_openai_client
             
             client_kwargs = {}
             
@@ -190,8 +192,88 @@ class EntityExtractor:
             http_client = httpx.Client()
             client_kwargs["http_client"] = http_client
             
-            self._llm_client = OpenAI(**client_kwargs)
+            self._llm_client = wrap_openai_client(OpenAI(**client_kwargs))
         return self._llm_client
+
+    @staticmethod
+    def _parse_json_response(text: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Parse LLM JSON output; tolerate empty bodies, fences, and extra prose."""
+        if text is None:
+            return None
+        s = str(text).strip()
+        if not s:
+            return None
+
+        try:
+            return json.loads(s)
+        except json.JSONDecodeError:
+            pass
+
+        fence = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", s)
+        if fence:
+            block = fence.group(1).strip()
+            try:
+                return json.loads(block)
+            except json.JSONDecodeError:
+                s = block
+
+        start = s.find("{")
+        if start < 0:
+            return None
+        depth = 0
+        for i, ch in enumerate(s[start:], start):
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(s[start : i + 1])
+                    except json.JSONDecodeError:
+                        break
+        return None
+
+    def _call_extraction_llm(self, client, prompt: str) -> Dict[str, Any]:
+        """Call LLM for entity extraction; retry without response_format for weak proxies."""
+        messages = [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": prompt},
+        ]
+        empty = {"entities": [], "relations": []}
+
+        for use_json_format in (True, False):
+            kwargs: Dict[str, Any] = {
+                "model": self.model_name,
+                "messages": messages,
+                "temperature": 0,
+                "max_tokens": 1024,
+            }
+            if use_json_format:
+                kwargs["response_format"] = {"type": "json_object"}
+
+            try:
+                response = client.chat.completions.create(**kwargs)
+            except Exception as exc:
+                logger.debug(
+                    "Entity extraction LLM call failed (json_format=%s): %s",
+                    use_json_format,
+                    exc,
+                )
+                continue
+
+            content = (response.choices[0].message.content or "").strip()
+            parsed = self._parse_json_response(content)
+            if parsed is not None:
+                return parsed
+
+            if content:
+                logger.debug(
+                    "Entity extraction unparseable response (json_format=%s): %r",
+                    use_json_format,
+                    content[:200],
+                )
+
+        return empty
 
     def extract(
         self,
@@ -252,31 +334,10 @@ class EntityExtractor:
         # Build extraction prompt
         prompt = self._build_extraction_prompt(raw_text, context)
         
-        # Call LLM for extraction
         client = self._get_llm_client()
-        
+
         try:
-            response = client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": self._get_system_prompt()
-                    },
-                    {
-                        "role": "user", 
-                        "content": prompt
-                    }
-                ],
-                temperature=0,
-                response_format={"type": "json_object"},
-            )
-            
-            result_text = response.choices[0].message.content
-            if result_text:
-                result_json = json.loads(result_text)
-            else:
-                result_json = {"entities": [], "relations": []}
+            result_json = self._call_extraction_llm(client, prompt)
 
             # Parse entities
             entities = []
@@ -309,7 +370,7 @@ class EntityExtractor:
             )
 
         except Exception as e:
-            logger.error(f"Entity extraction failed: {e}")
+            logger.debug("Entity extraction failed: %s", e)
             return ExtractionResult(
                 entities=[],
                 relations=[],

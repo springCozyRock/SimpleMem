@@ -499,6 +499,16 @@ class SimpleMemMethod(HistoryMethod):
         cfg.retrieval.enable_multi_query_retrieval = bool(
             self.config.get("enable_multi_query_retrieval", False)
         )
+        cfg.retrieval.auto_expand_threshold = float(
+            self.config.get("auto_expand_threshold", 0.4)
+        )
+        cfg.retrieval.evidence_token_budget = int(
+            self.config.get("evidence_token_budget", 6000)
+        )
+        # Pyramid retrieval: preview = summary only; full_text via DETAILS expand.
+        cfg.retrieval.include_details_in_preview = bool(
+            self.config.get("include_details_in_preview", False)
+        )
 
         # Skip self-evolution (auto-research loop) by default for benchmark fairness
         cfg.enable_self_evolution = bool(self.config.get("enable_self_evolution", False))

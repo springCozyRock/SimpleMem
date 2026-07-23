@@ -8,7 +8,9 @@ The orchestrator manages:
 4. Session management
 """
 
+import base64
 import logging
+import mimetypes
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, List, Dict, Any, Union, Tuple
@@ -33,6 +35,8 @@ from omni_memory.retrieval.pyramid_retriever import (
     RetrievalResult,
     ExpansionRequest,
     RetrievalLevel,
+    limit_expansion_ids,
+    mau_has_on_demand_raw,
 )
 from omni_memory.retrieval.query_processor import QueryProcessor
 from omni_memory.retrieval.expansion_manager import ExpansionManager
@@ -69,6 +73,46 @@ except ImportError:
     pass
 
 logger = logging.getLogger(__name__)
+
+
+def _encode_local_image_as_data_url(image_path: str) -> Optional[str]:
+    try:
+        raw = Path(image_path).read_bytes()
+    except OSError:
+        logger.warning("Failed to read question image for multimodal answer: %s", image_path)
+        return None
+    mime_type, _ = mimetypes.guess_type(image_path)
+    if not mime_type or not mime_type.startswith("image/"):
+        mime_type = "image/png"
+    encoded = base64.b64encode(raw).decode("utf-8")
+    return f"data:{mime_type};base64,{encoded}"
+
+
+def _append_raw_images_to_content_parts(
+    content_parts: List[Dict[str, Any]],
+    raw: Dict[str, Any],
+) -> None:
+    """Append all on-demand images from expanded raw content to LLM content parts."""
+    images = raw.get("images") or []
+    if images:
+        for image in images:
+            b64 = image.get("base64")
+            if b64:
+                content_parts.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+                    }
+                )
+        return
+    b64 = raw.get("base64")
+    if b64:
+        content_parts.append(
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+            }
+        )
 
 
 class OmniMemoryOrchestrator:
@@ -206,6 +250,7 @@ class OmniMemoryOrchestrator:
         if self._llm_client is None:
             from openai import OpenAI
             import httpx
+            from omni_memory.utils.usage import wrap_openai_client
 
             # Only pass non-None parameters to avoid compatibility issues
             client_kwargs = {}
@@ -219,7 +264,7 @@ class OmniMemoryOrchestrator:
             http_client = httpx.Client()
             client_kwargs["http_client"] = http_client
 
-            self._llm_client = OpenAI(**client_kwargs)
+            self._llm_client = wrap_openai_client(OpenAI(**client_kwargs))
         return self._llm_client
 
     # ==================== Session Management ====================
@@ -459,7 +504,11 @@ class OmniMemoryOrchestrator:
         )
 
         res_img = self.image_processor.process(
-            image, session_id=session_id, force=force
+            image,
+            session_id=session_id,
+            force=force,
+            generate_caption=False,
+            generate_embedding=False,
         )
         res_txt = self.text_processor.process(
             cap_wrapped, session_id=session_id, force=force
@@ -475,7 +524,10 @@ class OmniMemoryOrchestrator:
         mau = res_txt.mau
         if res_img.mau.raw_pointer:
             mau.raw_pointer = res_img.mau.raw_pointer
-        self._store_mau(mau, tags)
+        merged_tags = list(tags or [])
+        if "vision_on_demand" not in merged_tags:
+            merged_tags.append("vision_on_demand")
+        self._store_mau(mau, merged_tags)
         return ProcessingResult(success=True, mau=mau)
 
     def add_multimodal(
@@ -785,7 +837,7 @@ class OmniMemoryOrchestrator:
                                 "timestamp": mau.timestamp,
                                 "score": bm25_score * 0.01,
                                 "tags": mau.metadata.tags,
-                                "has_raw_data": mau.raw_pointer is not None,
+                                "has_raw_data": mau_has_on_demand_raw(mau),
                             }
                         )
                         existing_ids.add(mau_id)
@@ -802,11 +854,14 @@ class OmniMemoryOrchestrator:
             result.graph_entities = graph_context
 
         if auto_expand and strategy.get("require_expansion"):
-            expansion_ids = [
-                item["id"]
-                for item in result.items
-                if item.get("score", 0) > self.config.retrieval.auto_expand_threshold
-            ][: self.config.retrieval.max_expanded_items]
+            expansion_ids = limit_expansion_ids(
+                [
+                    item["id"]
+                    for item in result.items
+                    if item.get("score", 0) > self.config.retrieval.auto_expand_threshold
+                ],
+                self.config.retrieval.max_expanded_items,
+            )
 
             if expansion_ids:
                 expansion = self.retriever.expand(
@@ -821,6 +876,15 @@ class OmniMemoryOrchestrator:
                         expanded = next(
                             e for e in expansion.items if e["id"] == item["id"]
                         )
+                        # DETAILS expand rebuilds the item dict; preserve preview
+                        # score so _expand_evidence_with_budget can still rank/select.
+                        if item.get("score") is not None and expanded.get("score") is None:
+                            expanded["score"] = item["score"]
+                        if (
+                            item.get("has_raw_data") is not None
+                            and expanded.get("has_raw_data") is None
+                        ):
+                            expanded["has_raw_data"] = item["has_raw_data"]
                         result.items[i] = expanded
 
         return result
@@ -847,32 +911,94 @@ class OmniMemoryOrchestrator:
             )
         )
 
-    def answer(
+    @staticmethod
+    def _retrieval_item_tags(item: Dict[str, Any]) -> List[str]:
+        tags = list(item.get("tags") or [])
+        meta_tags = (item.get("metadata") or {}).get("tags") or []
+        return tags + [t for t in meta_tags if t not in tags]
+
+    def _estimate_evidence_token_cost(self, item: Dict[str, Any]) -> int:
+        raw = item.get("raw_content") or {}
+        if isinstance(raw, dict):
+            try:
+                estimate = int(raw.get("token_estimate") or 0)
+            except (TypeError, ValueError):
+                estimate = 0
+            if estimate > 0:
+                return estimate
+        return 500
+
+    def _expand_evidence_with_budget(self, retrieval: RetrievalResult) -> None:
+        """Expand vision_on_demand items to EVIDENCE, bounded by evidence_token_budget."""
+        budget = int(getattr(self.config.retrieval, "evidence_token_budget", 6000) or 0)
+        if budget <= 0:
+            return
+
+        max_items = int(getattr(self.config.retrieval, "max_expanded_items", 5) or 0)
+        candidates = []
+        for idx, item in enumerate(retrieval.items):
+            if "vision_on_demand" not in self._retrieval_item_tags(item):
+                continue
+            if not item.get("has_raw_data"):
+                continue
+            try:
+                score = float(item.get("score") or 0.0)
+            except (TypeError, ValueError):
+                score = 0.0
+            if score <= 0:
+                continue
+
+            token_cost = max(1, self._estimate_evidence_token_cost(item))
+            candidates.append((score / token_cost, score, idx, item["id"], token_cost))
+
+        remaining_budget = budget
+        expanded_count = 0
+        for _, _, idx, mau_id, estimated_cost in sorted(
+            candidates, key=lambda c: (c[0], c[1]), reverse=True
+        ):
+            if max_items > 0 and expanded_count >= max_items:
+                break
+            if estimated_cost > remaining_budget:
+                continue
+
+            expansion = self.retriever.expand(
+                ExpansionRequest(
+                    mau_ids=[mau_id],
+                    level=RetrievalLevel.EVIDENCE,
+                )
+            )
+            if not expansion.items:
+                continue
+
+            expanded = expansion.items[0]
+            raw = expanded.get("raw_content") or {}
+            actual_cost = estimated_cost
+            if isinstance(raw, dict):
+                try:
+                    actual_cost = int(raw.get("token_estimate") or estimated_cost)
+                except (TypeError, ValueError):
+                    actual_cost = estimated_cost
+            actual_cost = max(1, actual_cost)
+            if actual_cost > remaining_budget:
+                continue
+
+            original = retrieval.items[idx]
+            if original.get("score") is not None and expanded.get("score") is None:
+                expanded["score"] = original["score"]
+            retrieval.items[idx] = expanded
+            remaining_budget -= actual_cost
+            expanded_count += 1
+
+    def retrieve_answer_context(
         self,
         question: str,
         top_k: int = 10,
-        include_sources: bool = True,
         tags_filter: Optional[List[str]] = None,
         time_range: Optional[Tuple[float, float]] = None,
         include_on_demand_images: bool = True,
+        question_images: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
-        """
-        Answer a question using memory retrieval.
-
-        This implements the full retrieval-augmented generation flow:
-        1. Retrieve relevant memories (optionally multi-query + tags/time filter)
-        2. Optionally expand vision_on_demand items to load images for multimodal prompt
-        3. Format context
-        4. Generate answer with LLM
-
-        Args:
-            question: The question to answer
-            top_k: Number of memories to retrieve
-            include_sources: Include source references
-            tags_filter: Optional tags to restrict retrieval (e.g. ["locomo_conv-26"])
-            time_range: Optional (start_ts, end_ts) to filter by MAU timestamp
-            include_on_demand_images: If True, expand vision_on_demand MAUs and include images in the prompt
-        """
+        """Retrieve and format memory context for external answer generation."""
         k_per_query = (
             top_k * 2
             if getattr(self.config.retrieval, "enable_multi_query_retrieval", False)
@@ -897,7 +1023,6 @@ class OmniMemoryOrchestrator:
                 time_range=time_range,
             )
 
-        # Multi-query retrieval (SimpleMem-inspired): generate 2~3 queries, run retrievals concurrently, merge results
         if getattr(self.config.retrieval, "enable_multi_query_retrieval", False):
             queries = self._generate_search_queries(question)
             if len(queries) > 1:
@@ -926,117 +1051,196 @@ class OmniMemoryOrchestrator:
         if not retrieval.items:
             logger.debug("Answer: no retrieval items (empty vector search)")
             return {
+                "context": "",
+                "user_content": question,
+                "retrieval": retrieval,
+                "empty": True,
+            }
+
+        if include_on_demand_images:
+            self._expand_evidence_with_budget(retrieval)
+
+        context = self.retriever.format_for_llm(retrieval, include_instructions=False)
+        graph_ctx = getattr(retrieval, "graph_entities", None)
+        if graph_ctx and (
+            graph_ctx.entities or graph_ctx.related_entities or graph_ctx.relations
+        ):
+            graph_text = self.graph_retriever.format_for_llm(graph_ctx)
+            context = f"{context}\n\n[Knowledge Graph]\n{graph_text}"
+
+        user_content: Any = (
+            f"Based on these memories:\n\n{context}\n\nAnswer this question: {question}"
+        )
+        content_parts: List[Dict[str, Any]] = []
+        for question_image in question_images or []:
+            data_url = _encode_local_image_as_data_url(str(question_image))
+            if data_url:
+                content_parts.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": data_url},
+                    }
+                )
+        for item in retrieval.items:
+            raw = item.get("raw_content") or {}
+            if raw.get("type") == "image":
+                _append_raw_images_to_content_parts(content_parts, raw)
+        if content_parts:
+            content_parts.insert(0, {"type": "text", "text": user_content})
+            user_content = content_parts
+
+        return {
+            "context": context,
+            "user_content": user_content,
+            "retrieval": retrieval,
+            "empty": False,
+        }
+
+    def answer(
+        self,
+        question: str,
+        top_k: int = 10,
+        include_sources: bool = True,
+        tags_filter: Optional[List[str]] = None,
+        time_range: Optional[Tuple[float, float]] = None,
+        include_on_demand_images: bool = True,
+        system_prompt: Optional[str] = None,
+        user_prompt_template: Optional[str] = None,
+        question_images: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Answer a question using memory retrieval.
+
+        This implements the full retrieval-augmented generation flow:
+        1. Retrieve relevant memories (optionally multi-query + tags/time filter)
+        2. Optionally expand vision_on_demand items to load images for multimodal prompt
+        3. Format context
+        4. Generate answer with LLM
+
+        Args:
+            question: The question to answer
+            top_k: Number of memories to retrieve
+            include_sources: Include source references
+            tags_filter: Optional tags to restrict retrieval (e.g. ["locomo_conv-26"])
+            time_range: Optional (start_ts, end_ts) to filter by MAU timestamp
+            include_on_demand_images: If True, expand vision_on_demand MAUs and include images in the prompt
+            system_prompt: Optional override for benchmark-style answer generation
+            user_prompt_template: Optional template with {context} and {question} placeholders
+            question_images: Optional local image paths to include in multimodal prompt
+        """
+        bundle = self.retrieve_answer_context(
+            question=question,
+            top_k=top_k,
+            tags_filter=tags_filter,
+            time_range=time_range,
+            include_on_demand_images=include_on_demand_images,
+            question_images=question_images,
+        )
+        retrieval = bundle["retrieval"]
+        if bundle["empty"]:
+            return {
                 "answer": "I don't have any relevant memories to answer this question.",
                 "sources": [],
                 "retrieval_result": retrieval.to_dict(),
             }
 
-        # On-demand: expand vision_on_demand items to load raw images for multimodal prompt
-        if include_on_demand_images:
-            on_demand_ids = [
-                item["id"]
-                for item in retrieval.items
-                if "vision_on_demand" in (item.get("tags") or [])
-                and item.get("has_raw_data")
-            ]
-            if on_demand_ids:
-                expansion = self.retriever.expand(
-                    ExpansionRequest(
-                        mau_ids=on_demand_ids,
-                        level=RetrievalLevel.EVIDENCE,
-                    )
-                )
-                expanded_by_id = {e["id"]: e for e in expansion.items}
-                for i, item in enumerate(retrieval.items):
-                    if item["id"] in expanded_by_id:
-                        retrieval.items[i] = expanded_by_id[item["id"]]
-
-        # Format context
-        context = self.retriever.format_for_llm(retrieval, include_instructions=False)
-
-        # Build user message: text + optional image parts for on_demand
-        user_content: Any = (
-            f"Based on these memories:\n\n{context}\n\nAnswer this question: {question}"
-        )
-        content_parts = []
-        for item in retrieval.items:
-            raw = item.get("raw_content") or {}
-            if raw.get("type") == "image" and raw.get("base64"):
-                content_parts.append(
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{raw['base64']}"},
-                    }
-                )
-        if content_parts:
-            content_parts.insert(0, {"type": "text", "text": user_content})
-            user_content = content_parts
+        context = bundle["context"]
+        user_content = bundle["user_content"]
 
         # Generate answer
         client = self._get_llm_client()
         try:
-            system_content = (
-                "You are a professional Q&A assistant. Your task is to extract concise, "
-                "accurate answers from the provided memory context. "
-                "You should make reasonable inferences from the context when possible. "
-                "IMPORTANT: The conversations took place in 2023. Never use today's date "
-                "(2025 or 2026) as an answer. Only use dates that actually appear in the memories. "
-                "You must output valid JSON format."
-            )
-            answer_instructions = (
-                "Based on these memories:\n\n"
-                f"{context}\n\n"
-                f"Question: {question}\n\n"
-                "Requirements:\n"
-                "1. First, think through the reasoning process\n"
-                "2. Provide a CONCISE answer (short phrase, ideally under 10 words). "
-                "Use exact words and phrases from the context whenever possible rather than paraphrasing.\n"
-                "3. Answer based on the provided context. You may make reasonable inferences "
-                "from the information given (e.g., inferring personality traits, likely preferences, "
-                "or approximate dates from surrounding context)\n"
-                "4. All dates in the response must be formatted as 'DD Month YYYY'. "
-                "NEVER use dates from 2025 or 2026. Use the 'Time:' metadata shown with each memory "
-                "to determine when events occurred.\n"
-                "5. Try your best to answer. Only respond with 'unknown' if the context contains "
-                "absolutely NO relevant information about the topic asked\n"
-                "6. For counting questions, answer with just the number (e.g., '2' not 'twice')\n"
-                "7. For yes/no questions, start with 'Yes', 'No', 'Likely yes', or 'Likely no'\n"
-                "8. When listing multiple items, separate them with commas (e.g., 'item1, item2')\n"
-                "9. Return your response in JSON format\n\n"
-                "Output Format:\n"
-                '{"reasoning": "Brief explanation of your thought process", '
-                '"answer": "Concise answer in a short phrase"}'
-            )
-            # For multimodal content, wrap text instructions with image parts
-            if isinstance(user_content, list):
-                # user_content already has image parts; replace text part
-                user_content[0] = {"type": "text", "text": answer_instructions}
-                final_user_content = user_content
+            if system_prompt is not None:
+                template = user_prompt_template or (
+                    "Context:\n{context}\n\n"
+                    "Question:\n{question}\n\n"
+                    "Answer using only the retrieved memory context."
+                )
+                answer_instructions = template.format(context=context, question=question)
+                if isinstance(user_content, list):
+                    user_content[0] = {"type": "text", "text": answer_instructions}
+                    final_user_content = user_content
+                else:
+                    final_user_content = answer_instructions
+
+                api_kwargs = dict(
+                    model=self.config.llm.query_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": final_user_content},
+                    ],
+                    temperature=0.1,
+                )
+                response = client.chat.completions.create(**api_kwargs)
+                raw_answer = (response.choices[0].message.content or "").strip()
+                logger.debug(
+                    "LLM raw answer: %s",
+                    raw_answer[:200] + ("..." if len(raw_answer) > 200 else ""),
+                )
+                answer = raw_answer
             else:
-                final_user_content = answer_instructions
+                system_content = (
+                    "You are a professional Q&A assistant. Your task is to extract concise, "
+                    "accurate answers from the provided memory context. "
+                    "You should make reasonable inferences from the context when possible. "
+                    "IMPORTANT: The conversations took place in 2023. Never use today's date "
+                    "(2025 or 2026) as an answer. Only use dates that actually appear in the memories. "
+                    "You must output valid JSON format."
+                )
+                answer_instructions = (
+                    "Based on these memories:\n\n"
+                    f"{context}\n\n"
+                    f"Question: {question}\n\n"
+                    "Requirements:\n"
+                    "1. First, think through the reasoning process\n"
+                    "2. Provide a CONCISE answer (short phrase, ideally under 10 words). "
+                    "Use exact words and phrases from the context whenever possible rather than paraphrasing.\n"
+                    "3. Answer based on the provided context. You may make reasonable inferences "
+                    "from the information given (e.g., inferring personality traits, likely preferences, "
+                    "or approximate dates from surrounding context)\n"
+                    "4. All dates in the response must be formatted as 'DD Month YYYY'. "
+                    "NEVER use dates from 2025 or 2026. Use the 'Time:' metadata shown with each memory "
+                    "to determine when events occurred.\n"
+                    "5. Try your best to answer. Only respond with 'unknown' if the context contains "
+                    "absolutely NO relevant information about the topic asked\n"
+                    "6. For counting questions, answer with just the number (e.g., '2' not 'twice')\n"
+                    "7. For yes/no questions, start with 'Yes', 'No', 'Likely yes', or 'Likely no'\n"
+                    "8. When listing multiple items, separate them with commas (e.g., 'item1, item2')\n"
+                    "9. Return your response in JSON format\n\n"
+                    "Output Format:\n"
+                    '{"reasoning": "Brief explanation of your thought process", '
+                    '"answer": "Concise answer in a short phrase"}'
+                )
+                # For multimodal content, wrap text instructions with image parts
+                if isinstance(user_content, list):
+                    # user_content already has image parts; replace text part
+                    user_content[0] = {"type": "text", "text": answer_instructions}
+                    final_user_content = user_content
+                else:
+                    final_user_content = answer_instructions
 
-            # Force JSON output for reliable extraction of concise answers
-            api_kwargs = dict(
-                model=self.config.llm.query_model,
-                messages=[
-                    {"role": "system", "content": system_content},
-                    {"role": "user", "content": final_user_content},
-                ],
-                temperature=0.1,
-            )
-            # json_object mode forces valid JSON output (critical for concise answer extraction)
-            if not isinstance(final_user_content, list):  # skip for multimodal (vision)
-                api_kwargs["response_format"] = {"type": "json_object"}
-            response = client.chat.completions.create(**api_kwargs)
-            raw_content = response.choices[0].message.content or ""
-            raw_answer = raw_content.strip()
-            logger.debug(
-                "LLM raw answer: %s",
-                raw_answer[:200] + ("..." if len(raw_answer) > 200 else ""),
-            )
+                # Force JSON output for reliable extraction of concise answers
+                api_kwargs = dict(
+                    model=self.config.llm.query_model,
+                    messages=[
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": final_user_content},
+                    ],
+                    temperature=0.1,
+                )
+                # json_object mode forces valid JSON output (critical for concise answer extraction)
+                if not isinstance(final_user_content, list):  # skip for multimodal (vision)
+                    api_kwargs["response_format"] = {"type": "json_object"}
+                response = client.chat.completions.create(**api_kwargs)
+                raw_content = response.choices[0].message.content or ""
+                raw_answer = raw_content.strip()
+                logger.debug(
+                    "LLM raw answer: %s",
+                    raw_answer[:200] + ("..." if len(raw_answer) > 200 else ""),
+                )
 
-            # Extract concise answer from JSON response
-            answer = self._extract_answer_from_json(raw_answer)
+                # Extract concise answer from JSON response
+                answer = self._extract_answer_from_json(raw_answer)
         except Exception as e:
             logger.error(f"Answer generation failed: {e}")
             answer = "I encountered an error generating the answer."

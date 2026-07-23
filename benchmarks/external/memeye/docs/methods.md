@@ -1,6 +1,6 @@
 # MemEye Benchmark Methods
 
-13 methods across 4 categories. Each method is evaluated in both MCQ and Open modes.
+14 methods across 4 categories. Each method is evaluated in both MCQ and Open modes.
 
 ## Method Taxonomy
 
@@ -38,7 +38,7 @@ LLM compresses dialogue history into summaries before answering.
 - Retrieval follows orchestrator built-ins (`query()` and `answer()`): FAISS+dense and BM25+sparse hybrid search, then optional KG text augmentation.
 - This method does not claim Mem-Gallery adapter's category-specific heuristics (`[FR]`, `[TR]`, etc.) or image-catalog post-retrieval routing.
 
-### Agentic Memory (7)
+### Agentic Memory (8)
 
 Autonomous agents that construct, update, and query their own memory.
 
@@ -51,6 +51,7 @@ Autonomous agents that construct, update, and query their own memory.
 | M2A | `m2a` | Visual | Multimodal ReAct loop + semantic memory bank (SigLIP2) |
 | MMA | `mma` | Visual | Confidence-weighted multimodal retrieval (SigLIP v1 so400m) |
 | MIRIX | `mirix` | Visual | Multi-layer memory agent system |
+| SeCom | `secom` | Text | Segment-level memory + optional LLMLingua compression |
 
 ## Multimodal Embedding Models
 

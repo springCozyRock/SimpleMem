@@ -1,0 +1,1024 @@
+category,cluster,id,gt_letter,pred_letter,deny,failure_tag,n_retrieval,n_vlm_images,question,raw_response
+Single_Hop_QA,cluster_19,b8ba1f69,B,A,False,U0_other,14,4,"Based on Doc. 7ff9b310, Doc. 62bc93a2, Doc. 105e0aad, What are the key processes and features during Metaphase I of meiosis?",(A)
+Single_Hop_QA,cluster_13,82a2bd85,C,,False,U0_other,11,0,"Based on Doc. 5691bf56, Doc. eb876c27, Doc. 22679ebd, According to this survey, which country’s youth show the greatest concern about unemployment problem?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_2,1a6dcf60,D,A,False,U0_other,16,2,"Based on Fig. 74e984c0, Doc. d97eb365, Doc. c7b10455, Doc. f29b3a68, Doc. 4760f9d5, Doc. e138f955, How do the concepts of reporting and analysis contribute to the analytics value chain, and what roles do they play in the progression from business intelligence to business analytics?",(A)
+Single_Hop_QA,cluster_43,QA_sample_72b9c43b,C,,False,U0_other,18,0,"Based on Fig. 490219e8, the text, what would the new revenue contribution be from the sector that is targeted for a ""10% increase,"" and does this change remain within the ""monthly energy consumption goal"" as defined?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_52,QA_sample_f3e1d813,C,A,False,L2_comparison,15,0,"Based on Fig. d63a3165, both the chart and the government program's criteria, what is the current assessment of the economic conditions in 2015 according to whether they are considered ""favorable,"" ""unfavorable,"" or ""neutral"" as defined in the text?",(A)
+Single_Hop_QA,cluster_27,QA_sample_cfac84da,A,,False,U0_other,10,0,"Based on Fig. 14563743, the previous definition, which of the metrics (M1, M2, or M3) is considered ""effective"" according to whether it meets or exceeds the 80% target as shown in the visualized data?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_4,QA_sample_6a0e313c,B,A,False,T1_temporal,17,0,"Based on Fig. 389c1133, the text, which cryptocurrency experienced ""stabilization"" after 04:00 AM according to the previous definition?",(A)
+Single_Hop_QA,cluster_35,QA_sample_3674a8db,C,A,False,T1_temporal+C1_counting+L2_comparison,16,0,"Based on Fig. f522d881, the text's definition, which year was the first to meet the threshold for classification as a ""severe"" humanitarian crisis, where the ""total displaced population surpasses 50 million and the number of displaced persons per 1,000 world population exceeds 7 in the same year""?",(A)
+Single_Hop_QA,cluster_14,d91cdb71,B,C,False,U0_other,10,0,"Based on Doc. eb340464, Doc. e4c3f151, Doc. c161f8c0, Doc. d98c6dc2, How does female representation vary across different STEM job clusters?",(C)
+Single_Hop_QA,cluster_46,QA_sample_0f3df45d,B,D,False,C1_counting,12,0,"Based on Fig. df480ad1, the text, which combat aircraft is categorized as 'expensive' according to the definition of having a 'combined operating cost exceeding $20 million' and 'maintenance costs accounting for more than 30%' of the total cost per aircraft?",(D)
+Single_Hop_QA,cluster_32,QA_sample_d70ca6b5,A,B,False,U0_other,18,4,"Based on Fig. bff357c3, the text, which players in the chart meet the ""elite performance thresholds"" for rebounds and assists?",(B)
+Single_Hop_QA,cluster_20,cd34b524,D,C,False,U0_other,19,4,"Based on Doc. 8b4aa4df, Doc. f7e8e227, Doc. f7c3ad77, what is long-term debt of  Costco in FY 2021? Anwser in millions.","(C): 7,531"
+Single_Hop_QA,cluster_39,QA_sample_0676e3f8,B,A,False,U0_other,14,2,"Based on Fig. ad83173d, According to the previous definition, which market or product line should Dechra Pharmaceuticals prioritize for growth based on a ""revenue growth rate that exceeds 10%"" from 2017 to 2018?",(A)
+Single_Hop_QA,cluster_30,QA_sample_0d2fe105,D,,False,U0_other,17,1,"Based on Fig. b660beda, the text, which electorates are considered ""highly competitive"" according to the previous definition under the 'IF O.N. PREFS REVERSED' scenario?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_21,QA_sample_646706ea,D,B,False,U0_other,16,0,"Based on Fig. 09d9c204, the text, which activity is classified as a ""critical priority"" and which is classified as a ""lower priority"" according to the previous definitions?",(B)
+Single_Hop_QA,cluster_34,QA_sample_8cc2f639,D,,False,C1_counting,10,0,"Based on Fig. 2f3a7088, What proportion of the lemon meringue pie is sugar, and according to the previous definition, does this meet the ""requirement that sugar occupies at least 25% of the pie's total composition"" for making a balanced pie?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_50,b3fb86e6,A,B,False,U0_other,19,1,"Based on Doc. 0e52e530, Doc. c7f3149f, Doc. 2067c081, What does the plus sign on the Gallery screen indicate?",(B)
+Single_Hop_QA,cluster_51,QA_sample_5c563e53,A,,False,T1_temporal,14,0,"Based on Fig. 2378a37c, the text, which cryptocurrency experienced a ""recovery level"" after the ""critical dip"" around 04:00 AM according to the previous definitions?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_37,QA_sample_ed39cd8c,B,,False,C1_counting,14,0,"Based on Fig. c385f4f3, the definitions provided in the text, by the year 2035, which plays a larger role in total energy capacity: sources that are renewable and signify progress toward a sustainable future, or sources that are considered dispatchable and critical for grid reliability?","No, I can not answer this question based on the available information"
+Single_Hop_QA,cluster_22,QA_sample_0bf22e83,D,,False,U0_other,13,0,"Based on Fig. 9de2c5da, the text, what income category was Thailand classified into in 2016 according to its GDP per capita and the previously defined classifications of ""high-income,"" ""middle-income,"" and ""lower-income"" nations?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_22,QA_sample_ecf24cf2,A,B,False,T1_temporal,14,3,"Based on Table. 9eb5ed00, During the 2000 season, in a game between the Chicago Bears and a team with an attendance of 59,869, did the player who joined the Bears in 2000 after playing for the Tampa Bay Buccaneers participate?",(B)
+Multi_Hop_QA,cluster_58,QA_sample_197b7c17,D,A,False,U0_other,16,4,"Based on Fig. de0b5bc8, Fig. 90e1106c, Fig. f5bc02cc, Table. 633f68c7, Which driver associated with a Ford car in the top 10 results of the 1992 Mountain Dew Southern 500 was identifiable by their gray hair?",(A)
+Multi_Hop_QA,cluster_7,QA_sample_48085b6f,D,B,False,U0_other,18,6,"Based on Fig. 75f914c6, Fig. a72cccc2, Fig. 7fc07365, Which country with a flag featuring yellow is part of a basketball tournament involving European nations?",(B)
+Multi_Hop_QA,cluster_8,QA_sample_9c56672c,D,C,False,U0_other,10,1,"Based on Table. e45b6ac3, Which company that owns a subsidiary focused on strategic games was the publisher of a video game series in 2004 and created a board game with reversed Monopoly rules in 1965?",(C)
+Multi_Hop_QA,cluster_16,QA_sample_8e5df8b4,A,D,False,U0_other,14,0,"Based on Table. 58b29d2f, Which team visiting Lambeau Field during the 2011 NFL regular season had a player with a familial connection to Howie Long, and what was the outcome of that game?",(D)
+Multi_Hop_QA,cluster_50,QA_sample_4777f339,C,D,False,L3_multi_hop,14,1,"Based on Table. 2a8efd5e, What is the location, involved in a kickboxing match won by a fighter with several victories in Hero Legends, that was also used for filming scenes of Fullmetal Alchemist?",(D): Dunhuang China
+Multi_Hop_QA,cluster_51,QA_sample_e32b3938,A,C,False,V1_visual_detail,11,6,"Based on Fig. 3eddcac1, Fig. ea5c393f, Table. 1b27df6d, Which blonde-haired Australian player listed in the prop position for the 2004 Anzac Test lineup matches the appearance depicted in the provided images?",(C)
+Multi_Hop_QA,cluster_32,QA_sample_7a4f199c,A,B,False,U0_other,15,0,"Based on Table. 4c382099, Which stadium hosted a game between the New York Giants and a professional football team displaced due to a significant disaster?",(B): Tiger Stadium
+Multi_Hop_QA,cluster_9,QA_sample_ed40d39e,A,,False,T1_temporal+V1_visual_detail+F1_function_call,0,0,"Based on Fig. 9e53a664, Which Grammy-winning artist known for collaborating on the album featuring 'Forgot About Dre' is wearing multiple chains in the provided image?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fd72ce7a570 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-81bec676-084b-9939-b370-a9866965e7b0', 'request_id': '81bec676-084b-9939-b370-a9866965e7b0'}
+"
+Multi_Hop_QA,cluster_15,QA_sample_0c4aaf85,A,,False,T1_temporal+L2_comparison+L3_multi_hop,12,1,"Based on Table. 63c2552b, Which doubles pair won the title in the same tournament where the runner-up of the men's singles event also later won the men's singles title at a Grand Slam in a year ending in 7?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_10,QA_sample_6c3b01f3,D,,False,T1_temporal,16,0,"Based on Table. c00eec81, Which game marked the first Monday night NFL matchup of the 2017 regular season, and where was it played?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_6,QA_sample_0b66d63b,C,D,False,U0_other,19,2,"Based on Table. fa4f44b3, Who has more assists in Serie A's 2019-20 season, the Argentine player associated with a boot designed for deceptive players or the one playing for Atalanta?",(D)
+Multi_Hop_QA,cluster_22,QA_sample_4f7dae1a,A,B,False,U0_other,18,0,"Based on Table. fa25d02e, In a game held during the Arizona Cardinals' 2013 season, what was the outcome against the NFL team that had prolonged struggles under its head coach that year?",(B)
+Multi_Hop_QA,cluster_58,QA_sample_a7fda091,B,D,False,U0_other,16,0,"Based on Table. 8be16fb1, What venue hosted the game between the team previously part of the geographically inaccurate NFC West division and the St. Louis Rams during the 2010 regular season?",(D): Ford Field
+Multi_Hop_QA,cluster_7,QA_sample_96754cd3,A,,False,T1_temporal+C1_counting,15,2,"Based on Table. 3dbf64ce, Which player who had appearances in cup matches in a season when Arsenal won the title in the oldest football competition played a total of 177 league games for the club during his career?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_8,QA_sample_cb90e90d,A,D,False,U0_other,14,0,"Based on Table. 97ea2795, Which HexaDrive-backed game playable on a console that supports The Legend of Zelda: Breath of the Wild was published by a company known for the Metal Gear Solid series?",(D)
+Multi_Hop_QA,cluster_16,QA_sample_4b00da6d,C,,False,T1_temporal,14,2,"Based on Table. 6fd630e0, Which football division did Dan Turner play the most matches in after the merger of the Scottish Premier League and Scottish Football League forming the Scottish Professional Football League?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_50,QA_sample_be3d09c6,B,,False,U0_other,13,0,"Based on Table. 060f4048, Which cricket team mentioned as one of the most successful franchises, matching the historical significance of a Sultanate in Delhi, has faced another cricket team during the 2013 season in Mumbai and won the match by 60 runs?","No, I can not answer this question based on the available information"
+Multi_Hop_QA,cluster_51,QA_sample_25893b7b,D,C,False,L3_multi_hop,15,0,"Based on Table. 88ec0172, Which player won a men's singles title at an ATP Masters Series event in 2007 by defeating an opponent who also won a singles title at the US Open in 2017?",(C)
+Multi_Hop_QA,cluster_32,QA_sample_01b6dc4c,B,C,False,C1_counting,17,0,"Based on Table. bc3ec526, Which team known for its green and white colors did Mesca make more total appearances for compared to the club that joined the highest level of English football in 2019?",(C)
+Conflict_Resolution_QA,cluster_20,QA_sample_df2d5e6c,C,,False,U0_other,14,0,"Based on Fig. 1dd5f903, Who established the brand corresponding to the logo?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_26,MMKE_8cc9,A,,False,V1_visual_detail,12,2,"Based on Fig. e4cb9fe8, On which continent is the species shown in the image found?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_36,MMKE_6164,B,,False,V1_visual_detail,10,3,"Based on Fig. c91f16b8, What does the species shown in the image consume for protein during its breeding season?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_25,QA_sample_6873bacd,D,,False,V1_visual_detail,14,6,"Based on Fig. 4d2b7947, What is the nationality of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_18,QA_sample_708e0838,A,,False,V1_visual_detail,11,5,"Based on Fig. d216d041, What is the occupation of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_23,MMKE_9e9b,B,,False,V1_visual_detail,10,3,"Based on Fig. 65818097, During which season is the building shown in the image open to visitors?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_17,MMKE_2089,D,B,False,T1_temporal+V1_visual_detail,13,3,"Based on Fig. d6ccb30c, What crime was the individual shown in the image convicted of by the Yugoslav government after World War II?",(B)
+Conflict_Resolution_QA,cluster_6,QA_sample_364fbe11,D,,False,V1_visual_detail,10,1,"Based on Fig. a25326ab, What is the occupation of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_8,QA_sample_6e0c135b,D,,False,U0_other,20,2,"Based on Fig. 46c73515, What are the main products of this brand?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_53,QA_sample_dfa9563e,A,D,False,T1_temporal,20,4,"Based on Fig. 63d9a85f, When was the brand associated with the logo established?",(D)
+Conflict_Resolution_QA,cluster_48,QA_sample_7083b69b,C,,False,V1_visual_detail,13,7,"Based on Fig. ce5e22e6, What is the nationality of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_16,MMKE_5ef8,A,,False,V1_visual_detail,10,4,"Based on Fig. cc80cb42, In addition to grassy slopes and woodlands, in what other type of habitat can the species shown in the image grow?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_15,MMKE_10eb,A,,False,T1_temporal,18,4,"Based on Fig. d9814ad7, At which auto show was the concept car that inspired the name of the vehicle mentioned in the text first introduced?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_2,QA_sample_2b1b5a3b,B,,False,V1_visual_detail,10,7,"Based on Fig. f1b42a80, What is the nationality of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_31,MMKE_018b,C,B,False,V1_visual_detail,10,0,"Based on Fig. bdd80b20, Which record label did the band shown in the image sign to in 1979?",(B): Virgin Records
+Conflict_Resolution_QA,cluster_9,QA_sample_34dc928b,D,,False,V1_visual_detail,12,7,"Based on Fig. 38f16ff6, What is the nationality of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_7,QA_sample_44bf7baf,A,B,False,V1_visual_detail,12,0,"Based on Fig. 8406e6d8, What is the occupation of the person in the picture?",(B)
+Conflict_Resolution_QA,cluster_35,MMKE_d8c5,C,,False,V1_visual_detail,12,1,"Based on Fig. 945f23a1, What is the specific food plant of the larvae of the species shown in the image?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_37,QA_sample_af78b60d,B,,False,V1_visual_detail,13,4,"Based on Fig. 2402ff2e, What is the nationality of the person in the picture?","No, I can not answer this question based on the available information"
+Conflict_Resolution_QA,cluster_12,MMKE_c704,B,C,False,V1_visual_detail,13,2,"Based on Fig. 324ec9cd, What is one of the countries where the species shown in the image can be found?",(C)
+Preference_QA,cluster_46,QA_sample_db01369d_3,B,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. ac61f711, the image, what is Drake Ashley most likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7ff65237c590 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-89fd55b3-74eb-9427-96c8-5c62e276b65b', 'request_id': '89fd55b3-74eb-9427-96c8-5c62e276b65b'}
+"
+Preference_QA,cluster_53,QA_sample_93732777_2,A,C,False,V1_visual_detail+L2_comparison+P1_preference,10,1,"Based on Fig. 448c503a, Among the activities that could reasonably occur in the given image, which one is Kayden Soto least likely to be doing?",(C)
+Preference_QA,cluster_56,QA_sample_0f81d4c4_3,B,C,False,V1_visual_detail+L2_comparison+P1_preference,10,4,"Based on Fig. 0d365cb6, Among the activities that could reasonably occur in the given image, which one is Kane Owen least likely to be doing?",(C)
+Preference_QA,cluster_38,QA_sample_e84b6bc4_3,B,D,False,V1_visual_detail+L2_comparison+P1_preference,10,6,"Based on Fig. af5050ba, Among the activities that could reasonably occur in the given image, which one is Lilianna Colon least likely to be doing?",(D)
+Preference_QA,cluster_61,QA_sample_abd12e05_2,B,C,False,V1_visual_detail+L2_comparison+P1_preference,10,3,"Based on Fig. 20309c16, Among the activities that could reasonably occur in the given image, which one is Paxton Clarke least likely to be doing?",(C)
+Preference_QA,cluster_9,QA_sample_94320d57_1,D,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. 3118f07d, Among the activities that could reasonably occur in the given image, which one is Alan Woods least likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fd72cecdf10 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-1213721c-26fa-93d5-91fa-04b05d22bc92', 'request_id': '1213721c-26fa-93d5-91fa-04b05d22bc92'}
+"
+Preference_QA,cluster_45,QA_sample_0bcca2fd_3,D,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. 1a35082d, the image, what is Jovanny Matthews most likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fe594ef5be0 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-6e57d0cf-7287-9bb5-8f5d-2145db0531a5', 'request_id': '6e57d0cf-7287-9bb5-8f5d-2145db0531a5'}
+"
+Preference_QA,cluster_20,QA_sample_92e75a2d_2,C,B,False,V1_visual_detail+L2_comparison+P1_preference,10,2,"Based on Fig. 1f4b15cd, Among the activities that could reasonably occur in the given image, which one is Cannon Hester least likely to be doing?",(B)
+Preference_QA,cluster_14,QA_sample_84d7f62d_2,B,,False,V1_visual_detail+L2_comparison+P1_preference,10,3,"Based on Fig. 84cc15b6, the image, what is Jaliyah Gamble most likely to be doing?","No, I can not answer this question based on the available information"
+Preference_QA,cluster_29,QA_sample_9daa6aaf_3,A,C,False,V1_visual_detail+L2_comparison+P1_preference,10,4,"Based on Fig. 100dbe9c, Among the activities that could reasonably occur in the given image, which one is Harper Clark least likely to be doing?",(C)
+Preference_QA,cluster_24,QA_sample_217ac44f_2,C,A,False,V1_visual_detail+L2_comparison+P1_preference,11,1,"Based on Fig. 71c9d5de, Among the activities that could reasonably occur in the given image, which one is Meadow Boyer least likely to be doing?",(A)
+Preference_QA,cluster_26,QA_sample_5e60c675_1,A,D,False,V1_visual_detail+L2_comparison+P1_preference,10,0,"Based on Fig. 0bf1de88, Among the activities that could reasonably occur in the given image, which one is Kara Yates least likely to be doing?",(D)
+Preference_QA,cluster_27,QA_sample_04c5aee4_2,D,C,False,V1_visual_detail+L2_comparison+P1_preference,17,0,"Based on Fig. f034b867, Among the activities that could reasonably occur in the given image, which one is Alexzander Pope least likely to be doing?",(C)
+Preference_QA,cluster_30,QA_sample_84d7f62d_3,A,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. 5773997e, Among the activities that could reasonably occur in the given image, which one is Elle Spears least likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fb33f647290 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-05b68e18-c939-9a44-b786-79c6c229c7d3', 'request_id': '05b68e18-c939-9a44-b786-79c6c229c7d3'}
+"
+Preference_QA,cluster_49,QA_sample_cccfa3f0_3,C,B,False,V1_visual_detail+L2_comparison+P1_preference,10,1,"Based on Fig. c6070410, Among the activities that could reasonably occur in the given image, which one is Trent Sandoval least likely to be doing?",(B)
+Preference_QA,cluster_11,QA_sample_0bcca2fd_3,D,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. e7b8d37b, the image, what is Justice Clark most likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7feaf059f9e0 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-7a77fccd-abcb-9736-8193-34c910d15719', 'request_id': '7a77fccd-abcb-9736-8193-34c910d15719'}
+"
+Preference_QA,cluster_21,QA_sample_e84b6bc4_2,A,D,False,V1_visual_detail+L2_comparison+P1_preference,19,5,"Based on Fig. 2cb69ebb, Among the activities that could reasonably occur in the given image, which one is Lori Roby least likely to be doing?",(D)
+Preference_QA,cluster_13,QA_sample_d1479f89_3,A,B,False,V1_visual_detail+L2_comparison+P1_preference,10,2,"Based on Fig. df94aa40, Among the activities that could reasonably occur in the given image, which one is Cannon Hester least likely to be doing?",(B)
+Preference_QA,cluster_42,QA_sample_db01369d_3,B,,False,T1_temporal+V1_visual_detail+L2_comparison,0,0,"Based on Fig. 314b1e93, the image, what is Meadow Boyer most likely to be doing?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fe9cf08da90 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-a6ac293a-fda3-9591-9244-cd52f918f477', 'request_id': 'a6ac293a-fda3-9591-9244-cd52f918f477'}
+"
+Preference_QA,cluster_58,QA_sample_72ee2a64_2,C,D,False,V1_visual_detail+L2_comparison+P1_preference,12,4,"Based on Fig. 39f12073, Among the activities that could reasonably occur in the given image, which one is Solomon Paul least likely to be doing?",(D)
+Function_Call,cluster_46,FC_sample_495d8d17,"[{'step': 1, 'calls': [{'name': 'GOOGLE_MAPS_geocode', 'arguments': {'address': 'Binnenhof, The Hague, Netherlands'}}, {'name': 'GOOGLE_MAPS_geocode', 'arguments': {'address': 'Niagara Falls, US'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. ad0d90b0, What are the precise geographic coordinates for each of the two locations shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""GOOGLE_MAPS_geocode"",
+      ""arguments"": {
+        ""address"": ""European cityscape with illuminated fountain and historic buildings at dusk""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_geocode"",
+      ""arguments"": {
+        ""address"": ""Niagara Falls observation deck with waterfall and city skyline""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_39,FC_sample_25308ed4,"[{'step': 1, 'calls': [{'name': 'AMAZON_search_products', 'arguments': {'keywords': 'Pepsi 20 oz bottle'}}, {'name': 'AMAZON_search_products', 'arguments': {'keywords': 'Pepsi Zero Sugar 20 oz bottle'}}, {'name': 'AMAZON_search_products', 'arguments': {'keywords': 'Diet Pepsi bottle'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. cdb8609a, What are the current online prices for the different types of drinks shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""AMAZON_search_products"",
+      ""arguments"": {
+        ""keywords"": ""Pepsi bottle"",
+        ""n"": 5,
+        ""page"": 1,
+        ""amazon_domain"": ""amazon.com""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_38,FC_sample_aa888782,"[{'step': 1, 'calls': [{'name': 'TMDB_search_movies', 'arguments': {'query': 'Once Upon a Time... in Hollywood'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'Once Upon a Time in Hollywood showtimes near New York', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 376e987f, what is shown in this image, can you find where this movie is currently playing in cinemas near New York?","{
+  ""calls"": [
+    {
+      ""name"": ""TMDB_search_movies"",
+      ""arguments"": {
+        ""query"": ""Once Upon a Time in... Hollywood""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""movie theater"",
+        ""regionCode"": ""US"",
+        ""locationBias"": {
+          ""circle"": {
+            ""center"": {
+              ""latitude"": 40.7128,
+              ""longitude"": -74.0060
+            },
+            ""radius"": 5000
+          }
+        }
+      }
+    }
+  ]
+}"
+Function_Call,cluster_59,FC_sample_4d34cf5d,"[{'step': 1, 'calls': [{'name': 'WIKI_search', 'arguments': {'query': 'Cambridge, Massachusetts'}}, {'name': 'WEATHER_get_weather', 'arguments': {'location': 'Cambridge, MA'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'best restaurants near Harvard Yard, Cambridge, MA', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. d97ed096, what is shown in this image, can you tell me about the city where this landmark is located, including current weather and nearby dining options?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_summary"",
+      ""arguments"": {
+        ""title"": ""University of Chicago""
+      }
+    },
+    {
+      ""name"": ""WEATHER_get_weather"",
+      ""arguments"": {
+        ""location"": ""Chicago, IL"",
+        ""units"": ""us""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""restaurants near University of Chicago"",
+        ""regionCode"": ""US"",
+        ""languageCode"": ""en"",
+        ""maxResultCount"": 5
+      }
+    }
+  ]
+}"
+Function_Call,cluster_48,FC_sample_ef0c8f14,"[{'step': 1, 'calls': []}, {'step': 2, 'calls': [{'name': 'TMDB_search_movies', 'arguments': {'query': 'Green Book'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'Green Book showtimes near New York, NY', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 9949ff2d, what is shown in this image, can you find where this movie is currently playing in cinemas near New York?","{
+  ""calls"": [
+    {
+      ""name"": ""TMDB_search_movies"",
+      ""arguments"": {
+        ""query"": ""Green Book""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""movie theater"",
+        ""regionCode"": ""US"",
+        ""locationBias"": {
+          ""circle"": {
+            ""center"": {
+              ""latitude"": 40.7128,
+              ""longitude"": -74.0060
+            },
+            ""radius"": 5000
+          }
+        }
+      }
+    }
+  ]
+}"
+Function_Call,cluster_37,FC_sample_b489ff79,"[{'step': 1, 'calls': [{'name': 'GOOGLE_MAPS_geocode', 'arguments': {'address': 'Los Angeles, California'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. dc0d1b54, What is the geographic location of the city shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""GOOGLE_MAPS_geocode"",
+      ""arguments"": {
+        ""address"": ""Dodger Stadium, Los Angeles, CA""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_52,FC_sample_636b731d,"[{'step': 1, 'calls': [{'name': 'WIKI_summary', 'arguments': {'title': 'Common carp'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. e97e04c1, What can you tell me about the fish shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_search"",
+      ""arguments"": {
+        ""query"": ""silvery-gold fish with reddish-brown fins"",
+        ""n"": 1
+      }
+    }
+  ]
+}"
+Function_Call,cluster_35,FC_sample_836ebf81,"[{'step': 1, 'calls': [{'name': 'WIKI_summary', 'arguments': {'title': 'American eel'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 565d5703, What is a brief overview of the species shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_summary"",
+      ""arguments"": {
+        ""title"": ""Eel""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_50,FC_sample_946f75ae,"[{'step': 1, 'calls': []}, {'step': 2, 'calls': [{'name': 'NIXOS_nixos_search', 'arguments': {'query': 'fake_tensor_ops'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'wrong_dep_alpha'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'fastapi'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'uvicorn'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'json'}}]}]",,False,T1_temporal+V1_visual_detail+F1_function_call,0,0,"Based on Fig. eb4a62e8, the code shown in this image, can you check if the first five imported packages are available in the NixOS package repository?","{
+  ""calls"": [
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""fake_tensor_ops"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""wrong_dep_alpha"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""fastapi"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""uvicorn"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""sentence_transformers"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_53,FC_sample_4425cb56,"[{'step': 1, 'calls': [{'name': 'NATIONALPARKS_getCampgrounds', 'arguments': {'parkCode': 'romo'}}, {'name': 'NATIONALPARKS_getAlerts', 'arguments': {'parkCode': 'romo'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. fb21d544, What campgrounds and current alerts are available for the national park shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""NATIONALPARKS_getCampgrounds"",
+      ""arguments"": {
+        ""parkCode"": ""YELL""
+      }
+    },
+    {
+      ""name"": ""NATIONALPARKS_getAlerts"",
+      ""arguments"": {
+        ""parkCode"": ""YELL""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_51,FC_sample_f585be10,"[{'step': 1, 'calls': []}, {'step': 2, 'calls': [{'name': 'TMDB_search_movies', 'arguments': {'query': 'Inception'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'Inception showtimes near New York, NY', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 364c9eb3, what is shown in this image, find where this movie is currently playing in cinemas near New York.","{
+  ""calls"": [
+    {
+      ""name"": ""TMDB_search_movies"",
+      ""arguments"": {
+        ""query"": ""Inception""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""movie theater"",
+        ""regionCode"": ""US"",
+        ""locationBias"": {
+          ""circle"": {
+            ""center"": {
+              ""latitude"": 40.7128,
+              ""longitude"": -74.0060
+            },
+            ""radius"": 5000
+          }
+        }
+      }
+    }
+  ]
+}"
+Function_Call,cluster_56,FC_sample_69e3db04,"[{'step': 1, 'calls': []}, {'step': 2, 'calls': [{'name': 'NIXOS_nixos_search', 'arguments': {'query': 'polars'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'scipy'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'brokenkit_beta'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'pillow_simd'}}, {'name': 'NIXOS_nixos_search', 'arguments': {'query': 'time'}}]}]",,False,T1_temporal+V1_visual_detail+F1_function_call,0,0,"Based on Fig. c406ccf7, Check whether each of the first five package names visible in this image exists in the NixOS package repository.","{
+  ""calls"": [
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""polars"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""scipy"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""brokenkit_beta"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""pillow_simd"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    },
+    {
+      ""name"": ""NIXOS_nixos_search"",
+      ""arguments"": {
+        ""query"": ""time"",
+        ""search_type"": ""packages"",
+        ""limit"": 1,
+        ""channel"": ""unstable""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_44,FC_sample_158293d6,"[{'step': 1, 'calls': [{'name': 'WIKI_search', 'arguments': {'query': 'Washington, D.C.'}}, {'name': 'WEATHER_get_weather', 'arguments': {'location': 'Washington, DC'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'best restaurants near United States Capitol, Washington, DC', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 068f533a, What can you tell me about the city shown in this image, including its current weather and nearby dining options?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_summary"",
+      ""arguments"": {
+        ""title"": ""Washington, D.C.""
+      }
+    },
+    {
+      ""name"": ""WEATHER_get_weather"",
+      ""arguments"": {
+        ""location"": ""Washington, D.C."",
+        ""units"": ""us""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""restaurants near United States Capitol"",
+        ""regionCode"": ""US"",
+        ""maxResultCount"": 5
+      }
+    }
+  ]
+}"
+Function_Call,cluster_40,FC_sample_1f7c433f,"[{'step': 1, 'calls': [{'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '4 bananas'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '3 apples'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '3 pears'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '1 orange'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '1 tomato'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '1 pineapple'}}, {'name': 'FOOD_NUTRITION_MCP_get_nutrition', 'arguments': {'query': '1 watermelon'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. f2a08069, What are the nutritional details for each type of fruit shown in this image, based on the quantities visible?","{
+  ""calls"": [
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 banana""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 apple""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 tomato""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 slice of watermelon""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 pineapple""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 orange""
+      }
+    },
+    {
+      ""name"": ""FOOD_NUTRITION_MCP_get_nutrition"",
+      ""arguments"": {
+        ""query"": ""1 pear""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_55,FC_sample_3723ea4d,"[{'step': 1, 'calls': [{'name': 'HEALTHCARE_MCP_fda_drug_lookup', 'arguments': {'drug_name': 'acetaminophen'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 881f2000, What information can be found about the drug shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Penicillin VK"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Amoxicillin"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Tylenol"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Warfarin Sodium"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Aspirin"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Erythromycin"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""TUMS"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Ibuprofen"",
+        ""search_type"": ""general""
+      }
+    },
+    {
+      ""name"": ""HEALTHCARE_MCP_fda_drug_lookup"",
+      ""arguments"": {
+        ""drug_name"": ""Advil"",
+        ""search_type"": ""general""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_46,FC_sample_47124fbb,"[{'step': 1, 'calls': [{'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': ""Emperor Qinshihuang's Mausoleum Site Museum"", 'regionCode': 'cn'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. b092b0a9, What is the name of the landmark shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_search"",
+      ""arguments"": {
+        ""query"": ""Eiffel Tower"",
+        ""n"": 1
+      }
+    }
+  ]
+}"
+Function_Call,cluster_39,FC_sample_b7196c47,"[{'step': 1, 'calls': [{'name': 'AMAZON_search_products', 'arguments': {'keywords': 'OREO Selena Gomez Limited Edition Chocolate Sandwich Cookies'}}, {'name': 'AMAZON_search_products', 'arguments': {'keywords': 'OREO Chocolate Sandwich Cookies Family Size'}}, {'name': 'AMAZON_search_products', 'arguments': {'keywords': 'OREO Mega Stuf Chocolate Sandwich Cookies Family Size'}}, {'name': 'AMAZON_search_products', 'arguments': {'keywords': 'OREO Double Stuf Chocolate Sandwich Cookies Family Size'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 6af537bd, What are the current online prices for each type of cookie shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""AMAZON_search_products"",
+      ""arguments"": {
+        ""keywords"": ""Oreo Selena Gomez"",
+        ""n"": 1,
+        ""page"": 1,
+        ""amazon_domain"": ""amazon.com""
+      }
+    },
+    {
+      ""name"": ""AMAZON_search_products"",
+      ""arguments"": {
+        ""keywords"": ""Oreo Family Size"",
+        ""n"": 1,
+        ""page"": 1,
+        ""amazon_domain"": ""amazon.com""
+      }
+    },
+    {
+      ""name"": ""AMAZON_search_products"",
+      ""arguments"": {
+        ""keywords"": ""Oreo Mega Stuf"",
+        ""n"": 1,
+        ""page"": 1,
+        ""amazon_domain"": ""amazon.com""
+      }
+    },
+    {
+      ""name"": ""AMAZON_search_products"",
+      ""arguments"": {
+        ""keywords"": ""Oreo Double Stuf Family Size"",
+        ""n"": 1,
+        ""page"": 1,
+        ""amazon_domain"": ""amazon.com""
+      }
+    }
+  ]
+}"
+Function_Call,cluster_38,FC_sample_c51e324d,"[{'step': 1, 'calls': [{'name': 'TMDB_search_movies', 'arguments': {'query': 'Friday the 13th'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'movie theaters showing ""Friday the 13th"" near New York, NY', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 42f63359, What movie is shown in this image, and where can it be watched in cinemas near New York?","{
+  ""calls"": [
+    {
+      ""name"": ""TMDB_search_movies"",
+      ""arguments"": {
+        ""query"": ""Friday the 13th""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""cinema"",
+        ""regionCode"": ""US"",
+        ""locationBias"": {
+          ""circle"": {
+            ""center"": {
+              ""latitude"": 40.7128,
+              ""longitude"": -74.0060
+            },
+            ""radius"": 5000
+          }
+        }
+      }
+    }
+  ]
+}"
+Function_Call,cluster_59,FC_sample_cd721556,"[{'step': 1, 'calls': [{'name': 'WIKI_search', 'arguments': {'query': 'Tokyo'}}, {'name': 'WEATHER_get_weather', 'arguments': {'location': 'Tokyo, Japan'}}, {'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'best restaurants near Odaiba, Tokyo, Japan', 'regionCode': 'us'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. cebfc9ec, what is shown in this image, can you provide some background about the city, its current weather, and suggest nearby dining options?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_search"",
+      ""arguments"": {
+        ""query"": ""Statue of Liberty replica"",
+        ""n"": 1
+      }
+    },
+    {
+      ""name"": ""WEATHER_get_weather"",
+      ""arguments"": {
+        ""location"": ""New York City"",
+        ""units"": ""us""
+      }
+    },
+    {
+      ""name"": ""GOOGLE_MAPS_places_text_search"",
+      ""arguments"": {
+        ""query"": ""restaurants near Statue of Liberty"",
+        ""regionCode"": ""US"",
+        ""languageCode"": ""en"",
+        ""maxResultCount"": 5
+      }
+    }
+  ]
+}"
+Function_Call,cluster_48,FC_sample_f58084f3,"[{'step': 1, 'calls': [{'name': 'GOOGLE_MAPS_places_text_search', 'arguments': {'query': 'Clifton Suspension Bridge, Bristol', 'regionCode': 'gb'}}]}]",,False,V1_visual_detail+F1_function_call,0,0,"Based on Fig. 4eb37ec3, Can you identify the landmark shown in this image?","{
+  ""calls"": [
+    {
+      ""name"": ""WIKI_search"",
+      ""arguments"": {
+        ""query"": ""Eiffel Tower"",
+        ""n"": 1
+      }
+    }
+  ]
+}"
+Other,cluster_45,MMKE_2db0,A,,False,V1_visual_detail,10,4,"Based on Fig. a26fcbc9, What is the social behavior of the species shown in the image?","No, I can not answer this question based on the available information"
+Other,cluster_52,MMKE_b862,A,,False,V1_visual_detail,10,0,"Based on Fig. 870af7f9, Where is the species shown in the image primarily found?","No, I can not answer this question based on the available information"
+Other,cluster_49,MMKE_e631,B,A,False,V1_visual_detail,14,0,"Based on Fig. 0afc0054, What is the community member mentioned in the text that is associated with the species shown in the image?",(A)
+Other,cluster_53,MMKE_2e4c,D,,False,V1_visual_detail,10,0,"Based on Fig. b52a5a00, In which region of the United States is the species shown in the image native?","No, I can not answer this question based on the available information"
+Other,cluster_47,MMKE_31c8,A,D,False,V1_visual_detail,10,1,"Based on Fig. 2fc34e97, In what type of regions does the species shown in the image typically thrive?",(D)
+Other,cluster_45,MMKE_19f8,D,C,False,V1_visual_detail,10,0,"Based on Fig. 8545f9f3, Which season's adult form of the species shown in the image has additional eyespots on the underside of the wings?",(C): Wet-season
+Other,cluster_52,MMKE_855a,A,,False,V1_visual_detail,12,1,"Based on Fig. 938249b7, What type of prey does the species shown in the image primarily feed on?","No, I can not answer this question based on the available information"
+Other,cluster_49,MMKE_1a22,D,B,False,V1_visual_detail,10,1,"Based on Fig. a6eea3a7, What country is the species shown in the image found in?",(B): Brazil
+Other,cluster_53,MMKE_0261,C,,False,V1_visual_detail,12,3,"Based on Fig. b327998a, In what types of habitats is the species shown in the image found?","No, I can not answer this question based on the available information"
+Other,cluster_47,MMKE_33e9,D,B,False,V1_visual_detail,10,5,"Based on Fig. 9123533d, What type of soil is preferred by the species shown in the image?",(B)
+Other,cluster_45,MMKE_34a4,C,A,False,V1_visual_detail+P1_preference,13,0,"Based on Fig. 9c702036, What type of terrain does the species shown in the image prefer for nesting to facilitate easy takeoff?",(A)
+Other,cluster_49,MMKE_f427,A,B,False,V1_visual_detail,10,0,"Based on Fig. 97227577, In which northern region of North America is the species shown in the image found?",(B): Northern California
+Other,cluster_47,MMKE_8fc2,A,D,False,V1_visual_detail+P1_preference,10,4,"Based on Fig. 044707de, What type of environment does the species shown in the image prefer for optimal growth?",(D)
+Other,cluster_45,MMKE_000c,C,B,False,V1_visual_detail,10,1,"Based on Fig. c93cbb07, What is the commonly known name of the species shown in the image?",(B)
+Other,cluster_49,MMKE_f28b,C,,False,V1_visual_detail,10,0,"Based on Fig. d04def97, Where is the species shown in the image originally from?","No, I can not answer this question based on the available information"
+Other,cluster_47,MMKE_50d9,C,D,False,V1_visual_detail,17,1,"Based on Fig. a1f2cf12, The Latin name of the species shown in the image refers to which part of the plant?",(D)
+Other,cluster_45,MMKE_68ef,A,,False,T1_temporal+V1_visual_detail+F1_function_call,0,0,"Based on Fig. 4188f626, How are the flowers of the species shown in the image typically arranged?","Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 282, in get_response
+    return _get_response_with_retry(client, messages, args, return_usage=return_usage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 338, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 421, in exc_check
+    raise retry_exc from fut.exception()
+tenacity.RetryError: RetryError[<Future at 0x7fe594edfad0 state=finished raised BadRequestError>]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/base_mem_agent.py"", line 69, in evaluate_cluster
+    qa_result, readable_message = self.evaluate_single_qa(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 1196, in evaluate_single_qa
+    raw_response, answer_messages, result = self._answer_with_retrieval_bundle(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/agents/OmniSimpleMem/omni_simplemem_agent.py"", line 692, in _answer_with_retrieval_bundle
+    raw = get_response(self.client, answer_messages, self.args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 286, in get_response
+    raise inner from e
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/tenacity/__init__.py"", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/benchmarks/external/smmbench/evaluation/utils.py"", line 264, in _get_response_with_retry
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py"", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py"", line 1156, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/mnt/data/bts/repos/SimpleMem/.venv/lib/python3.12/site-packages/openai/_base_client.py"", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': '<400> InternalError.Algo.InvalidParameter: Multimodal file size is too large', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_parameter_error'}, 'id': 'chatcmpl-d4cb5840-f246-9a82-addf-3d00bcf0ab5c', 'request_id': 'd4cb5840-f246-9a82-addf-3d00bcf0ab5c'}
+"
+Other,cluster_49,MMKE_b861,D,C,False,V1_visual_detail,10,3,"Based on Fig. e499059b, Where is the species shown in the image frequently observed according to the description?",(C): Solitary shrubs
+Other,cluster_47,MMKE_ff51,D,,False,V1_visual_detail,10,2,"Based on Fig. 37dbb210, Where is the festival celebrating the species shown in the image held?","No, I can not answer this question based on the available information"
+Other,cluster_45,MMKE_f52c,C,A,False,V1_visual_detail,10,0,"Based on Fig. a5f8e457, Where is the congener of the species shown in the image found?",(A)

@@ -817,12 +817,12 @@ class OmniMemoryOrchestrator:
         if graph_context:
             result.graph_entities = graph_context
 
-        if auto_expand and strategy.get("require_expansion"):
+        if auto_expand:
             expansion_ids = [
                 item["id"]
                 for item in result.items
                 if item.get("score", 0) > self.config.retrieval.auto_expand_threshold
-            ][: self.config.retrieval.max_expanded_items]
+            ]
 
             if expansion_ids:
                 expansion = self.retriever.expand(
@@ -837,6 +837,8 @@ class OmniMemoryOrchestrator:
                         expanded = next(
                             e for e in expansion.items if e["id"] == item["id"]
                         )
+                        if item.get("score") is not None and expanded.get("score") is None:
+                            expanded["score"] = item["score"]
                         result.items[i] = expanded
 
         return result
@@ -862,6 +864,72 @@ class OmniMemoryOrchestrator:
                 level=level,
             )
         )
+
+    def _estimate_evidence_token_cost(self, item: Dict[str, Any]) -> int:
+        raw = item.get("raw_content") or {}
+        if isinstance(raw, dict):
+            try:
+                estimate = int(raw.get("token_estimate") or 0)
+            except (TypeError, ValueError):
+                estimate = 0
+            if estimate > 0:
+                return estimate
+        return 500
+
+    def _expand_evidence_with_budget(self, retrieval: RetrievalResult) -> None:
+        budget = int(getattr(self.config.retrieval, "evidence_token_budget", 6000) or 0)
+        if budget <= 0:
+            return
+
+        candidates = []
+        for idx, item in enumerate(retrieval.items):
+            if "vision_on_demand" not in (item.get("tags") or []):
+                continue
+            if not item.get("has_raw_data"):
+                continue
+            try:
+                score = float(item.get("score") or 0.0)
+            except (TypeError, ValueError):
+                score = 0.0
+            if score <= 0:
+                continue
+
+            token_cost = max(1, self._estimate_evidence_token_cost(item))
+            candidates.append((score / token_cost, score, idx, item["id"], token_cost))
+
+        remaining_budget = budget
+        for _, _, idx, mau_id, estimated_cost in sorted(
+            candidates, key=lambda c: (c[0], c[1]), reverse=True
+        ):
+            if estimated_cost > remaining_budget:
+                continue
+
+            expansion = self.retriever.expand(
+                ExpansionRequest(
+                    mau_ids=[mau_id],
+                    level=RetrievalLevel.EVIDENCE,
+                )
+            )
+            if not expansion.items:
+                continue
+
+            expanded = expansion.items[0]
+            raw = expanded.get("raw_content") or {}
+            actual_cost = estimated_cost
+            if isinstance(raw, dict):
+                try:
+                    actual_cost = int(raw.get("token_estimate") or estimated_cost)
+                except (TypeError, ValueError):
+                    actual_cost = estimated_cost
+            actual_cost = max(1, actual_cost)
+            if actual_cost > remaining_budget:
+                continue
+
+            original = retrieval.items[idx]
+            if original.get("score") is not None and expanded.get("score") is None:
+                expanded["score"] = original["score"]
+            retrieval.items[idx] = expanded
+            remaining_budget -= actual_cost
 
     def retrieve_answer_context(
         self,
@@ -932,23 +1000,7 @@ class OmniMemoryOrchestrator:
             }
 
         if include_on_demand_images:
-            on_demand_ids = [
-                item["id"]
-                for item in retrieval.items
-                if "vision_on_demand" in (item.get("tags") or [])
-                and item.get("has_raw_data")
-            ]
-            if on_demand_ids:
-                expansion = self.retriever.expand(
-                    ExpansionRequest(
-                        mau_ids=on_demand_ids,
-                        level=RetrievalLevel.EVIDENCE,
-                    )
-                )
-                expanded_by_id = {e["id"]: e for e in expansion.items}
-                for i, item in enumerate(retrieval.items):
-                    if item["id"] in expanded_by_id:
-                        retrieval.items[i] = expanded_by_id[item["id"]]
+            self._expand_evidence_with_budget(retrieval)
 
         context = self.retriever.format_for_llm(retrieval, include_instructions=False)
         graph_ctx = getattr(retrieval, "graph_entities", None)

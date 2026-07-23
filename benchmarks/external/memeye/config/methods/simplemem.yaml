@@ -8,6 +8,9 @@ llm_api_key_env: OPENAI_API_KEY
 
 # Retrieval settings (Mem-Gallery default)
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 
 # Embedding (matches A-MEM / other MemoryBench baselines)
 embedding_model: all-MiniLM-L6-v2

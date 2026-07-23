@@ -103,6 +103,7 @@ class BaseProcessor(ABC):
             from openai import OpenAI
             import httpx
             import os
+            from omni_memory.utils.usage import wrap_openai_client
             
             # Only pass non-None parameters to avoid compatibility issues
             client_kwargs = {}
@@ -128,7 +129,7 @@ class BaseProcessor(ABC):
             http_client = httpx.Client()
             client_kwargs["http_client"] = http_client
             
-            self._llm_client = OpenAI(**client_kwargs)
+            self._llm_client = wrap_openai_client(OpenAI(**client_kwargs))
             logger.debug(f"Created LLM client with base_url: {client_kwargs.get('base_url', 'default')}")
         return self._llm_client
 

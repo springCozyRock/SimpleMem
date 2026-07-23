@@ -12,6 +12,9 @@ llm_api_key_env: OPENAI_API_KEY
 
 # Retrieval settings
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 
 # Embedding (text retrieval — images are loaded on-demand, not embedded)
 embedding_model: all-MiniLM-L6-v2

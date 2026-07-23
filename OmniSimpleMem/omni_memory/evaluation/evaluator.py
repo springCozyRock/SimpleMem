@@ -689,10 +689,13 @@ Answer format: [format]"""
                     # Directly call OpenAI API instead of using extract_answer module
                     # This avoids module reloading issues
                     from openai import OpenAI
+                    from omni_memory.utils.usage import wrap_openai_client
                     if api_key:
-                        client = OpenAI(api_key=api_key, base_url=api_base_url)
+                        client = wrap_openai_client(
+                            OpenAI(api_key=api_key, base_url=api_base_url)
+                        )
                     else:
-                        client = OpenAI()  # Will use environment variable
+                        client = wrap_openai_client(OpenAI())  # Will use environment variable
                     
                     # Call the API directly (same as extract_answer does)
                     # Use the configured model (default: gpt4o-mini)

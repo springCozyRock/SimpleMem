@@ -72,6 +72,7 @@ class ImageProcessor(BaseProcessor):
         session_id: Optional[str] = None,
         force: bool = False,
         generate_caption: bool = True,
+        generate_embedding: bool = True,
         **kwargs
     ) -> ProcessingResult:
         """
@@ -82,6 +83,7 @@ class ImageProcessor(BaseProcessor):
             session_id: Optional session identifier
             force: Force processing even if trigger rejects
             generate_caption: Whether to generate VLM caption
+            generate_embedding: Whether to compute visual embedding (OpenVision/CLIP)
 
         Returns:
             ProcessingResult with MAU
@@ -112,8 +114,8 @@ class ImageProcessor(BaseProcessor):
         else:
             summary = "Image captured"
 
-        # Generate embedding
-        embedding = self.generate_embedding(image)
+        # Generate embedding (optional; caption-only ingest skips this)
+        embedding = self.generate_embedding(image) if generate_embedding else []
 
         # Store in cold storage
         raw_pointer = self._store_image(image, session_id)

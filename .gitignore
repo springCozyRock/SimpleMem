@@ -87,3 +87,13 @@ test_results/
 *.pth
 *.onnx
 docs/other
+
+# SMMBench local secrets / outputs
+benchmarks/external/smmbench/evaluation/scripts/env.smmbench.local
+benchmarks/external/smmbench/runs/
+*.local
+
+# Mem-Gallery local outputs / runtime memory
+benchmarks/external/mem-gallery/benchmark/runs/
+benchmarks/external/mem-gallery/benchmark/result_debug/
+benchmarks/external/mem-gallery/benchmark/result/

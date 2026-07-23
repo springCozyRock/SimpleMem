@@ -6,6 +6,9 @@ llm_api_key_env: OPENROUTER_API_KEY
 llm_base_url: https://openrouter.ai/api/v1
 
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 embedding_model: all-MiniLM-L6-v2
 embedding_dim: 384
 caption_preprocessed: true

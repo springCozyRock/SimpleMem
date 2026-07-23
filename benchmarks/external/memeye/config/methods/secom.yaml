@@ -1,0 +1,29 @@
+name: secom
+
+# Text-only: images are replaced by dense captions already stored in dialog JSON
+# (image_caption). Re-generate with tools/preprocess_captions.py if needed.
+modality: text_only
+caption_preprocessed: true
+
+# Leave empty to auto-detect sibling repo at ../../../../SeCom, or set SECOM_ROOT.
+secom_root: ""
+# Relative to SeCom root by default.
+secom_config: secom/configs/halumem_bm25.yaml
+
+granularity: segment
+# 1.0 = no LLMLingua compression (faster smoke test). Use <1 with
+# secom/configs/halumem_bm25_comp.yaml or mpnet.yaml to enable denoising.
+compress_rate: 1.0
+retrieve_k: 3
+
+# LLM used for topical segmentation inside SeCom.
+llm_model: gpt-4o-mini
+llm_api_key: ""
+llm_api_key_env: OPENAI_API_KEY
+llm_base_url: ""
+llm_timeout: 90
+
+# Leave empty to reuse the benchmark --model-config answer model.
+answer_model: ""
+temperature: 0.0
+max_tokens: 128

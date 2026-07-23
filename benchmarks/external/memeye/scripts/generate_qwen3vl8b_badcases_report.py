@@ -48,8 +48,11 @@ IMAGE_ROOT = MEMEYE_ROOT / "data" / "image"
 TEXT_TRUNC = 400
 RETRIEVAL_TEXT_TRUNC = 140
 RETRIEVAL_TEXT_TRUNC_LONG = 200
+RETRIEVAL_KG_LINE_TRUNC = 200
 RETRIEVAL_TOP_K = 0  # 0 = show all retrieved_items that entered context
 CLUE_TEXT_TRUNC = 200
+VLM_CAPTION_TRUNC = 240
+_IMAGE_CAPTION_RE = re.compile(r"image_caption:\s*(.+?)(?:\n|$)", re.IGNORECASE)
 
 # MemEye matrix cell order: group by Y first (Y1: X1→X4, then Y2, Y3).
 CELL_ORDER = [f"X{x}_Y{y}" for y in range(1, 4) for x in range(1, 5)]
@@ -93,8 +96,94 @@ def load_context(path: str) -> Optional[Dict[str, Any]]:
     return load_json(p)
 
 
-def format_retrieval_block(context_path: str, label: str) -> List[str]:
-    """Full retrieval trace: all context items + images sent to VLM."""
+def _extract_image_caption(text: str) -> str:
+    if not text:
+        return ""
+    match = _IMAGE_CAPTION_RE.search(text)
+    return match.group(1).strip() if match else ""
+
+
+def _lookup_image_caption(rel_path: str, *caption_maps: Dict[str, str]) -> str:
+    name = Path(rel_path).name
+    for caption_map in caption_maps:
+        if rel_path in caption_map:
+            return caption_map[rel_path]
+        if name in caption_map:
+            return caption_map[name]
+    return ""
+
+
+def _caption_map_from_retrieved_items(items: List[Dict[str, Any]]) -> Dict[str, str]:
+    caption_map: Dict[str, str] = {}
+    for item in items:
+        image_path = item.get("image_path")
+        if not image_path:
+            continue
+        rel = rel_image(str(image_path))
+        caption = _extract_image_caption(item.get("full_text_preview") or "")
+        if caption:
+            caption_map[rel] = caption
+            caption_map[Path(rel).name] = caption
+    return caption_map
+
+
+def _vlm_image_entries(
+    ctx: Dict[str, Any],
+    dialog_captions: Optional[Dict[str, str]] = None,
+) -> List[Tuple[str, str]]:
+    """Return (rel_image_path, caption) for each image sent to the VLM."""
+    items = ctx.get("retrieved_items") or []
+    items_by_rank = {
+        int(item["rank"]): item for item in items if item.get("rank") is not None
+    }
+    item_captions = _caption_map_from_retrieved_items(items)
+    dialog_captions = dialog_captions or {}
+
+    entries: List[Tuple[str, str]] = []
+    expanded = ctx.get("images_expanded") or []
+    if expanded:
+        for row in expanded:
+            image_path = row.get("image_path", "")
+            if not image_path:
+                continue
+            rel = rel_image(str(image_path))
+            caption = ""
+            rank = row.get("context_rank")
+            if rank is not None:
+                item = items_by_rank.get(int(rank))
+                if item:
+                    caption = _extract_image_caption(item.get("full_text_preview") or "")
+            if not caption:
+                caption = _lookup_image_caption(rel, item_captions, dialog_captions)
+            entries.append((rel, caption))
+        return entries
+
+    for image_path in (ctx.get("prompt") or {}).get("user_image_paths") or []:
+        rel = rel_image(str(image_path))
+        caption = _lookup_image_caption(rel, item_captions, dialog_captions)
+        entries.append((rel, caption))
+    return entries
+
+
+def _knowledge_graph_text(ctx: Dict[str, Any]) -> str:
+    """KG block appended to LLM context (separate from faiss/bm25 retrieved_items)."""
+    kg = str(ctx.get("knowledge_graph_text") or "").strip()
+    if kg:
+        return kg
+    context_text = str(ctx.get("context_text") or "")
+    marker = "\n\n[Knowledge Graph]\n"
+    if marker in context_text:
+        return context_text.split(marker, 1)[1].strip()
+    return ""
+
+
+def format_retrieval_block(
+    context_path: str,
+    label: str,
+    *,
+    dialog_captions: Optional[Dict[str, str]] = None,
+) -> List[str]:
+    """Full retrieval trace: retrieved_items + KG text + images sent to VLM."""
     lines: List[str] = []
     ctx = load_context(context_path)
     if ctx is None:
@@ -128,14 +217,24 @@ def format_retrieval_block(context_path: str, label: str) -> List[str]:
             f"- #{rank}{score_s}{source_s} `{rid}`{img_note}: {truncate(text, limit)}"
         )
 
-    expanded = ctx.get("images_expanded") or []
-    img_paths = [rel_image(e.get("image_path", "")) for e in expanded if e.get("image_path")]
-    if not img_paths:
-        img_paths = [rel_image(p) for p in (ctx.get("prompt") or {}).get("user_image_paths") or []]
-    if img_paths:
-        shown = ", ".join(f"`{p}`" for p in img_paths[:5])
-        extra = f" (+{len(img_paths) - 5} more)" if len(img_paths) > 5 else ""
-        lines.append(f"- **→ VLM ({len(img_paths)})**: {shown}{extra}")
+    kg_text = _knowledge_graph_text(ctx)
+    if kg_text:
+        lines.append("- **→ Knowledge Graph**:")
+        for line in kg_text.splitlines():
+            stripped = line.rstrip()
+            if stripped:
+                lines.append(f"  - {truncate(stripped, RETRIEVAL_KG_LINE_TRUNC)}")
+    else:
+        lines.append("- **→ Knowledge Graph**: _(empty)_")
+
+    vlm_entries = _vlm_image_entries(ctx, dialog_captions)
+    if vlm_entries:
+        lines.append(f"- **→ VLM ({len(vlm_entries)})**:")
+        for rel_path, caption in vlm_entries:
+            line = f"  - `{rel_path}`"
+            if caption:
+                line += f": {truncate(caption, VLM_CAPTION_TRUNC)}"
+            lines.append(line)
     else:
         lines.append("- **→ VLM**: _(no images)_")
     lines.append("")
@@ -184,6 +283,24 @@ class TaskDialogIndex:
     def round_payload(self, task: str, round_id: str) -> Optional[Dict[str, Any]]:
         _, rounds = self._load(task)
         return rounds.get(round_id)
+
+    def image_caption_index(self, task: str) -> Dict[str, str]:
+        """Map relative image path (and basename) -> caption from dialog JSON."""
+        _, rounds = self._load(task)
+        caption_map: Dict[str, str] = {}
+        for payload in rounds.values():
+            images = payload.get("input_image") or []
+            captions = payload.get("image_caption") or []
+            for idx, image in enumerate(images):
+                rel = str(image).strip()
+                if not rel:
+                    continue
+                caption = str(captions[idx]).strip() if idx < len(captions) else ""
+                if not caption:
+                    continue
+                caption_map[rel] = caption
+                caption_map[Path(rel).name] = caption
+        return caption_map
 
 
 def canonical_mcq_options(qa: Dict[str, Any]) -> Tuple[Dict[str, str], str]:
@@ -461,7 +578,11 @@ def group_paired_by_task(paired: List[Dict[str, Any]]) -> Dict[str, List[Dict[st
     return grouped
 
 
-def format_case_card(r: Dict[str, Any], case_no: int) -> List[str]:
+def format_case_card(
+    r: Dict[str, Any],
+    case_no: int,
+    dialog_index: TaskDialogIndex,
+) -> List[str]:
     lines: List[str] = []
     lines.append(f"#### {case_no}. `{r['task']}` #{r['idx']}")
     lines.append("")
@@ -481,7 +602,14 @@ def format_case_card(r: Dict[str, Any], case_no: int) -> List[str]:
         lines.extend(format_mcq_options_block(option_map, r.get("mcq_gt_letter", r["mcq_gt"]), r["mcq_pred"]))
     lines.append(f"- GT: `{r['mcq_gt']}` | Pred: `{r['mcq_pred']}` | debiased_em: `{r['mcq_debiased_em']}`")
     lines.append("")
-    lines.extend(format_retrieval_block(r.get("mcq_context_file", ""), "MCQ"))
+    dialog_captions = dialog_index.image_caption_index(r["task"])
+    lines.extend(
+        format_retrieval_block(
+            r.get("mcq_context_file", ""),
+            "MCQ",
+            dialog_captions=dialog_captions,
+        )
+    )
     lines.append("**Open**")
     lines.append(f"- Q: {r['open_question']}")
     lines.append(f"- GT: {r['open_gt']}")
@@ -489,7 +617,13 @@ def format_case_card(r: Dict[str, Any], case_no: int) -> List[str]:
     if r.get("open_judge_reasoning"):
         lines.append(f"- Judge reasoning: {truncate(r['open_judge_reasoning'], 240)}")
     lines.append("")
-    lines.extend(format_retrieval_block(r.get("open_context_file", ""), "Open"))
+    lines.extend(
+        format_retrieval_block(
+            r.get("open_context_file", ""),
+            "Open",
+            dialog_captions=dialog_captions,
+        )
+    )
     if r.get("clue_dialogue_md"):
         lines.append("**Clue rounds (abbrev.)**")
         lines.append("")
@@ -508,6 +642,7 @@ def build_summary_md(
     all_mcq_rows: List[Dict[str, Any]],
     mcq_metrics: Dict[str, Any],
     open_metrics: Dict[str, Any],
+    dialog_index: TaskDialogIndex,
 ) -> str:
     lines: List[str] = []
     lines.append("# Qwen3-VL-8B Bad Cases Report — Paired Wrong (MCQ + Open)")
@@ -592,7 +727,7 @@ def build_summary_md(
     lines.append("- Full machine-readable list: `badcases_paired_wrong.csv`")
     lines.append("- Case cards below are grouped **by task (scenario)**, then **by MemEye cell** (Y-first: X1_Y1 → X4_Y3)")
     lines.append("- Within each cell: sorted by question idx")
-    lines.append("- Each card lists **all retrieved_items** in context (typically 10–20) plus **VLM image paths** from `contexts/*.json`")
+    lines.append("- Each card lists **all retrieved_items** in context (typically 10–20), **Knowledge Graph** text, plus **VLM images with captions** from `contexts/*.json` / dialog JSON")
     lines.append("")
     lines.append(f"## 4. All {len(paired)} paired-wrong case cards (by task → cell)")
     lines.append("")
@@ -621,7 +756,7 @@ def build_summary_md(
             lines.append("")
             for row in rows:
                 case_no += 1
-                lines.extend(format_case_card(row, case_no))
+                lines.extend(format_case_card(row, case_no, dialog_index))
 
     return "\n".join(lines)
 
@@ -650,7 +785,9 @@ def main() -> None:
     csv_path = OUT_DIR / "badcases_paired_wrong.csv"
     write_csv(csv_path, csv_rows, fields)
 
-    report = build_summary_md(paired, mcq_paired_rows, mcq_rows, mcq_metrics, open_metrics)
+    report = build_summary_md(
+        paired, mcq_paired_rows, mcq_rows, mcq_metrics, open_metrics, dialog_index
+    )
     report_path = OUT_DIR / f"REPORT_paired_wrong_{len(paired)}_by_task.md"
     report_path.write_text(report, encoding="utf-8")
 

@@ -10,6 +10,9 @@ llm_api_key_env: DASHSCOPE_API_KEY
 base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
 
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 enable_hybrid_search: true
 enable_graph_traversal: true
 enable_multi_query_retrieval: false

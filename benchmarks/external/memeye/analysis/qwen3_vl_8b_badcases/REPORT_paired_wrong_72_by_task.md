@@ -1,6 +1,6 @@
 # Qwen3-VL-8B Bad Cases Report — Paired Wrong (MCQ + Open)
 
-- Generated: 2026-07-01 15:55
+- Generated: 2026-07-01 21:34
 - Model: `qwen3-vl-8b-instruct` (`qwen3_vl_8b_dashscope`)
 - Method: `simplemem__multimodal` (caption ingest + vision_on_demand, K=20, max_expanded_images=5)
 - Run batch: `20260701` (vision_on_demand fix, images expanded in QA)
@@ -101,7 +101,7 @@
 - Full machine-readable list: `badcases_paired_wrong.csv`
 - Case cards below are grouped **by task (scenario)**, then **by MemEye cell** (Y-first: X1_Y1 → X4_Y3)
 - Within each cell: sorted by question idx
-- Each card lists **all retrieved_items** in context (typically 10–20) plus **VLM image paths** from `contexts/*.json`
+- Each card lists **all retrieved_items** in context (typically 10–20) plus **VLM images with captions** from `contexts/*.json` / dialog JSON
 
 ## 4. All 72 paired-wrong case cards (by task → cell)
 
@@ -109,12 +109,31 @@
 
 ### `X1_Y2` — 3 in this task
 
-#### 1. `brand_memory_test` #5
+#### 1. `brand_memory_test` #5 可口可乐红底计数 召回污染+不全
 
 - **Tag**: `C1_counting+V1_visual_detail+L3_multi_session` | **Position bias**: `bias_Bx2`
 - **session_id**: `BRAND_S1;BRAND_S9;BRAND_S17;BRAND_S26;BRAND_S34`
 - **source_sessions**: `BRAND_S1;BRAND_S9;BRAND_S17;BRAND_S26;BRAND_S34`
 - **clue_rounds** (5): `BRAND_S1:R1;BRAND_S9:R1;BRAND_S17:R1;BRAND_S26:R1;BRAND_S34:R1`
+
+Ground truth 核对（5 张 Coke 广告）：
+
+广告	背景	算红底？
+CocaCola_1 联名赞助
+左球场 + 右纯蓝
+❌
+CocaCola_2 Share a Coke
+浅灰渐变
+❌
+CocaCola_3 生活方式
+纯红
+✅
+CocaCola_4 手持瓶
+纯红
+✅
+CocaCola_5 四瓶 lineup
+纯红
+✅
 
 **MCQ**
 - Q: Across all 5 Coca-Cola ads, how many used a SOLID RED background?
@@ -124,6 +143,8 @@
   - **C**: 2
   - **D**: 3 ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
+
+缺BRAND_S34:R1 cocacola_5 看Open 检索到了MAU 但图片没进入context
 
 **Retrieval (MCQ, 13/20 in context)**
 - #1 faiss `mau_1782874805554_feddaaeb` [img `Brand_Memory_Test/Pepsi_1.png`]: user (Alex Mercer): Switching to Pepsi. Canonical product hero shot. How does Pepsi's visual language differ from the Coke ads we just discussed? assistant: Pepsi tends to be product first, while Cok…
@@ -139,7 +160,12 @@
 - #11 faiss `mau_1782874752080_c968f1cc` [img `Brand_Memory_Test/CocaCola_1.png`]: user (Alex Mercer): I'm adding a Coca-Cola co branded sponsorship piece to my reference deck. How does sponsorship visual language differ from a standalone brand ad? assistant: Sponsorship ads share …
 - #12 faiss `mau_1782874959246_581d1a2f` [img `Brand_Memory_Test/BurgerKing_3.png`]: user (Alex Mercer): This Brazilian BK ad is a phonetic typography play for the Carioca dialect. assistant: The headline does all the creative work by phonetically rendering the regional accent applie…
 - #13 score=0.09 bm25 `BRAND_S17:R1`: This Coke ad prioritizes emotion over personalization, reflecting a classic, feel-good marketing approach in contrast to the Share a Coke c…
-- **→ VLM (5)**: `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/CocaCola_4.png`, `Brand_Memory_Test/Pepsi_2.png`, `Brand_Memory_Test/CocaCola_1.png`, `Brand_Memory_Test/BurgerKing_3.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - yes `Brand_Memory_Test/CocaCola_4.png` : A smiling woman holds an ice-cold Coca‑Cola bottle against a bright red “perfection” backdrop.
+  - `Brand_Memory_Test/Pepsi_2.png`: A chilled Pepsi can with the slogan “Refresh Your World” on a bright blue background.
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
+  - `Brand_Memory_Test/BurgerKing_3.png`: A mouthwatering Burger King burger stacked with lettuce, tomato, onion, pickles, bacon, and cheese on a sesame seed bun.
 
 **Open**
 - Q: How many of the five Coca-Cola ads used a solid red background?
@@ -157,12 +183,17 @@
 - #7 faiss `mau_1782875129898_5dd9f577` [img `Brand_Memory_Test/Starbucks_5.png`]: user (Alex Mercer): This is the final Starbucks piece, a seasonal blend lineup ad. It is structurally similar to the Coca-Cola variant lineup we discussed earlier. assistant: Same idea, with the vari…
 - #8 score=0.45 faiss `BRAND_S17:R2`: user (Alex Mercer): So Coca-Cola has at least two distinct lifestyle modes, personalization and pure emotion. assistant: Yes. They alternat…
 - #9 score=0.44 faiss `BRAND_S34:R1`: user (Alex Mercer): This is the last Coke piece, the variant lineup ad. Does this approach actually help variant recall, or does it dilute …
-- #10 score=0.44 faiss `BRAND_S1:R1`: user (Alex Mercer): I'm adding a Coca-Cola co branded sponsorship piece to my reference deck. How does sponsorship visual language differ f…
+- #10 score=0.44 faiss `BRAND_S1:R1`: user (Alex Mercer): I'm adding a Coca-Cola co branded sponsorship piece to my reference deck. How does sponsorship visual language differ f… 检索到了，但图片没有展开
 - #11 score=0.12 faiss `BRAND_S35:R1`: Verify the exact bottle count from the original creative rather than relying on memory or perceived symmetry.
 - #12 score=0.11 faiss `BRAND_S29:R1`: Verify the actual frame rather than relying on memory when categorizing Cannes-style McDonald’s ads by background color, especially for amb…
 - #13 score=0.08 bm25 `BRAND_S5:R1`: Resolve ambiguous cola sponsorship examples like the soccer goalkeeper piece by referring back to the original source material, not persona…
 - #14 score=0.07 bm25 `BRAND_S7:R1`: This Ethos Water campaign is the only Starbucks piece in the deck focused on CSR and cause marketing, positioning the brand as a supporting…
-- **→ VLM (5)**: `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/Pepsi_2.png`, `Brand_Memory_Test/CocaCola_4.png`, `Brand_Memory_Test/CocaCola_3.png`, `Brand_Memory_Test/Starbucks_5.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - yes `Brand_Memory_Test/Pepsi_2.png`: A chilled Pepsi can with the slogan “Refresh Your World” on a bright blue background.
+  - yes `Brand_Memory_Test/CocaCola_4.png`: A smiling woman holds an ice-cold Coca‑Cola bottle against a bright red “perfection” backdrop.
+  - `Brand_Memory_Test/CocaCola_3.png`: Smiling friends share ice-cold Coca-Cola and a moment of happiness.
+  - `Brand_Memory_Test/Starbucks_5.png`: Starbucks ad featuring four seasonal lattes topped with whipped cream, caramel, and chocolate.
 
 **Clue rounds (abbrev.)**
 
@@ -195,12 +226,31 @@
 
 ---
 
-#### 2. `brand_memory_test` #6
+#### 2. `brand_memory_test` #6 食物主体计数 召回污染+不全
 
 - **Tag**: `C1_counting+L3_multi_session` | **Position bias**: `bias_Dx2`
 - **session_id**: `BRAND_S3;BRAND_S10;BRAND_S19;BRAND_S27;BRAND_S37`
 - **source_sessions**: `BRAND_S3;BRAND_S10;BRAND_S19;BRAND_S27;BRAND_S37`
 - **clue_rounds** (5): `BRAND_S3:R1;BRAND_S10:R1;BRAND_S19:R1;BRAND_S27:R1;BRAND_S37:R1`
+
+广告	视觉主体	算食物 centerpiece？
+Dunkin_1 Flavor Radio
+信息图/案例研究
+❌（非 poster，多 panel）
+Dunkin_2 番茄+芝士
+食物摄影
+✅
+Dunkin_3 万圣节 smoothie
+smoothie + 芝士 puff 蜘蛛
+✅
+Dunkin_4 培根条
+食物
+✅
+Dunkin_5 25¢ donut 促销
+硬币+甜甜圈 hybrid
+✅
+
+检索只命中 2/5 张 Dunkin 图（Dunkin_2、Dunkin_4），Dunkin_1/3/5 未进 context。
 
 **MCQ**
 - Q: Across the 5 Dunkin' ads, how many had FOOD as the visual centerpiece (not coffee, not a multi-panel layout)?
@@ -222,7 +272,12 @@
 - #8 score=0.13 faiss `BRAND_S5:R1`: Resolve ambiguous cola sponsorship examples like the soccer goalkeeper piece by referring back to the original source material, not persona…
 - #9 faiss `mau_1782875016214_755100dc` [img `Brand_Memory_Test/McDonalds_4.png`]: user (Alex Mercer): This McDonald's Cannes ad is a self congratulatory creative award acknowledgment. assistant: It is an industry self congratulation ad, dressed up as creative bravado. Awards ads a…
 - #10 faiss `mau_1782874849376_877fe074` [img `Brand_Memory_Test/Dunkin_2.png`]: user (Alex Mercer): This is a weird Dunkin' piece, with minimalist food photography. It is a menu expansion announcement. assistant: It is a menu expansion announcement using high end food photograph…
-- **→ VLM (5)**: `Brand_Memory_Test/Starbucks_1.png`, `Brand_Memory_Test/Dunkin_4.png`, `Brand_Memory_Test/Starbucks_2.png`, `Brand_Memory_Test/McDonalds_4.png`, `Brand_Memory_Test/Dunkin_2.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Starbucks_1.png`: A bottle of Ethos W
+  - `Brand_Memory_Test/Dunkin_4.png`: A single bacon strip promotes Dunkin’ Donuts’ breakfast sandwiches—more than coffee and donuts.
+  - `Brand_Memory_Test/Starbucks_2.png`: A Starbucks takeaway cup on a wooden table beside the slogan, “The best coffee for the best YOU.”
+  - `Brand_Memory_Test/McDonalds_4.png`: McDonald’s fries burst like golden fireworks on a red backdrop to celebrate Cannes Creative Marketer of the Year.
+  - `Brand_Memory_Test/Dunkin_2.png`: A ripe tomato and a wedge of cheese highlight Dunkin’ Donuts offering personal pizzas—more than
 
 **Open**
 - Q: In how many of the 5 Dunkin' ads was food the visual centerpiece, excluding coffee and multi-panel layouts?
@@ -241,7 +296,12 @@
 - #8 score=0.09 bm25 `BRAND_S17:R1`: This Coke ad prioritizes emotion over personalization, reflecting a classic, feel-good marketing approach in contrast to the Share a Coke c…
 - #9 score=0.09 bm25 `BRAND_S19:R2`: user (Alex Mercer): So this is Halloween creative for a coffee chain. Unusual move. assistant: Yes, and it lives on in case studies because…
 - #10 score=0.09 bm25 `BRAND_S3:R1`: Dunkin’ Donuts’ “Flavor Radio” campaign uses scent-triggered experiential marketing on buses to boost visits and sales, showcasing strategy…
-- **→ VLM (5)**: `Brand_Memory_Test/Dunkin_4.png`, `Brand_Memory_Test/BurgerKing_5.png`, `Brand_Memory_Test/Dunkin_2.png`, `Brand_Memory_Test/CocaCola_1.png`, `Brand_Memory_Test/Starbucks_3.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Dunkin_4.png`: A single bacon strip promotes Dunkin’ Donuts’ breakfast sandwiches—more than coffee and donuts.
+  - `Brand_Memory_Test/BurgerKing_5.png`: A whimsical tower of clay cows balances beside the Burger King Big Stacker logo.
+  - `Brand_Memory_Test/Dunkin_2.png`: A ripe tomato and a wedge of cheese highlight Dunkin’ Donuts offering personal pizzas—more than
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
+  - `Brand_Memory_Test/Starbucks_3.png`: A glowing espresso cup with sparkles and the text “BUY ME A COFFEE” pr
 
 **Clue rounds (abbrev.)**
 
@@ -274,7 +334,7 @@
 
 ---
 
-#### 3. `brand_memory_test` #19
+#### 3. `brand_memory_test` #19 30张广告中手持产品计数，top-k=20注定召回不全，检索噪声大
 
 - **Tag**: `C1_counting+L3_multi_session` | **Position bias**: `bias_Dx2`
 - **session_id**: `BRAND_S1;BRAND_S2;BRAND_S3;BRAND_S4;BRAND_S6;BRAND_S7;BRAND_S9;BRAND_S10;BRAND_S11;BRAND_S13;BRAND_S14;BRAND_S15;BRAND_S17;BRAND_S18;BRAND_S19;BRAND_S21;BRAND_S22;BRAND_S23;BRAND_S26;BRAND_S27;BRAND_S28;BRAND_S30;BRAND_S31;BRAND_S32;BRAND_S34;BRAND_S36;BRAND_S37;BRAND_S39;BRAND_S40;BRAND_S41`
@@ -290,6 +350,13 @@
   - **D**: 4 ← GT
 - GT: `D` | Pred: `B` | debiased_em: `0.0`
 
+Ground truth 应为这 4 张：
+
+CocaCola_2：双手举杯碰杯
+CocaCola_3：男女各持一瓶
+CocaCola_4：女性手持瓶
+Pepsi_4：Sofia Vergara 手持 Diet Pepsi 罐
+
 **Retrieval (MCQ, 10/20 in context)**
 - #1 score=0.12 faiss `BRAND_S18:R2`: user (Alex Mercer): So McDonald's does product reinterpretations in their creative. assistant: Yes, and there are more in the queue.
 - #2 faiss `mau_1782874881295_88412500` [img `Brand_Memory_Test/Pepsi_2.png`]: user (Alex Mercer): Another Pepsi piece, from the same campaign cycle but with a more minimal execution. The typography emphasis matters here. assistant: When you reduce an ad to one product plus one…
@@ -301,7 +368,12 @@
 - #8 faiss `mau_1782874992302_276e5b38` [img `Brand_Memory_Test/CocaCola_4.png`]: user (Alex Mercer): Here is another Coke piece. The format choice signals a different consumption occasion compared with the previous ones. assistant: Different package formats tend to live in differ…
 - #9 score=0.08 bm25 `BRAND_S12:R1`: To avoid misattribution, anchor the salad ad’s active lifestyle imagery specifically to the original campaign brand rather than relying on …
 - #10 score=0.08 bm25 `BRAND_S29:R1`: Verify the actual frame rather than relying on memory when categorizing Cannes-style McDonald’s ads by background color, especially for amb…
-- **→ VLM (5)**: `Brand_Memory_Test/Pepsi_2.png`, `Brand_Memory_Test/Starbucks_1.png`, `Brand_Memory_Test/BurgerKing_3.png`, `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/CocaCola_4.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Pepsi_2.png`: A chilled Pepsi can with the slogan “Refresh Your World” on a bright blue background.
+  - `Brand_Memory_Test/Starbucks_1.png`: A bottle of Ethos W
+  - `Brand_Memory_Test/BurgerKing_3.png`: A mouthwatering Burger King burger stacked with lettuce, tomato, onion, pickles, bacon, and cheese on a sesame seed bun.
+  -`Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - yes `Brand_Memory_Test/CocaCola_4.png`: A smiling woman holds an ice-cold Coca‑Cola bottle against a bright red “perfection” backdrop.
 
 **Open**
 - Q: How many of the 30 ads showed a person actively holding the product in their hands?
@@ -320,7 +392,12 @@
 - #8 faiss `mau_1782874920103_b056b359` [img `Brand_Memory_Test/McDonalds_3.png`]: user (Alex Mercer): This is a surreal McDonald's piece with product reinterpretation. assistant: The design choice is a literal interpretation of the product name. It is a single image visual pun tha…
 - #9 score=0.06 bm25 `BRAND_S7:R1`: This Ethos Water campaign is the only Starbucks piece in the deck focused on CSR and cause marketing, positioning the brand as a supporting…
 - #10 score=0.06 bm25 `BRAND_S29:R1`: Verify the actual frame rather than relying on memory when categorizing Cannes-style McDonald’s ads by background color, especially for amb…
-- **→ VLM (5)**: `Brand_Memory_Test/CocaCola_4.png`, `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/BurgerKing_5.png`, `Brand_Memory_Test/CocaCola_1.png`, `Brand_Memory_Test/McDonalds_3.png`
+- **→ VLM (5)**:
+  - yes `Brand_Memory_Test/CocaCola_4.png`: A smiling woman holds an ice-cold Coca‑Cola bottle against a bright red “perfection” backdrop.
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - `Brand_Memory_Test/BurgerKing_5.png`: A whimsical tower of clay cows balances beside the Burger King Big Stacker logo.
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
+  - `Brand_Memory_Test/McDonalds_3.png`: Whimsical Filet-O-Fish ad shows a goldfish swimming inside a glass burger bun.
 
 **Clue rounds (abbrev.)**
 
@@ -480,12 +557,16 @@
 
 ### `X3_Y2` — 2 in this task
 
-#### 4. `brand_memory_test` #2
+#### 4. `brand_memory_test` #2 对话第一个广告品牌 时序丢失，证据靠后
 
 - **Tag**: `T1_temporal+B1_brand+L3_multi_session` | **Position bias**: `bias_Bx2`
 - **session_id**: `BRAND_S1`
 - **source_sessions**: `BRAND_S1`
 - **clue_rounds** (1): `BRAND_S1:R1`
+
+事实：BRAND_S1:R1（2024-01-05）是第一则广告，品牌为 Coca-Cola。 
+正确 clue 排位低：BRAND_S1:R1（Coca-Cola）在 Open 检索仅排 #7，MCQ 排 #10
+按 embedding 相似度排序top1的被当做了答案
 
 **MCQ**
 - Q: Which brand was shown in the very FIRST ad of the entire conversation?
@@ -507,7 +588,12 @@
 - #8 faiss `mau_1782874907058_a870cd94` [img `Brand_Memory_Test/CocaCola_3.png`]: user (Alex Mercer): This is a lifestyle Coke ad. How does it compare to the Share a Coke approach we just discussed? assistant: It is the inverse mode. Share a Coke was personalization driven; this o…
 - #9 score=0.14 faiss `BRAND_S40:R1`: This Starbucks seasonal blend ad mirrors the Coca-Cola variant lineup structure, presenting four festive lattes in a grid layout for optima…
 - #10 score=0.14 faiss `BRAND_S1:R1`: Sponsorship visuals like this Coca-Cola/Citi co-branded ad share space with partners, diluting visual dominance for broader reach and conte…
-- **→ VLM (5)**: `Brand_Memory_Test/BurgerKing_3.png`, `Brand_Memory_Test/Starbucks_1.png`, `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/BurgerKing_5.png`, `Brand_Memory_Test/CocaCola_3.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/BurgerKing_3.png`: A mouthwatering Burger King burger stacked with lettuce, tomato, onion, pickles, bacon, and cheese on a sesame seed bun.
+  - `Brand_Memory_Test/Starbucks_1.png`: A bottle of Ethos W
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - `Brand_Memory_Test/BurgerKing_5.png`: A whimsical tower of clay cows balances beside the Burger King Big Stacker logo.
+  - `Brand_Memory_Test/CocaCola_3.png`: Smiling friends share ice-cold Coca-Cola and a moment of happiness.
 
 **Open**
 - Q: What brand was featured in the very first advertisement mentioned in the entire conversation?
@@ -534,7 +620,12 @@
 - #16 score=0.06 bm25 `BRAND_S21:R1`: This limited edition Pepsi can wrap is designed to engage collectors and shelf hunters, rewarding attention while leveraging the brand’s co…
 - #17 score=0.06 bm25 `BRAND_S9:R1`: Name personalization transforms a mass-market product into an intimate, one-to-one gift, driving unprecedented social sharing through clean…
 - #18 score=0.06 bm25 `BRAND_S17:R1`: This Coke ad prioritizes emotion over personalization, reflecting a classic, feel-good marketing approach in contrast to the Share a Coke c…
-- **→ VLM (5)**: `Brand_Memory_Test/Pepsi_2.png`, `Brand_Memory_Test/Dunkin_1.png`, `Brand_Memory_Test/McDonalds_3.png`, `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/CocaCola_1.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Pepsi_2.png`: A chilled Pepsi can with the slogan “Refresh Your World” on a bright blue background.
+  - `Brand_Memory_Test/Dunkin_1.png`: Dunkin’ Donuts’ “Flavor Radio” plays the jingle on buses to trigger coffee-scent atomiz
+  - `Brand_Memory_Test/McDonalds_3.png`: Whimsical Filet-O-Fish ad shows a goldfish swimming inside a glass burger bun.
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
 
 **Clue rounds (abbrev.)**
 
@@ -547,12 +638,26 @@
 
 ---
 
-#### 5. `brand_memory_test` #28
+#### 5. `brand_memory_test` #28 三张麦当劳红底广告谁最早 时序丢失，证据靠后/没检索到
 
 - **Tag**: `T1_temporal+B1_brand+L2_comparison` | **Position bias**: `bias_Bx2`
 - **session_id**: `BRAND_S4;BRAND_S28;BRAND_S36`
 - **source_sessions**: `BRAND_S4;BRAND_S28;BRAND_S36`
 - **clue_rounds** (3): `BRAND_S4:R1;BRAND_S28:R1;BRAND_S36:R1`
+
+三候选与时间线：
+
+广告	Session	日期
+Salad + running woman (McDonalds_1)
+BRAND_S4
+2024-01-14 ← 最早
+Cannes fries fireworks (McDonalds_4)
+BRAND_S28
+2024-04-xx
+Wi-Fi fries (McDonalds_5)
+BRAND_S36
+2024-05-06
+
 
 **MCQ**
 - Q: Of the THREE McDonald's ads with red backgrounds, which one was the EARLIEST chronologically?
@@ -579,7 +684,12 @@
 - #13 score=0.14 faiss `BRAND_S26:R1`: The Coca-Cola bottle’s format in this image—paired with a bright red “perfection” backdrop and a smiling woman holding it cold—signals a pr…
 - #14 score=0.13 faiss `BRAND_S11:R1`: This heritage piece highlights McDonald’s enduring menu legacy to evoke nostalgia and position the brand as timeless, competing on history …
 - #15 score=0.13 faiss `BRAND_S9:R1`: Name personalization transforms a mass-market product into an intimate, one-to-one gift, driving unprecedented social sharing through clean…
-- **→ VLM (5)**: `Brand_Memory_Test/McDonalds_4.png`, `Brand_Memory_Test/McDonalds_3.png`, `Brand_Memory_Test/Dunkin_4.png`, `Brand_Memory_Test/Dunkin_2.png`, `Brand_Memory_Test/McDonalds_5.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/McDonalds_4.png`: McDonald’s fries burst like golden fireworks on a red backdrop to celebrate Cannes Creative Marketer of the Year.
+  - `Brand_Memory_Test/McDonalds_3.png`: Whimsical Filet-O-Fish ad shows a goldfish swimming inside a glass burger bun.
+  - `Brand_Memory_Test/Dunkin_4.png`: A single bacon strip promotes Dunkin’ Donuts’ breakfast sandwiches—more than coffee and donuts.
+  - `Brand_Memory_Test/Dunkin_2.png`: A ripe tomato and a wedge of cheese highlight Dunkin’ Donuts offering personal pizzas—more than
+  - `Brand_Memory_Test/McDonalds_5.png`: Golden fries, free Wi‑Fi—connect at McDonald’s.
 
 **Open**
 - Q: Among the three McDonald's ads featuring red backgrounds, which one appeared earliest in chronological order?
@@ -605,7 +715,12 @@
 - #15 score=0.06 bm25 `BRAND_S24:R1`: Ground the espresso glass ad in its actual saved creative rather than forcing it into a stylistic deck, to avoid aesthetic confusion.
 - #16 score=0.06 bm25 `BRAND_S33:R1`: Anchor the black bun Halloween burger to the original brand that first introduced it to avoid confusion with either Burger King or McDonald…
 - #17 score=0.05 bm25 `BRAND_S3:R2`: user (Alex Mercer): So our Dunkin' deck will include one case study and four product ads. assistant: Correct.
-- **→ VLM (5)**: `Brand_Memory_Test/McDonalds_4.png`, `Brand_Memory_Test/McDonalds_3.png`, `Brand_Memory_Test/Dunkin_4.png`, `Brand_Memory_Test/McDonalds_1.png`, `Brand_Memory_Test/McDonalds_2.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/McDonalds_4.png`: McDonald’s fries burst like golden fireworks on a red backdrop to celebrate Cannes Creative Marketer of the Year.
+  - `Brand_Memory_Test/McDonalds_3.png`: Whimsical Filet-O-Fish ad shows a goldfish swimming inside a glass burger bun.
+  - `Brand_Memory_Test/Dunkin_4.png`: A single bacon strip promotes Dunkin’ Donuts’ breakfast sandwiches—more than coffee and donuts.
+  - `Brand_Memory_Test/McDonalds_1.png`: A trail runner and bold graphics spotli
+  - `Brand_Memory_Test/McDonalds_2.png`: Graphic showcasing the historical timeline of McDonald’s USA menu with classic items like burgers, fries, wraps, and salads.
 
 **Clue rounds (abbrev.)**
 
@@ -630,12 +745,27 @@
 
 ### `X4_Y2` — 1 in this task
 
-#### 6. `brand_memory_test` #18
+#### 6. `brand_memory_test` #18 背景色最多样品牌 需要全量枚举计数 显然召回不全
 
 - **Tag**: `V1_visual_detail+B1_brand` | **Position bias**: `bias_Dx2`
 - **session_id**: `BRAND_S1;BRAND_S2;BRAND_S3;BRAND_S4;BRAND_S6;BRAND_S7;BRAND_S9;BRAND_S10;BRAND_S11;BRAND_S13;BRAND_S14;BRAND_S15;BRAND_S17;BRAND_S18;BRAND_S19;BRAND_S21;BRAND_S22;BRAND_S23;BRAND_S26;BRAND_S27;BRAND_S28;BRAND_S30;BRAND_S31;BRAND_S32;BRAND_S34;BRAND_S36;BRAND_S37;BRAND_S39;BRAND_S40;BRAND_S41`
 - **source_sessions**: `BRAND_S1;BRAND_S2;BRAND_S3;BRAND_S4;BRAND_S6;BRAND_S7;BRAND_S9;BRAND_S10;BRAND_S11;BRAND_S13;BRAND_S14;BRAND_S15;BRAND_S17;BRAND_S18;BRAND_S19;BRAND_S21;BRAND_S22;BRAND_S23;BRAND_S26;BRAND_S27;BRAND_S28;BRAND_S30;BRAND_S31;BRAND_S32;BRAND_S34;BRAND_S36;BRAND_S37;BRAND_S39;BRAND_S40;BRAND_S41`
 - **clue_rounds** (30): `BRAND_S1:R1;BRAND_S2:R1;BRAND_S3:R1;BRAND_S4:R1;BRAND_S6:R1;BRAND_S7:R1;BRAND_S9:R1;BRAND_S10:R1;BRAND_S11:R1;BRAND_S13:R1;BRAND_S14:R1;BRAND_S15:R1;BRAND_S17:R1;BRAND_S18:R1;BRAND_S19:R1;BRAND_S21:R1;BRAND_S22:R1;BRAND_S23:R1;BRAND_S26:R1;BRAND_S27:R1;BRAND_S28:R1;BRAND_S30:R1;BRAND_S31:R1;BRAND_S32:R1;BRAND_S34:R1;BRAND_S36:R1;BRAND_S37:R1;BRAND_S39:R1;BRAND_S40:R1;BRAND_S41:R1`
+
+Burger King 5 张背景各不同：
+BK 广告	背景
+BK_1 时尚 crossover
+浅灰/米白渐变
+BK_2 早餐
+黄色纹理
+BK_3 里约口音
+深红
+BK_4 万圣节
+纯黑
+BK_5 粘土牛
+浅灰
+
+
 
 **MCQ**
 - Q: Among the 6 brands, which brand's 5 ads showed the WIDEST variety of background colors (5 visibly different backgrounds)?
@@ -657,7 +787,11 @@
 - #8 score=0.14 faiss `BRAND_S29:R1`: Verify the actual frame rather than relying on memory when categorizing Cannes-style McDonald’s ads by background color, especially for amb…
 - #9 score=0.14 faiss `BRAND_S33:R1`: Anchor the black bun Halloween burger to the original brand that first introduced it to avoid confusion with either Burger King or McDonald…
 - #10 faiss `mau_1782875031591_ebb645e9` [img `Brand_Memory_Test/Pepsi_4.png`]: user (Alex Mercer): This is a different mode for Pepsi, with celebrity style endorsement creative. What do you make of the cohesion play? assistant: Visual cohesion turns the spokesperson into an ext…
-- **→ VLM (4)**: `Brand_Memory_Test/Starbucks_1.png`, `Brand_Memory_Test/CocaCola_1.png`, `Brand_Memory_Test/BurgerKing_3.png`, `Brand_Memory_Test/Pepsi_4.png`
+- **→ VLM (4)**:
+  - `Brand_Memory_Test/Starbucks_1.png`: A bottle of Ethos W
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
+  - `Brand_Memory_Test/BurgerKing_3.png`: A mouthwatering Burger King burger stacked with lettuce, tomato, onion, pickles, bacon, and cheese on a sesame seed bun.
+  - `Brand_Memory_Test/Pepsi_4.png`: A glamorous woman in a blue dress kisses a can of Diet Pepsi with a striped straw.
 
 **Open**
 - Q: Which brand's five ads displayed the widest variety of background colors among the six brands?
@@ -684,7 +818,12 @@
 - #16 score=0.07 bm25 `BRAND_S24:R1`: Ground the espresso glass ad in its actual saved creative rather than forcing it into a stylistic deck, to avoid aesthetic confusion.
 - #17 score=0.07 bm25 `BRAND_S1:R2`: user (Alex Mercer): Right, sponsorships extend brand reach into contexts that pure product ads cannot. assistant: Yes. The trade is reach v…
 - #18 score=0.07 bm25 `BRAND_S20:R1`: The surreal goldfish burger image blurs brand lines, so its true origin—not just a vague category association—should determine where it bel…
-- **→ VLM (5)**: `Brand_Memory_Test/Pepsi_2.png`, `Brand_Memory_Test/Pepsi_1.png`, `Brand_Memory_Test/Dunkin_4.png`, `Brand_Memory_Test/CocaCola_1.png`, `Brand_Memory_Test/CocaCola_5.png`
+- **→ VLM (5)**:
+  - `Brand_Memory_Test/Pepsi_2.png`: A chilled Pepsi can with the slogan “Refresh Your World” on a bright blue background.
+  - `Brand_Memory_Test/Pepsi_1.png`: Ice-cold Pepsi cans bursting with a refreshing splash on a bold blue backdrop.
+  - `Brand_Memory_Test/Dunkin_4.png`: A single bacon strip promotes Dunkin’ Donuts’ breakfast sandwiches—more than coffee and donuts.
+  - `Brand_Memory_Test/CocaCola_1.png`: Kick off game season with Citi and Coca‑Cola: save
+  - `Brand_Memory_Test/CocaCola_5.png`: Four Coca‑Cola bottles—Classic, Life, Zero, and Diet—stand side by side und
 
 **Clue rounds (abbrev.)**
 
@@ -844,16 +983,20 @@
 
 ## `card_playlog_test` — 12 paired wrong / 48 total (25.0%)
 
-### `X4_Y2` — 3 in this task
+100% 在 X4（需要读图 + 精确状态推理），
+ 3/12 Y2 定位到某一时刻，历史过程计数
+ 9/12 Y3 问当前状态
 
-#### 7. `card_playlog_test` #34
+### `X4_Y2` — 3 in this task 都需要定位到某一时刻，然后追踪某视角的全部历史计数
+
+#### 7. `card_playlog_test` #34 玩家动作触发 无状态追踪
 
 - **Tag**: `T1_temporal+C1_counting` | **Position bias**: `bias_Bx2`
 - **session_id**: `PLAY_S3`
 - **source_sessions**: `PLAY_S3`
 - **clue_rounds** (1): `PLAY_S3:R7`
 
-**MCQ**
+**MCQ** P2 第2次 draw 时累计抽到的蓝牌 需要定位到P2这个人并跟踪到第二次抓牌
 - Q: At the moment when Player 2's 2nd draw action happens, how many blue cards has Player 2 drawn so far?
 - Options (canonical rotation):
   - **A**: 0 ← Pred
@@ -861,6 +1004,11 @@
   - **C**: 2
   - **D**: 1 ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
+
+文本对话可以追踪到P2两次draw，检索也确实能命中第2次 draw state_0023（#3），
+还需要根据公共状态，追踪到Person 2这个人视角下的图片 
+-第一次 draw 的历史帧 S3:R4 虽然文本中明确有写，但未召回
+-state_0012 第2次 draw state_0023 召回且图片进入context
 
 **Retrieval (MCQ, 18/20 in context)**
 - #1 faiss `mau_1782874865954_84f528ff` [img `Card_Playlog_Test/uno_44/state_0024.jpg`]: user (Card_Playlog_Test): Player 1 decides to: draw Player 1 draws a card. ---------- End of Player 1's turn ---------- Player 2 decides to: play-(card_idx: 3) Player 2 plays yellow-7-number. -------…
@@ -881,7 +1029,12 @@
 - #16 score=0.05 bm25 `PLAY_S2:R1`: Player 0 played a yellow-4-number card in a digital UNO game, initiating their turn after the deck was shuffled and starting with a red-4-n…
 - #17 score=0.04 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
 - #18 score=0.04 bm25 `PLAY_S4:R3`: Player 3 played a black-wild card choosing green, then Player 0 played a green Reverse card, altering turn order in the digital UNO game.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0024.jpg`, `Card_Playlog_Test/uno_44/state_0021.jpg`, `Card_Playlog_Test/uno_44/state_0023.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0025.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0024.jpg`: Digital UNO game interface showing four players, a central pile of played cards, and a blue 1 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
+  - `Card_Playlog_Test/uno_44/state_0023.jpg`: Digital UNO game board showing four AI players, a central pile of played cards with a blue Reverse as the target card, and Player 2’s visible hand of five cards.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0025.jpg`: Digital UNO game board showing Player 0 with one blue card, Player 1 and Player 3 with larger hands, and a blue 2 as the current target card.
 
 **Open**
 - Q: How many blue cards has Player 2 drawn by the time of their second draw action?
@@ -907,7 +1060,12 @@
 - #15 score=0.05 bm25 `PLAY_S1:R1`: In a digital UNO game, Player 0 starts with a hand including a green 7 and other cards, while the discard pile shows a red 4 — matching the…
 - #16 score=0.04 bm25 `PLAY_S1:R3`: In a digital UNO game, players sequentially play cards—Player 0 plays green-7, Player 1 plays green-2, Player 2 plays green-6, and Player 3…
 - #17 score=0.04 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0021.jpg`, `Card_Playlog_Test/uno_44/state_0024.jpg`, `Card_Playlog_Test/uno_44/state_0023.jpg`, `Card_Playlog_Test/uno_44/state_0025.jpg`, `Card_Playlog_Test/uno_44/state_0011.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
+  - `Card_Playlog_Test/uno_44/state_0024.jpg`: Digital UNO game interface showing four players, a central pile of played cards, and a blue 1 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0023.jpg`: Digital UNO game board showing four AI players, a central pile of played cards with a blue Reverse as the target card, and Player 2’s visible hand of five cards.
+  - `Card_Playlog_Test/uno_44/state_0025.jpg`: Digital UNO game board showing Player 0 with one blue card, Player 1 and Player 3 with larger hands, and a blue 2 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0011.jpg`: Digital UNO game board showing four AI players, a central pile of played green cards with a green Reverse as the target card, and Player 1 holding red 5, yellow Reverse, blue 5, and blue Skip 2.
 
 **Clue rounds (abbrev.)**
 
@@ -920,15 +1078,18 @@
 
 ---
 
-#### 8. `card_playlog_test` #35
+#### 8. `card_playlog_test` #35 公共状态触发
 
 - **Tag**: `T1_temporal+C1_counting` | **Position bias**: `bias_Bx2`
 - **session_id**: `PLAY_S3`
 - **source_sessions**: `PLAY_S3`
 - **clue_rounds** (3): `PLAY_S3:R3;PLAY_S3:R2;PLAY_S3:R4`
 
-**MCQ**
-- Q: Immediately after public direction changes from 1 to -1 for the 1st time, how many green cards has Player 0 played so far?
+首次 reverse 出现在PLAY_S3:R3 state_0010，通过对话文本可以定位reverse的位置，该MAU成功被召回
+但 未完整覆盖 P0 出牌历史 state0,4,8 
+
+**MCQ** 方向首次 1→-1 后 P0 出过的绿牌 
+- Q: Immediately after public direction changes from 1 to -1 for the 1st time, how many green cards has Player 0 played so far? 
 - Options (canonical rotation):
   - **A**: 1 ← Pred
   - **B**: 3
@@ -955,7 +1116,12 @@
 - #16 score=0.06 bm25 `PLAY_S2:R5`: In a digital UNO game, players take turns playing cards—including wild draws and color changes—with Player 0 using a blue-wild to force col…
 - #17 score=0.05 bm25 `PLAY_S4:R8`: Player 0 wins the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1, 2, and 3 scored -108, -13, and …
 - #18 score=0.04 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0009.jpg`, `Card_Playlog_Test/uno_44/state_0011.jpg`, `Card_Playlog_Test/uno_44/state_0005.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0009.jpg`: Digital UNO game board showing four players, a central pile of played green cards with a green Reverse on
+  - `Card_Playlog_Test/uno_44/state_0011.jpg`: Digital UNO game board showing four AI players, a central pile of played green cards with a green Reverse as the target card, and Player 1 holding red 5, yellow Reverse, blue 5, and blue Skip 2.
+  - `Card_Playlog_Test/uno_44/state_0005.jpg`: Digital Uno game interface showing four players, a green 7 target card, and Player 1 holding red 5, yellow reverse, blue 5, blue 2, and blue skip cards.
 
 **Open**
 - Q: How many green cards has Player 0 played immediately after the public direction changes from 1 to -1 for the first time?
@@ -982,7 +1148,12 @@
 - #16 score=0.06 bm25 `PLAY_S2:R5`: In a digital UNO game, players take turns playing cards—including wild draws and color changes—with Player 0 using a blue-wild to force col…
 - #17 score=0.05 bm25 `PLAY_S4:R8`: Player 0 wins the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1, 2, and 3 scored -108, -13, and …
 - #18 score=0.04 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0009.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0009.jpg`: Digital UNO game board showing four players, a central pile of played green cards with a green Reverse on
 
 **Clue rounds (abbrev.)**
 
@@ -1005,7 +1176,7 @@
 
 ---
 
-#### 9. `card_playlog_test` #42
+#### 9. `card_playlog_test` #42 牌堆首次 77→76 后 P0 出过的绿牌
 
 - **Tag**: `T1_temporal+C1_counting` | **Position bias**: `bias_Bx3`
 - **session_id**: `PLAY_S4`
@@ -1037,7 +1208,12 @@
 - #13 score=0.06 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #14 score=0.06 bm25 `PLAY_S3:R8`: Player 0 won the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1 scored -108 and Player 2 scored -…
 - #15 score=0.06 bm25 `PLAY_S2:R5`: In a digital UNO game, players take turns playing cards—including wild draws and color changes—with Player 0 using a blue-wild to force col…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0005.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0005.jpg`: Digital Uno game interface showing four players, a green 7 target card, and Player 1 holding red 5, yellow reverse, blue 5, blue 2, and blue skip cards.
 
 **Open**
 - Q: How many green cards has Player 0 played immediately after the public deck size changes from 77 to 76 for the first time?
@@ -1061,7 +1237,12 @@
 - #13 score=0.06 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #14 score=0.06 bm25 `PLAY_S3:R8`: Player 0 won the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1 scored -108 and Player 2 scored -…
 - #15 score=0.06 bm25 `PLAY_S2:R5`: In a digital UNO game, players take turns playing cards—including wild draws and color changes—with Player 0 using a blue-wild to force col…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1089,7 +1270,7 @@
 
 ---
 
-### `X4_Y3` — 9 in this task
+### `X4_Y3` — 9 in this task 定位到某时刻，追踪当前状态
 
 #### 10. `card_playlog_test` #14
 
@@ -1098,7 +1279,7 @@
 - **source_sessions**: `PLAY_S2`
 - **clue_rounds** (2): `PLAY_S2:R2;PLAY_S2:R3`
 
-**MCQ**
+**MCQ** P1 手牌首次 6→5 后持有的蓝牌
 - Q: Immediately after Player 1's visible hand size changes from 6 to 5 for the 1st time, how many blue cards does Player 1 hold?
 - Options (canonical rotation):
   - **A**: 2
@@ -1123,7 +1304,12 @@
 - #13 score=0.06 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #14 score=0.05 bm25 `PLAY_S4:R4`: In a digital UNO game, Player 1 plays a yellow reverse card, Player 2 responds with a yellow 5, while Players 3 and 2 draw cards during the…
 - #15 score=0.05 bm25 `PLAY_S1:R2`: In a digital UNO game, players sequentially play numbered cards—Player 0 plays yellow-4, Player 1 plays green-4, Player 2 plays green-3, an…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0021.jpg`, `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0023.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0023.jpg`: Digital UNO game board showing four AI players, a central pile of played cards with a blue Reverse as the target card, and Player 2’s visible hand of five cards.
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
 
 **Open**
 - Q: How many blue cards does Player 1 hold immediately after their visible hand size changes from 6 to 5 for the first time?
@@ -1147,7 +1333,12 @@
 - #13 score=0.05 bm25 `PLAY_S4:R4`: In a digital UNO game, Player 1 plays a yellow reverse card, Player 2 responds with a yellow 5, while Players 3 and 2 draw cards during the…
 - #14 score=0.04 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #15 score=0.04 bm25 `PLAY_S4:R8`: Player 0 wins the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1, 2, and 3 scored -108, -13, and …
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0027.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0021.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0027.jpg`: Digital UNO game interface showing four players’ hand
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
 
 **Clue rounds (abbrev.)**
 
@@ -1165,7 +1356,7 @@
 
 ---
 
-#### 11. `card_playlog_test` #20
+#### 11. `card_playlog_test` #20 P1 第1次出牌后持有的蓝牌
 
 - **Tag**: `T1_temporal+C1_counting` | **Position bias**: `bias_Cx2`
 - **session_id**: `PLAY_S2`
@@ -1180,6 +1371,16 @@
   - **C**: 1 ← Pred
   - **D**: 3 ← GT
 - GT: `D` | Pred: `C` | debiased_em: `0.0`
+
+GT 核对：
+PLAY_S2:R1 state_0001：P1 手牌 7 张，含 Blue 5、Blue Skip、Blue 2 等
+PLAY_S2:R2 P1 出 Green 4 后 → state_0005：剩 Red 5、Yellow Reverse、Blue 5、Blue Skip、Blue 2、Green 2 → 3 张蓝牌
+
+初始状态召回，PLAY_S2:R1，排名#，淹没在无关game中
+第1次出牌 没被召回
+
+
+
 
 **Retrieval (MCQ, 16/20 in context)**
 - #1 faiss `mau_1782874801741_a7687f66` [img `Card_Playlog_Test/uno_44/state_0021.jpg`]: user (Card_Playlog_Test): Player 0 decides to: play-(card_idx: 2, chosen_color: blue) Player 0 plays black-wild_draw_4-wild. Player 0 chose the color blue. ---------- End of Player 0's turn ---------…
@@ -1198,7 +1399,12 @@
 - #14 score=0.04 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
 - #15 score=0.04 bm25 `PLAY_S4:R3`: Player 3 played a black-wild card choosing green, then Player 0 played a green Reverse card, altering turn order in the digital UNO game.
 - #16 score=0.04 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0021.jpg`, `Card_Playlog_Test/uno_44/state_0027_3.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0025.jpg`, `Card_Playlog_Test/uno_44/state_0027_1.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
+  - `Card_Playlog_Test/uno_44/state_0027_3.jpg`: Digital UNO game interface showing four players’ hands, played cards in the center, and a blue 1 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0025.jpg`: Digital UNO game board showing Player 0 with one blue card, Player 1 and Player 3 with larger hands, and a blue 2 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0027_1.jpg`: Digital UNO game interface showing four players’ hands, played cards in the center, and a blue 1 as the current target card.
 
 **Open**
 - Q: How many blue cards does Player 1 have immediately after their first play action?
@@ -1225,7 +1431,12 @@
 - #16 score=0.03 bm25 `PLAY_S4:R2`: Players 0–3 each played a green-numbered card (7, 7, 2, and 6 respectively) in sequence during their turns in a digital UNO game.
 - #17 score=0.03 bm25 `PLAY_S2:R4`: In a digital UNO game, players sequentially play yellow cards—reverse, 5, and 0—while Player 1 holds red, blue 5s, and a blue skip card.
 - #18 score=0.03 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0021.jpg`, `Card_Playlog_Test/uno_44/state_0022.jpg`, `Card_Playlog_Test/uno_44/state_0025.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0021.jpg`: Digital UNO ga
+  - `Card_Playlog_Test/uno_44/state_0022.jpg`: Digital UNO game board showing four players, a central pile of played cards, a blue Reverse as the current target card, and Player 3 holding a red 9 and a red Skip.
+  - `Card_Playlog_Test/uno_44/state_0025.jpg`: Digital UNO game board showing Player 0 with one blue card, Player 1 and Player 3 with larger hands, and a blue 2 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1275,7 +1486,12 @@
 - #13 score=0.05 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #14 score=0.05 bm25 `PLAY_S3:R1`: In a digital UNO game, Player 0 plays yellow-4-number and Player 1 responds with green-4-number, both matching the current red-4-number car…
 - #15 score=0.04 bm25 `PLAY_S2:R4`: In a digital UNO game, players sequentially play yellow cards—reverse, 5, and 0—while Player 1 holds red, blue 5s, and a blue skip card.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0011.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0024.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0011.jpg`: Digital UNO game board showing four AI players, a central pile of played green cards with a green Reverse as the target card, and Player 1 holding red 5, yellow Reverse, blue 5, and blue Skip 2.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0024.jpg`: Digital UNO game interface showing four players, a central pile of played cards, and a blue 1 as the current target card.
 
 **Open**
 - Q: How many red cards does Player 1 have immediately after their second play action?
@@ -1299,7 +1515,12 @@
 - #13 score=0.03 bm25 `PLAY_S3:R8`: Player 0 won the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1 scored -108 and Player 2 scored -…
 - #14 score=0.03 bm25 `PLAY_S4:R8`: Player 0 wins the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1, 2, and 3 scored -108, -13, and …
 - #15 score=0.03 bm25 `PLAY_S4:R2`: Players 0–3 each played a green-numbered card (7, 7, 2, and 6 respectively) in sequence during their turns in a digital UNO game.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0022.jpg`, `Card_Playlog_Test/uno_44/state_0014.jpg`, `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0022.jpg`: Digital UNO game board showing four players, a central pile of played cards, a blue Reverse as the current target card, and Player 3 holding a red 9 and a red Skip.
+  - `Card_Playlog_Test/uno_44/state_0014.jpg`: Digital UNO game interface showing four players, a central row of played cards, and Player 0’s hand with blue, yellow, and wild cards at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1349,7 +1570,12 @@
 - #13 score=0.07 bm25 `PLAY_S1:R8`: Player 0 wins the game by playing the blue-1-number card, leaving them with no cards and defeating opponents with scores of -108, -13, and …
 - #14 score=0.07 bm25 `PLAY_S2:R5`: In a digital UNO game, players take turns playing cards—including wild draws and color changes—with Player 0 using a blue-wild to force col…
 - #15 score=0.06 bm25 `PLAY_S4:R5`: In a digital UNO game, Player 3 plays yellow-3, Player 0 plays yellow-0, Player 1 draws, and Player 2 plays yellow-7—setting the target car…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
 
 **Open**
 - Q: When Player 2's visible hand size decreases from 6 to 5 for the second time, how many red cards does Player 2 have?
@@ -1372,7 +1598,12 @@
 - #12 score=0.05 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #13 score=0.05 bm25 `PLAY_S4:R4`: In a digital UNO game, Player 1 plays a yellow reverse card, Player 2 responds with a yellow 5, while Players 3 and 2 draw cards during the…
 - #14 score=0.04 bm25 `PLAY_S1:R2`: In a digital UNO game, players sequentially play numbered cards—Player 0 plays yellow-4, Player 1 plays green-4, Player 2 plays green-3, an…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`, `Card_Playlog_Test/uno_44/state_0012.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0012.jpg`: Digital UNO game board showing four AI players, a central pile of played cards, a yellow Reverse as the target card, and Player 2’s visible yellow and red hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1433,7 +1664,12 @@
 - #14 score=0.04 bm25 `PLAY_S3:R7`: In a digital UNO game, Player 2 draws a card, Player 3 plays a blue-2-number, Player 0 responds with a blue-reverse-action, and Player 3 su…
 - #15 score=0.04 bm25 `PLAY_S3:R3`: In a digital UNO game, Player 2 plays a green 6-number card, Player 3 responds with a green-wild card and chooses green as the new color, P…
 - #16 score=0.04 bm25 `PLAY_S2:R3`: In a digital UNO game, players sequentially play cards—Player 1 and 2 play numbered greens, Player 3 plays a wild card choosing green, and …
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0017.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0024.jpg`, `Card_Playlog_Test/uno_44/state_0014.jpg`, `Card_Playlog_Test/uno_44/state_0013.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0017.jpg`: Digital UNO game board showing four AI players, a yellow 7 as the target card, and Player 3’s visible hand with yellow 4, blue 2, blue 5, red 9, and red 0 cards.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0024.jpg`: Digital UNO game interface showing four players, a central pile of played cards, and a blue 1 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0014.jpg`: Digital UNO game interface showing four players, a central row of played cards, and Player 0’s hand with blue, yellow, and wild cards at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0013.jpg`: Digital UNO game board showing four players, a yellow 5 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
 
 **Open**
 - Q: How many yellow cards does Player 2 have immediately after their first play action?
@@ -1459,7 +1695,12 @@
 - #15 score=0.03 bm25 `PLAY_S2:R4`: In a digital UNO game, players sequentially play yellow cards—reverse, 5, and 0—while Player 1 holds red, blue 5s, and a blue skip card.
 - #16 score=0.02 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
 - #17 score=0.02 bm25 `PLAY_S3:R7`: In a digital UNO game, Player 2 draws a card, Player 3 plays a blue-2-number, Player 0 responds with a blue-reverse-action, and Player 3 su…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0017.jpg`, `Card_Playlog_Test/uno_44/state_0016.jpg`, `Card_Playlog_Test/uno_44/state_0018.jpg`, `Card_Playlog_Test/uno_44/state_0013.jpg`, `Card_Playlog_Test/uno_44/state_0014.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0017.jpg`: Digital UNO game board showing four AI players, a yellow 7 as the target card, and Player 3’s visible hand with yellow 4, blue 2, blue 5, red 9, and red 0 cards.
+  - `Card_Playlog_Test/uno_44/state_0016.jpg`: Digital UNO game interface showing four players, a central pile of played cards, a yellow target card, and a large remaining deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0018.jpg`: Digital UNO game board showing four players, a yellow 4 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0013.jpg`: Digital UNO game board showing four players, a yellow 5 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0014.jpg`: Digital UNO game interface showing four players, a central row of played cards, and Player 0’s hand with blue, yellow, and wild cards at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1510,7 +1751,12 @@
 - #14 score=0.04 bm25 `PLAY_S3:R7`: In a digital UNO game, Player 2 draws a card, Player 3 plays a blue-2-number, Player 0 responds with a blue-reverse-action, and Player 3 su…
 - #15 score=0.04 bm25 `PLAY_S3:R3`: In a digital UNO game, Player 2 plays a green 6-number card, Player 3 responds with a green-wild card and chooses green as the new color, P…
 - #16 score=0.04 bm25 `PLAY_S2:R3`: In a digital UNO game, players sequentially play cards—Player 1 and 2 play numbered greens, Player 3 plays a wild card choosing green, and …
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0017.jpg`, `Card_Playlog_Test/uno_44/state_0013.jpg`, `Card_Playlog_Test/uno_44/state_0024.jpg`, `Card_Playlog_Test/uno_44/state_0014.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0017.jpg`: Digital UNO game board showing four AI players, a yellow 7 as the target card, and Player 3’s visible hand with yellow 4, blue 2, blue 5, red 9, and red 0 cards.
+  - `Card_Playlog_Test/uno_44/state_0013.jpg`: Digital UNO game board showing four players, a yellow 5 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0024.jpg`: Digital UNO game interface showing four players, a central pile of played cards, and a blue 1 as the current target card.
+  - `Card_Playlog_Test/uno_44/state_0014.jpg`: Digital UNO game interface showing four players, a central row of played cards, and Player 0’s hand with blue, yellow, and wild cards at the bottom.
 
 **Open**
 - Q: How many yellow cards does Player 2 have immediately after their second play action?
@@ -1535,7 +1781,12 @@
 - #14 score=0.03 bm25 `PLAY_S4:R2`: Players 0–3 each played a green-numbered card (7, 7, 2, and 6 respectively) in sequence during their turns in a digital UNO game.
 - #15 score=0.02 bm25 `PLAY_S4:R7`: Player 3 plays a blue 2, then Player 0 responds with a blue Reverse card, altering turn order in this digital UNO game.
 - #16 score=0.02 bm25 `PLAY_S3:R7`: In a digital UNO game, Player 2 draws a card, Player 3 plays a blue-2-number, Player 0 responds with a blue-reverse-action, and Player 3 su…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0017.jpg`, `Card_Playlog_Test/uno_44/state_0016.jpg`, `Card_Playlog_Test/uno_44/state_0014.jpg`, `Card_Playlog_Test/uno_44/state_0018.jpg`, `Card_Playlog_Test/uno_44/state_0013.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0017.jpg`: Digital UNO game board showing four AI players, a yellow 7 as the target card, and Player 3’s visible hand with yellow 4, blue 2, blue 5, red 9, and red 0 cards.
+  - `Card_Playlog_Test/uno_44/state_0016.jpg`: Digital UNO game interface showing four players, a central pile of played cards, a yellow target card, and a large remaining deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0014.jpg`: Digital UNO game interface showing four players, a central row of played cards, and Player 0’s hand with blue, yellow, and wild cards at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0018.jpg`: Digital UNO game board showing four players, a yellow 4 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
+  - `Card_Playlog_Test/uno_44/state_0013.jpg`: Digital UNO game board showing four players, a yellow 5 target card, a stack of played cards, and a large remaining draw deck on a wooden background.
 
 **Clue rounds (abbrev.)**
 
@@ -1585,7 +1836,12 @@
 - #13 score=0.07 bm25 `PLAY_S1:R8`: Player 0 wins the game by playing the blue-1-number card, leaving them with no cards and defeating opponents with scores of -108, -13, and …
 - #14 score=0.06 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #15 score=0.05 bm25 `PLAY_S4:R5`: In a digital UNO game, Player 3 plays yellow-3, Player 0 plays yellow-0, Player 1 draws, and Player 2 plays yellow-7—setting the target car…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
 
 **Open**
 - Q: How many red cards does Player 3 hold immediately after Player 2's visible hand size changes from 4 to 5 for the first time?
@@ -1610,7 +1866,12 @@
 - #14 score=0.05 bm25 `PLAY_S4:R5`: In a digital UNO game, Player 3 plays yellow-3, Player 0 plays yellow-0, Player 1 draws, and Player 2 plays yellow-7—setting the target car…
 - #15 score=0.05 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #16 score=0.05 bm25 `PLAY_S4:R4`: In a digital UNO game, Player 1 plays a yellow reverse card, Player 2 responds with a yellow 5, while Players 3 and 2 draw cards during the…
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
 
 **Clue rounds (abbrev.)**
 
@@ -1659,7 +1920,12 @@
 - #12 score=0.05 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #13 score=0.05 bm25 `PLAY_S3:R1`: In a digital UNO game, Player 0 plays yellow-4-number and Player 1 responds with green-4-number, both matching the current red-4-number car…
 - #14 score=0.04 bm25 `PLAY_S2:R4`: In a digital UNO game, players sequentially play yellow cards—reverse, 5, and 0—while Player 1 holds red, blue 5s, and a blue skip card.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0011.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0020.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0011.jpg`: Digital UNO game board showing four AI players, a central pile of played green cards with a green Reverse as the target card, and Player 1 holding red 5, yellow Reverse, blue 5, and blue Skip 2.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0020.jpg`: Digital UNO game
 
 **Open**
 - Q: How many red cards does Player 3 have immediately after their third play action?
@@ -1684,7 +1950,12 @@
 - #14 score=0.03 bm25 `PLAY_S3:R8`: Player 0 won the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1 scored -108 and Player 2 scored -…
 - #15 score=0.03 bm25 `PLAY_S4:R8`: Player 0 wins the game by playing their last card (blue-1-number), ending with a score of 0 while Player 1, 2, and 3 scored -108, -13, and …
 - #16 score=0.03 bm25 `PLAY_S4:R2`: Players 0–3 each played a green-numbered card (7, 7, 2, and 6 respectively) in sequence during their turns in a digital UNO game.
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0022.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0011.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0009.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0022.jpg`: Digital UNO game board showing four players, a central pile of played cards, a blue Reverse as the current target card, and Player 3 holding a red 9 and a red Skip.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0011.jpg`: Digital UNO game board showing four AI players, a central pile of played green cards with a green Reverse as the target card, and Player 1 holding red 5, yellow Reverse, blue 5, and blue Skip 2.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0009.jpg`: Digital UNO game board showing four players, a central pile of played green cards with a green Reverse on
 
 **Clue rounds (abbrev.)**
 
@@ -1738,7 +2009,12 @@
 - #12 score=0.05 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #13 score=0.05 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #14 score=0.05 bm25 `PLAY_S1:R8`: Player 0 wins the game by playing the blue-1-number card, leaving them with no cards and defeating opponents with scores of -108, -13, and …
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`, `Card_Playlog_Test/uno_44/state_0019.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0019.jpg`: Digital UNO game board showing four players, a central pile of played cards, and Player 2’s visible hand of four red and yellow cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
 
 **Open**
 - Q: How many red cards does Player 3 hold immediately after the public deck size changes from 79 to 77 for the first time?
@@ -1762,7 +2038,12 @@
 - #13 score=0.05 bm25 `PLAY_S3:R4`: In a digital UNO game, Player 2 draws a card while Player 1 plays a yellow Reverse card, setting up the next turn’s action.
 - #14 score=0.05 bm25 `PLAY_S2:R6`: In a digital UNO game, Player 0 won by playing the blue 1-number card while having no cards left, leaving Player 1 with the worst score (-1…
 - #15 score=0.04 bm25 `PLAY_S1:R8`: Player 0 wins the game by playing the blue-1-number card, leaving them with no cards and defeating opponents with scores of -108, -13, and …
-- **→ VLM (5)**: `Card_Playlog_Test/uno_44/state_0000.jpg`, `Card_Playlog_Test/uno_44/state_0002.jpg`, `Card_Playlog_Test/uno_44/state_0003.jpg`, `Card_Playlog_Test/uno_44/state_0001.jpg`, `Card_Playlog_Test/uno_44/state_0010.jpg`
+- **→ VLM (5)**:
+  - `Card_Playlog_Test/uno_44/state_0000.jpg`: Digital UNO game interface showing four players, a red 4 card on the discard pile, and Player 0’s hand with green 7, yellow 4, blue 1, yellow Reverse, wild Draw 4, and green Reverse cards.
+  - `Card_Playlog_Test/uno_44/state_0002.jpg`: Digital UNO game interface showing four players, a central pile with red, yellow, and green 4 cards, and
+  - `Card_Playlog_Test/uno_44/state_0003.jpg`: Digital UNO game interface showing four players, a central discard pile with a green 3 target card, and Player 3’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0001.jpg`: Digital UNO game interface showing four players, a yellow 4 as the target card, and Player 1’s visible hand at the bottom.
+  - `Card_Playlog_Test/uno_44/state_0010.jpg`: Digital UNO game board showing four players, a green reverse card as the current target, and Player 2’s yellow and red cards visible at the bottom.
 
 **Clue rounds (abbrev.)**
 
@@ -1782,6 +2063,10 @@
 
 ## `cartoon_entertainment_companion` — 10 paired wrong / 76 total (13.2%)
 
+角色外观相似（多只绿恐龙、多只鸟）
+漫画页叙事相近（救援/王冠/宫殿/水灾易混）
+对话跨度极大（S1~S80+ sessions，检索易捞到 meta 讨论而非 clue 帧）
+
 ### `X1_Y1` — 1 in this task
 
 #### 19. `cartoon_entertainment_companion` #74
@@ -1791,7 +2076,13 @@
 - **source_sessions**: `CARTOON_S2`
 - **clue_rounds** (2): `CARTOON_S2:R5;CARTOON_S2:R3`
 
-**MCQ**
+GT 核对：S2-IMG2 中长颈幼龙 双臂环抱细树干、身体贴附攀爬，非站地面
+失败原因：
+Clue 图 S2-IMG2 未进 VLM Top5（送了 S8/S9/S1/S4 等无关帧）
+检索 #11 有 CARTOON_S2:R5 文字摘要「monkey clinging to tree」，但 VLM 未见原图
+模型用其他「恐龙+树/户外」场景臆测为「站在树旁」
+
+**MCQ** 宝宝恐龙与树的位置
 - Q: In the bright outdoor scene with open blue sky and a round green treetop, what is the baby dinosaur doing?
 - Options (canonical rotation):
   - **A**: Standing on the ground next to the tree ← Pred
@@ -1819,7 +2110,12 @@
 - #16 score=0.28 faiss `CARTOON_S1:R5`: A quiet, intimate scene unfolds with three blue-spotted eggs nestled warmly in a forest-floor nest, evoking nurturing stillness after a pri…
 - #17 score=0.28 faiss `CARTOON_S8:R10`: A solitary blue-green bird soars poetically through clouds, symbolizing freedom and contemplative closure to the flight sequence.
 - #18 score=0.28 faiss `CARTOON_S7:R7`: The cave’s natural architecture frames a densely packed but orderly dinosaur group, contrasting with the open-air ensemble shots from Episo…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S8-IMG1.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`, `Cartoon_Entertainment_Companion/S1-IMG1.jpg`, `Cartoon_Entertainment_Companion/S4-IMG4.jpg`, `Cartoon_Entertainment_Companion/Alley_Oop_Page_4.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S8-IMG1.jpg`: A green cartoon dinosaur stands looking up beside larger dinosaurs.
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
+  - `Cartoon_Entertainment_Companion/S1-IMG1.jpg`: A small dinosaur stands inside a blue cave with stalactites and rocky walls.
+  - `Cartoon_Entertainment_Companion/S4-IMG4.jpg`: A cartoon dinosaur crouches on a grassy path in a rocky valley.
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_4.jpg`: A caveman tests a small dinosaur as a new economical mount, gets bucked off and bitten, then another man praises the dinosaur while it looks smug.
 
 **Open**
 - Q: In the bright outdoor scene with an open blue sky and a round green treetop, how is the baby dinosaur positioned relative to the tree?
@@ -1844,7 +2140,12 @@
 - #14 score=0.21 faiss `CARTOON_S8:R6`: A striking minimalist composition features two cartoon birds standing close together against a dominant green sky, where negative space enh…
 - #15 score=0.20 faiss `CARTOON_S36:R1`: The scenes blur together due to overlapping dinosaur expressions and exaggerated close-ups, creating visual confusion.
 - #16 score=0.20 faiss `CARTOON_S7:R8`: Both open-sky and cave-wall framing techniques are equally effective visual strategies adaptable across brand contexts.
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S8-IMG1.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`, `Cartoon_Entertainment_Companion/S1-IMG1.jpg`, `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S5-IMG3.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S8-IMG1.jpg`: A green cartoon dinosaur stands looking up beside larger dinosaurs.
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
+  - `Cartoon_Entertainment_Companion/S1-IMG1.jpg`: A small dinosaur stands inside a blue cave with stalactites and rocky walls.
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S5-IMG3.jpg`: Two animated dinosaurs peek over rocks beside a stream in a canyon.
 
 **Clue rounds (abbrev.)**
 
@@ -1871,7 +2172,7 @@
 - **source_sessions**: `CARTOON_S3;CARTOON_S4`
 - **clue_rounds** (2): `CARTOON_S3:R7;CARTOON_S4:R7`
 
-**MCQ**
+**MCQ** 火山对峙捕食者计数
 - Q: In the volcano confrontation scene, how many large predatory dinosaurs faced the baby dinosaurs? (A similar predator type also appeared earlier in the jungle river session.)
 - Options (canonical rotation):
   - **A**: One grey T-Rex only
@@ -1879,6 +2180,11 @@
   - **C**: Two identical grey T-Rexes
   - **D**: Three — a grey T-Rex, a green carnivore, and a blue-grey raptor near the volcano ← GT
 - GT: `D` | Pred: `B` | debiased_em: `0.0`
+
+Clue：S3:R7（丛林河岸）+ S4:R7（火山对峙 S4-IMG3）
+Open VLM 有 S4-IMG3（#1），但模型只数出 2 个，漏数蓝灰 raptor（仅露头部，在绿龙颈后）  
+检索不稳，open时证据排在了S4-IMG3 #1
+MCQ 证据并没检索到
 
 **Retrieval (MCQ, 17/20 in context)**
 - #1 faiss `mau_1782875111132_dae55166` [img `Cartoon_Entertainment_Companion/S5-IMG1.jpg`]: user (Alley Oop MemEye Draft Curator): Remember every detail in this one. I'm going to come back to it when I build the color spec document — especially the individual features. My client specificall…
@@ -1898,7 +2204,12 @@
 - #15 score=0.31 faiss `CARTOON_S85:R1`: Some Alley Oop strips jump straight to the dinner scene without showing the preceding outdoor fight.
 - #16 score=0.31 faiss `CARTOON_S11:R2`: Two animated dinosaurs strain to carry a log across a precarious rocky ledge, framed by dynamic environmental elements that amplify the ten…
 - #17 score=0.30 faiss `CARTOON_S8:R6`: A striking minimalist composition features two cartoon birds standing close together against a dominant green sky, where negative space enh…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S5-IMG1.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`, `Cartoon_Entertainment_Companion/S7-IMG2.jpg`, `Cartoon_Entertainment_Companion/S8-IMG1.jpg`, `Cartoon_Entertainment_Companion/S5-IMG3.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S5-IMG1.jpg`: A group of cartoon dinosaurs stands on green grass, with a small p
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
+  - `Cartoon_Entertainment_Companion/S7-IMG2.jpg`: A group of animated dinosaurs stands together facing a character in a blue hat.
+  - `Cartoon_Entertainment_Companion/S8-IMG1.jpg`: A green cartoon dinosaur stands looking up beside larger dinosaurs.
+  - `Cartoon_Entertainment_Companion/S5-IMG3.jpg`: Two animated dinosaurs peek over rocks beside a stream in a canyon.
 
 **Open**
 - Q: In the volcano confrontation scene, how many and which large predatory dinosaurs faced the baby dinosaurs, including the similar predator type that appeared earlier in the jungle river session?
@@ -1925,7 +2236,12 @@
 - #16 score=0.22 faiss `CARTOON_S3:R13`: Next session will focus on group dynamics and dramatic set pieces for strong compositional references in high-stakes scenes.
 - #17 score=0.21 faiss `CARTOON_S10:R7`: A uniquely colored cartoon dinosaur gazes upward in a nighttime jungle scene, its striking appearance and emotive expression making it inst…
 - #18 score=0.21 faiss `CARTOON_S10:R11`: To maintain clarity and brand uniqueness across a large cast, the series uses bold, distinctly different hues rather than subtle variations…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S4-IMG3.jpg`, `Cartoon_Entertainment_Companion/S1-IMG4.jpg`, `Cartoon_Entertainment_Companion/S8-IMG1.jpg`, `Cartoon_Entertainment_Companion/S5-IMG3.jpg`, `Cartoon_Entertainment_Companion/S7-IMG2.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S4-IMG3.jpg`: Animated dinosaurs face each other in a volcanic landscape.
+  - `Cartoon_Entertainment_Companion/S1-IMG4.jpg`: Two long-necked dinosaurs stand in a lush prehistoric landscape.
+  - `Cartoon_Entertainment_Companion/S8-IMG1.jpg`: A green cartoon dinosaur stands looking up beside larger dinosaurs.
+  - `Cartoon_Entertainment_Companion/S5-IMG3.jpg`: Two animated dinosaurs peek over rocks beside a stream in a canyon.
+  - `Cartoon_Entertainment_Companion/S7-IMG2.jpg`: A group of animated dinosaurs stands together facing a character in a blue hat.
 
 **Clue rounds (abbrev.)**
 
@@ -1959,6 +2275,14 @@
   - **D**: Center ← GT
 - GT: `D` | Pred: `B` | debiased_em: `0.0`
 
+Clue：CARTOON_S7:R7 → S7-IMG3.jpg（高蓝翼龙被小恐龙围看）
+???? 没有 with a hand on its face ？？？？？
+GT 核对：S7-IMG3 中高蓝翼龙（Pterano）为画面 视觉中心，小恐龙仰视
+失败原因：
+VLM 送了 S7-IMG1（另一洞穴帧），非 clue 的 S7-IMG3
+检索 #12 有 CARTOON_S7:R7 文字，但无对应 wide shot 图
+模型可能根据 S7-IMG1 中蓝鸟偏左布局作答
+
 **Retrieval (MCQ, 18/20 in context)**
 - #1 faiss `mau_1782875289763_b62e57ad` [img `Cartoon_Entertainment_Companion/S7-IMG1.jpg`]: user (Alley Oop MemEye Draft Curator): First up — a cave scene with some fresh designs. Multiple characters, enclosed space, interesting interplay. assistant: The style feels cohesive with Episode 1 …
 - #2 score=0.40 faiss `CARTOON_S41:R2`: user (Alley Oop MemEye Draft Curator): The crowd scene and the cave-work scene are actually the same page, right? assistant: Yes. The tempo…
@@ -1978,7 +2302,12 @@
 - #16 score=0.29 faiss `CARTOON_S11:R5`: Zooming in to pixel level reveals every design detail, making it the ultimate test of precision—what looks flawless here holds up everywher…
 - #17 score=0.28 faiss `CARTOON_S1:R4`: The first scene opens with a dark, atmospheric cave interior featuring a small dinosaur, immediately setting a mysterious and immersive ton…
 - #18 score=0.28 faiss `CARTOON_S36:R2`: user (Alley Oop MemEye Draft Curator): So just remembering an animal face at the end of a page is not enough. assistant: Right. The comic r…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S12-IMG4.jpg`, `Cartoon_Entertainment_Companion/S10-IMG2.jpg`, `Cartoon_Entertainment_Companion/S8-IMG3.jpg`, `Cartoon_Entertainment_Companion/S4-IMG2.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S12-IMG4.jpg`: A ca
+  - `Cartoon_Entertainment_Companion/S10-IMG2.jpg`: Two cartoon dinosaurs stand together outdoors.
+  - `Cartoon_Entertainment_Companion/S8-IMG3.jpg`: Two cartoon birds stand close together against a green sky.
+  - `Cartoon_Entertainment_Companion/S4-IMG2.jpg`: A cartoon bird sits on top of a cartoon hippopotamus against a green forest background.
 
 **Open**
 - Q: In the Episode 2 wide cave scene where the tall bird character looks worried with a hand on its face, where is the character positioned in the frame?
@@ -2005,7 +2334,12 @@
 - #16 score=0.21 faiss `CARTOON_S46:R1`: The assistant acknowledges that mixing up carrying gags—like a bucket on the shoulder versus one balanced on the head—is understandable and…
 - #17 score=0.21 faiss `CARTOON_S45:R1`: The palace pages alternate between power and embarrassment, with one scene reversing the chore sequence—showing work before rest, unlike th…
 - #18 score=0.21 faiss `CARTOON_S12:R7`: Both character moments and brand illustrations benefit from wide shots that ground the narrative in context and expand scope, balancing int…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S12-IMG4.jpg`, `Cartoon_Entertainment_Companion/S4-IMG2.jpg`, `Cartoon_Entertainment_Companion/S4-IMG4.jpg`, `Cartoon_Entertainment_Companion/S10-IMG2.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S12-IMG4.jpg`: A ca
+  - `Cartoon_Entertainment_Companion/S4-IMG2.jpg`: A cartoon bird sits on top of a cartoon hippopotamus against a green forest background.
+  - `Cartoon_Entertainment_Companion/S4-IMG4.jpg`: A cartoon dinosaur crouches on a grassy path in a rocky valley.
+  - `Cartoon_Entertainment_Companion/S10-IMG2.jpg`: Two cartoon dinosaurs stand together outdoors.
 
 **Clue rounds (abbrev.)**
 
@@ -2034,6 +2368,8 @@
   - **D**: Below the price tags ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
 
+
+
 **Retrieval (MCQ, 10/20 in context)**
 - #1 faiss `mau_1782876130658_1e9225db`: user (Alley Oop MemEye Draft Curator): The circus animals were labeled with price tags just like the dinosaur dealership, right? assistant:…
 - #2 score=0.44 faiss `CARTOON_S70:R1`: Only Treasure Comics consistently features a strong character in a plaid shirt, as it’s tied to Paul Bunyan; other comics do not share this…
@@ -2045,7 +2381,8 @@
 - #8 score=0.36 faiss `CARTOON_S85:R1`: Some Alley Oop strips jump straight to the dinner scene without showing the preceding outdoor fight.
 - #9 score=0.32 faiss `CARTOON_S41:R2`: The crowd scene and cave-work scene occur on the same page, showing the temporary ruler first pelted by the crowd outside and later working…
 - #10 score=0.32 faiss `CARTOON_S82:R1`: The crowned man likely pointed at the drowning person, but visual ambiguity in the opening panel makes attribution unclear.
-- **→ VLM (1)**: `Cartoon_Entertainment_Companion/Treasure_Comics_Page_1.jpg`
+- **→ VLM (1)**:
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_1.jpg`: Vintage comic book page titled “Paul Bunyan” showing the giant lumberjack lifting a massive barbell and later visiting a circus with crowds watching unusual animals.
 
 **Open**
 - Q: In the first page of Treasure Comics, where is Paul Bunyan positioned in relation to the price tags hanging in the panel?
@@ -2069,7 +2406,12 @@
 - #13 score=0.24 faiss `CARTOON_S32:R1`: Paul Bunyan and Alley Oop both feature strong fighters, but they battle in distinctly different worlds—Bunyan in a circus and Alley Oop in …
 - #14 score=0.24 faiss `CARTOON_S75:R1`: Treasure Comics likely featured treasure themes, while Champ Comics was sports-themed and probably didn’t include a treasure chest.
 - #15 score=0.23 faiss `CARTOON_S64:R1`: Page 20 of Treasure Comics features a detective adventure climaxing in an attic shootout over a treasure chest.
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/Treasure_Comics_Page_1.jpg`, `Cartoon_Entertainment_Companion/Treasure_Comics_Page_8.jpg`, `Cartoon_Entertainment_Companion/Treasure_Comics_Page_2.jpg`, `Cartoon_Entertainment_Companion/Treasure_Comics_Page_3.jpg`, `Cartoon_Entertainment_Companion/Treasure_Comics_Page_4.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_1.jpg`: Vintage comic book page titled “Paul Bunyan” showing the giant lumberjack lifting a massive barbell and later visiting a circus with crowds watching unusual animals.
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_8.jpg`: Comic book page showing Paul Bunyan in a circus ring tossing a man toward a trapeze, then refusing an offer to stay as the circus strongman and walking away toward the North Woods.
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_2.jpg`: Comic page showing Paul Bunyan rescuing a man from attackers at a circus, punching them as dialogue balloons shout “HELP!” and “OOW!”.
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_3.jpg`: Comic book page showing a tall lumberjack in a red plaid shirt confronting and then replacing a circus strongman named Matto Grasso.
+  - `Cartoon_Entertainment_Companion/Treasure_Comics_Page_4.jpg`: Comic page showing Paul Bunyan performing as a strongman at a circus while a jealous man secretly pours kerosene on the tent, starts a fire, and Paul rips down and stamps out the burning canvas to save everyone.
 
 **Clue rounds (abbrev.)**
 
@@ -2100,6 +2442,8 @@
   - **D**: Hostile — he confronted Oop ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
 
+Clue：CARTOON_S13:R1 → Alley_Oop_Page_1.jpg 
+
 **Retrieval (MCQ, 10/20 in context)**
 - #1 score=0.37 faiss `CARTOON_S68:R1`: The temporary king storyline belongs to Alley Oop, not Champ Comics.
 - #2 score=0.33 faiss `CARTOON_S34:R2`: Not every page featuring headgear and water qualifies as a rescue strip—some later or unrelated images reuse these motifs without the woman…
@@ -2117,7 +2461,7 @@
 - Q: How did the original king react toward Oop immediately after being rescued from the water?
 - GT: Hostile — he confronted Oop
 - Pred: He reminded Oop of an unpaid five-clam debt.
-- Judge reasoning: Ground Truth says the king reacted with hostility and confronted Oop. The assistant instead mentions a specific debt reminder, which does not match the required hostile confrontation reaction.
+- Judge reasoning: Ground Truth says the king reacted with hostility and confronted Oop. The assistant instead mentions a specific debt reminder, which does not match the required hostile confrontation reaction. 
 
 **Retrieval (Open, 16/20 in context)**
 - #1 score=0.43 faiss `CARTOON_S61:R3`: user (Alley Oop MemEye Draft Curator): What later detail on that same page makes it easy to distinguish from the earlier apology beat? assi…
@@ -2136,7 +2480,12 @@
 - #14 faiss `mau_1782876206355_1de64101` [img `Cartoon_Entertainment_Companion/Alley_Oop_Page_32.jpg`]: user (Alley Oop MemEye Draft Curator): Here's page 32 of the Alley Oop comic I'm reading. assistant: I see page 32. I'll keep track of what happens on this page as we continue through the comic. imag…
 - #15 score=0.12 faiss `CARTOON_S77:R1`: user (Alley Oop MemEye Draft Curator): Did all four comics have the same artist? They look similar to me. assistant: Each comic has its own…
 - #16 score=0.12 faiss `CARTOON_S50:R1`: Paul Bunyan rejects a circus strongman offer, tossing a man toward a trapeze before heading back to the North Woods.
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/Alley_Oop_Page_27.jpg`, `Cartoon_Entertainment_Companion/Alley_Oop_Page_28.jpg`, `Cartoon_Entertainment_Companion/Alley_Oop_Page_1.jpg`, `Cartoon_Entertainment_Companion/S4-IMG4.jpg`, `Cartoon_Entertainment_Companion/Alley_Oop_Page_32.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_27.jpg`: Comic strip titled “King for a Day” shows a caveman king trying to convince another caveman to take his place because ruling is hard work.
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_28.jpg`: A caveman comic strip shows a temporary king being pelted with rocks by angry villagers before relaxing alone in a cave and enjoying the perks of kingship.
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_1.jpg`: Black-and-white comic strip shows a caveman rescuing a drowning king, then reminding him of an unpaid five-clam debt.
+  - `Cartoon_Entertainment_Companion/S4-IMG4.jpg`: A cartoon dinosaur crouches on a grassy path in a rocky valley.
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_32.jpg`: A caveman comic strip shows a king with an ulcer eating a bland meal, then secretly gorging on a feast in a cave before being surprised and hit in the face with a pie.
 
 **Clue rounds (abbrev.)**
 
@@ -2167,6 +2516,8 @@
   - **D**: After starting Champ ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
 
+S19:R1（开始 Champ）+ S61:R1（Alley Oop Page 33，宫殿线收尾）
+
 **Retrieval (MCQ, 14/20 in context)**
 - #1 score=0.55 faiss `CARTOON_S68:R1`: user (Alley Oop MemEye Draft Curator): The Champ Comics character — was he the one who became temporary king? assistant: The temporary king…
 - #2 score=0.55 faiss `CARTOON_S38:R2`: user (Alley Oop MemEye Draft Curator): This bridge page is still before the palace takeover sequence, correct? assistant: Right. It belongs…
@@ -2182,7 +2533,8 @@
 - #12 score=0.34 faiss `CARTOON_S6:R11`: Taking a break to recharge and manage other commitments before starting Episode 2—smart move.
 - #13 score=0.34 faiss `CARTOON_S78:R1`: Paul Bunyan is the lumberjack-circus strongman in Treasure Comics, while Champ Comics features other action characters.
 - #14 score=0.32 faiss `CARTOON_S6:R1`: Alley Oop MemEye Draft Curator is concluding Episode 1 by synthesizing gathered insights before moving on to Episode 2.
-- **→ VLM (1)**: `Cartoon_Entertainment_Companion/Champ_Page_1.jpg`
+- **→ VLM (1)**:
+  - `Cartoon_Entertainment_Companion/Champ_Page_1.jpg`: Vintage Champ Comics cover featuring “The Human Meteor” swimming underwater and battling divers in old-fashioned diving suits.
 
 **Open**
 - Q: Did you finish the Alley Oop palace arc before or after starting Champ Comics?
@@ -2205,7 +2557,9 @@
 - #12 score=0.15 faiss `CARTOON_S6:R11`: Taking a break to recharge and manage other commitments before starting Episode 2—smart move.
 - #13 score=0.14 faiss `CARTOON_S78:R1`: Paul Bunyan is the lumberjack-circus strongman in Treasure Comics, while Champ Comics features other action characters.
 - #14 faiss `mau_1782875867685_4da5d6b0` [img `Cartoon_Entertainment_Companion/Champ_Page_1.jpg`]: user (Alley Oop MemEye Draft Curator): Reading another comic now — Champ Comics. Here is page 1. assistant: Okay, I'll hold onto this. image: image_id: CH1:IMG_001 image_caption: Vintage Champ Comics…
-- **→ VLM (2)**: `Cartoon_Entertainment_Companion/Alley_Oop_Page_27.jpg`, `Cartoon_Entertainment_Companion/Champ_Page_1.jpg`
+- **→ VLM (2)**:
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_27.jpg`: Comic strip titled “King for a Day” shows a caveman king trying to convince another caveman to take his place because ruling is hard work.
+  - `Cartoon_Entertainment_Companion/Champ_Page_1.jpg`: Vintage Champ Comics cover featuring “The Human Meteor” swimming underwater and battling divers in old-fashioned diving suits.
 
 **Clue rounds (abbrev.)**
 
@@ -2223,7 +2577,7 @@
 
 ---
 
-### `X3_Y2` — 3 in this task
+### `X3_Y2` — 3 in this task 
 
 #### 25. `cartoon_entertainment_companion` #4
 
@@ -2232,7 +2586,7 @@
 - **source_sessions**: `CARTOON_S5;CARTOON_S9`
 - **clue_rounds** (3): `CARTOON_S5:R6;CARTOON_S5:R7;CARTOON_S9:R3`
 
-**MCQ**
+**MCQ** 绿恐龙+棕鸟是否同对持蛋
 - Q: A small green dinosaur and a brown bird appeared as a pair in two Episode 1 scenes (by rocks near water, and in a rocky valley). Were these same two characters also seen together holding a large egg in a later session?
 - Options (canonical rotation):
   - **A**: No — the egg-holding pair is a completely different green dinosaur and a different bird ← Pred
@@ -2240,6 +2594,10 @@
   - **C**: No — the pair by rocks includes a purple dinosaur, not a green one
   - **D**: Yes — the same green dinosaur and brown bird appear consistently across all three scenes ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
+
+Clue：S5:R6/R7（水边岩石、峡谷同行）+ S9:R3（持蛋/共担）S9-IMG1.jpg
+
+检索有 S9-IMG1 但S5-IMG4,5没有检索到
 
 **Retrieval (MCQ, 10/20 in context)**
 - #1 faiss `mau_1782875468787_4b68c203`: user (Alley Oop MemEye Draft Curator): Here it is. A pair holding something together. The expressions are really telling — different emotio…
@@ -2252,7 +2610,12 @@
 - #8 score=0.63 faiss `CARTOON_S36:R1`: The scenes blur together due to overlapping dinosaur expressions and exaggerated close-ups, creating visual confusion.
 - #9 score=0.62 faiss `CARTOON_S10:R2`: A small purple dinosaur framed beneath a towering gray one uses scale to instantly convey power dynamics and emotional tension.
 - #10 score=0.62 faiss `CARTOON_S35:R1`: The dinosaur material is confusing due to inconsistent size comparisons across pages, unlike the clearer cheap-versus-bargain dealership la…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S4-IMG2.jpg`, `Cartoon_Entertainment_Companion/S8-IMG5.jpg`, `Cartoon_Entertainment_Companion/S5-IMG1.jpg`, `Cartoon_Entertainment_Companion/S2-IMG3.jpg`, `Cartoon_Entertainment_Companion/S5-IMG4.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S4-IMG2.jpg`: A cartoon bird sits on top of a cartoon hippopotamus against a green forest background.
+  - `Cartoon_Entertainment_Companion/S8-IMG5.jpg`: A blue-green bird with outstretched wings flies through a cloudy sky.
+  - `Cartoon_Entertainment_Companion/S5-IMG1.jpg`: A group of cartoon dinosaurs stands on green grass, with a small p
+  - `Cartoon_Entertainment_Companion/S2-IMG3.jpg`: Two cartoon dinosaurs stand on a grassy hillside, one holding a yellow spotted egg.
+  - `Cartoon_Entertainment_Companion/S5-IMG4.jpg`: Two cartoon dinosaurs stand in a rocky canyon beside a small stream.
 
 **Open**
 - Q: Did the same small green dinosaur and brown bird that appeared together in two Episode 1 scenes also appear together holding a large egg in a later session?
@@ -2275,7 +2638,12 @@
 - #12 score=0.20 faiss `CARTOON_S8:R6`: A striking minimalist composition features two cartoon birds standing close together against a dominant green sky, where negative space enh…
 - #13 score=0.19 faiss `CARTOON_S76:R1`: Western Love and Alley Oop have separate casts, making crossover appearances unlikely.
 - #14 score=0.18 faiss `CARTOON_S10:R2`: A small purple dinosaur framed beneath a towering gray one uses scale to instantly convey power dynamics and emotional tension.
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S2-IMG3.jpg`, `Cartoon_Entertainment_Companion/S5-IMG1.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`, `Cartoon_Entertainment_Companion/S8-IMG1.jpg`, `Cartoon_Entertainment_Companion/S7-IMG1.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S2-IMG3.jpg`: Two cartoon dinosaurs stand on a grassy hillside, one holding a yellow spotted egg.
+  - `Cartoon_Entertainment_Companion/S5-IMG1.jpg`: A group of cartoon dinosaurs stands on green grass, with a small p
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
+  - `Cartoon_Entertainment_Companion/S8-IMG1.jpg`: A green cartoon dinosaur stands looking up beside larger dinosaurs.
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
 
 **Clue rounds (abbrev.)**
 
@@ -2305,7 +2673,7 @@
 - **source_sessions**: `CARTOON_S8;CARTOON_S12`
 - **clue_rounds** (5): `CARTOON_S8:R6;CARTOON_S8:R8;CARTOON_S12:R2;CARTOON_S12:R4;CARTOON_S12:R6`
 
-**MCQ**
+**MCQ** 棕鸟+青色生物共现 5 场景 
 - Q: The brown bird and teal creature appear together in multiple Episode 2 scenes. In how many image scenes do they appear together?
 - Options (canonical rotation):
   - **A**: Four
@@ -2313,6 +2681,8 @@
   - **C**: Six
   - **D**: Five ← GT
 - GT: `D` | Pred: `B` | debiased_em: `0.0`
+
+5 个 rounds（S8:R6/R8, S12:R2/R4/R6）→ S8-IMG3/4, S12-IMG1/2/3 灾难性检索失败
 
 **Retrieval (MCQ, 10/20 in context)**
 - #1 score=0.29 faiss `CARTOON_S83:R1`: The ruler’s posture in the clams-dispute scene is often misremembered as standing and shouting, though it likely blends with throne/hearing…
@@ -2325,7 +2695,9 @@
 - #8 score=0.22 faiss `CARTOON_S4:R2`: Analyze how character arrangement avoids crowding and how dramatic scenes alter visual energy.
 - #9 faiss `mau_1782875289763_b62e57ad` [img `Cartoon_Entertainment_Companion/S7-IMG1.jpg`]: user (Alley Oop MemEye Draft Curator): First up — a cave scene with some fresh designs. Multiple characters, enclosed space, interesting interplay. assistant: The style feels cohesive with Episode 1 …
 - #10 score=0.22 faiss `CARTOON_S17:R2`: The dinosaur lot displays multiple sales labels with unexpectedly sized names.
-- **→ VLM (2)**: `Cartoon_Entertainment_Companion/S4-IMG1.jpg`, `Cartoon_Entertainment_Companion/S7-IMG1.jpg`
+- **→ VLM (2)**:
+  - `Cartoon_Entertainment_Companion/S4-IMG1.jpg`: Four cartoon dinosaurs stand together in a rocky landscape at sunset.
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
 
 **Open**
 - Q: In how many image scenes do the brown bird and teal creature appear together in Episode 2?
@@ -2344,7 +2716,10 @@
 - #8 faiss `mau_1782874870301_42ac39ef` [img `Cartoon_Entertainment_Companion/S2-IMG3.jpg`]: user (Alley Oop MemEye Draft Curator): Now a pair walking together. I love how they differentiate two characters sharing the same frame. assistant: Nice shape contrast between the two. You'd read the…
 - #9 score=0.12 faiss `CARTOON_S7:R14`: Tracking character consistency across episodes helps build a reliable visual style guide.
 - #10 score=0.12 faiss `CARTOON_S1:R14`: Anchoring objects in the frame guide the viewer’s eye and are essential for clarity in busy, multi-character brand illustrations.
-- **→ VLM (3)**: `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S7-IMG2.jpg`, `Cartoon_Entertainment_Companion/S2-IMG3.jpg`
+- **→ VLM (3)**:
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S7-IMG2.jpg`: A group of animated dinosaurs stands together facing a character in a blue hat.
+  - `Cartoon_Entertainment_Companion/S2-IMG3.jpg`: Two cartoon dinosaurs stand on a grassy hillside, one holding a yellow spotted egg.
 
 **Clue rounds (abbrev.)**
 
@@ -2377,12 +2752,15 @@
 
 ---
 
-#### 27. `cartoon_entertainment_companion` #40
+#### 27. `cartoon_entertainment_companion` #40 
 
 - **Tag**: `U0_other` | **Position bias**: `bias_Ax2`
 - **session_id**: `CARTOON_S4;CARTOON_S10`
 - **source_sessions**: `CARTOON_S4;CARTOON_S10`
 - **clue_rounds** (3): `CARTOON_S4:R9;CARTOON_S10:R4;CARTOON_S4:R7`
+
+Clue：S4:R9（独处于田野）、S10:R4（紫角色特写）、S4:R7（火山群像）
+GT：高蓝鸟 仅 Ep2（如 S7 系列），三类 Ep1 场景均无
 
 **MCQ**
 - Q: The orange triceratops appears in three types of scenes: alone in a field, in a close-up pair with a purple character, and in the volcano confrontation group. In which of these does a tall blue bird character also appear?
@@ -2412,7 +2790,12 @@
 - #16 score=0.42 faiss `CARTOON_S36:R1`: The scenes blur together due to overlapping dinosaur expressions and exaggerated close-ups, creating visual confusion.
 - #17 score=0.42 faiss `CARTOON_S3:R13`: Next session will focus on group dynamics and dramatic set pieces for strong compositional references in high-stakes scenes.
 - #18 score=0.41 faiss `CARTOON_S1:R5`: A quiet, intimate scene unfolds with three blue-spotted eggs nestled warmly in a forest-floor nest, evoking nurturing stillness after a pri…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S8-IMG3.jpg`, `Cartoon_Entertainment_Companion/S5-IMG1.jpg`, `Cartoon_Entertainment_Companion/S1-IMG1.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S8-IMG3.jpg`: Two cartoon birds stand close together against a green sky.
+  - `Cartoon_Entertainment_Companion/S5-IMG1.jpg`: A group of cartoon dinosaurs stands on green grass, with a small p
+  - `Cartoon_Entertainment_Companion/S1-IMG1.jpg`: A small dinosaur stands inside a blue cave with stalactites and rocky walls.
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
 
 **Open**
 - Q: The orange triceratops appears in three types of scenes: alone in a field, in a close-up pair with a purple character, and in the volcano confrontation group. In which of these does a tall blue bird character also appear?
@@ -2438,7 +2821,12 @@
 - #15 score=0.23 faiss `CARTOON_S4:R14`: I’ve cataloged the dramatic frames—like the group shot and confrontation—with detailed breakdowns ready whenever you need them.
 - #16 score=0.22 faiss `CARTOON_S10:R15`: The paired close-up’s character differentiation will be key to the spec doc, and I’ll ensure it’s addressed.
 - #17 score=0.22 faiss `CARTOON_S12:R7`: Both character moments and brand illustrations benefit from wide shots that ground the narrative in context and expand scope, balancing int…
-- **→ VLM (5)**: `Cartoon_Entertainment_Companion/S7-IMG1.jpg`, `Cartoon_Entertainment_Companion/S5-IMG1.jpg`, `Cartoon_Entertainment_Companion/S6-IMG2.jpg`, `Cartoon_Entertainment_Companion/S9-IMG2.jpg`, `Cartoon_Entertainment_Companion/S9-IMG1.jpg`
+- **→ VLM (5)**:
+  - `Cartoon_Entertainment_Companion/S7-IMG1.jpg`: A blue bird stands in a cave facing two small dinosaurs.
+  - `Cartoon_Entertainment_Companion/S5-IMG1.jpg`: A group of cartoon dinosaurs stands on green grass, with a small p
+  - `Cartoon_Entertainment_Companion/S6-IMG2.jpg`: A cartoon dinosaur stands in a forest beside a large animal’s body.
+  - `Cartoon_Entertainment_Companion/S9-IMG2.jpg`: Three cartoon dinosaurs stand in a lush jungle clearing.
+  - `Cartoon_Entertainment_Companion/S9-IMG1.jpg`: A green dinosaur stands on the back of a large yellow-spotted dinosaur in a rocky landscape.
 
 **Clue rounds (abbrev.)**
 
@@ -2470,14 +2858,16 @@
 - **source_sessions**: `CARTOON_S41;CARTOON_S47;CARTOON_S56`
 - **clue_rounds** (3): `CARTOON_S41:R1;CARTOON_S47:R1;CARTOON_S56:R1`
 
-**MCQ**
-- Q: After the earlier crowd and chore scenes, what problem appears on the last palace page?
+**MCQ** 宫殿最后一页问题
+- Q: After the earlier crowd and chore scenes, what problem appears on the last palace page? 
 - Options (canonical rotation):
   - **A**: The crowd crowns him peacefully
   - **B**: He leaves the palace before anything happens
   - **C**: The page only shows him resting quietly ← Pred
   - **D**: Noisy guards interrupt him at the palace ← GT
 - GT: `D` | Pred: `C` | debiased_em: `0.0`
+
+S41:R1（Page 28 群众/洞穴）、S47:R1（Page 29 家务）、S56:R1（Page 31 卫兵+牛排）
 
 **Retrieval (MCQ, 10/20 in context)**
 - #1 score=0.52 faiss `CARTOON_S45:R1`: The palace pages alternate between power and embarrassment, with one scene reversing the chore sequence—showing work before rest, unlike th…
@@ -2490,7 +2880,9 @@
 - #8 score=0.41 faiss `CARTOON_S41:R2`: The crowd scene and cave-work scene occur on the same page, showing the temporary ruler first pelted by the crowd outside and later working…
 - #9 faiss `mau_1782876018924_ad175ae1` [img `Cartoon_Entertainment_Companion/Alley_Oop_Page_26.jpg`]: user (Alley Oop MemEye Draft Curator): Here's page 26 of the Alley Oop comic I'm reading. assistant: I see page 26. I'll keep track of what happens on this page as we continue through the comic. imag…
 - #10 score=0.40 faiss `CARTOON_S47:R3`: The former ruler’s shift from lounging to frantic movement—shown by him running with a basin—is the key visual detail marking the transitio…
-- **→ VLM (2)**: `Cartoon_Entertainment_Companion/Alley_Oop_Page_1.jpg`, `Cartoon_Entertainment_Companion/Alley_Oop_Page_26.jpg`
+- **→ VLM (2)**:
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_1.jpg`: Black-and-white comic strip shows a caveman rescuing a drowning king, then reminding him of an unpaid five-clam debt.
+  - `Cartoon_Entertainment_Companion/Alley_Oop_Page_26.jpg`: A vintage comic strip shows a scientist teleporting a man from a prison cell to a woman, who prepares to kiss him before noticing another woman’s hair on his shoulder and angrily confronting him.
 
 **Open**
 - Q: After the earlier crowd and chore scenes, what problem appears on the last palace page?
@@ -2568,7 +2960,12 @@
 - #8 score=0.34 faiss `HOME_S5:R5`: Renovation is actively progressing in the stripped-down kitchen, with only the old stove and dishwasher remaining.
 - #9 score=0.33 faiss `HOME_S13:R2`: After a week of use, Hannah Brooks’ modern workspace remains tidy and functional, featuring a computer, laptop, notebook, and coffee cup by…
 - #10 score=0.33 faiss `HOME_S11:R3`: Hannah Brooks notes a later view from the other side, and the assistant agrees to keep it, while an image captures a serene dining nook bat…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D11_IMG_001.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`, `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D2_IMG_007.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D11_IMG_001.jpg`: Morning light spills over a small wooden table set with a bowl of fresh fruit and a coffee mug by the window.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D2_IMG_007.jpg`: A modern showroom displays a variety of minimalist wooden coffee tables on a tiled floor.
 
 **Open**
 - Q: In the terracotta inspiration image, where is the woven chair positioned relative to the coffee table?
@@ -2587,7 +2984,12 @@
 - #8 score=0.12 faiss `HOME_S10:R4`: The image shows a modern rectangular coffee table featuring a dark wood top and shelf, held up by a minimalist black metal frame.
 - #9 score=0.11 faiss `HOME_S12:R7`: The entryway is neatly organized with minimalist hooks and a slim console table, ready for everyday use after move-in.
 - #10 score=0.11 faiss `HOME_S6:R2`: The new color direction embraces warm, earthy tones and natural textures to create a cozy, minimalist living space.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D11_IMG_001.jpg`, `Home_Renovation_Interior_Design/D4_IMG_005.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`, `Home_Renovation_Interior_Design/D9_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D11_IMG_001.jpg`: Morning light spills over a small wooden table set with a bowl of fresh fruit and a coffee mug by the window.
+  - `Home_Renovation_Interior_Design/D4_IMG_005.jpg`: Partially removed hardwood flooring exposes the subfloor in an empty room under renovation.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
+  - `Home_Renovation_Interior_Design/D9_IMG_005.jpg`: A minimalist living room features a tan leather sofa against a warm terracotta wall beside large glass doors.
 
 **Clue rounds (abbrev.)**
 
@@ -2635,7 +3037,12 @@
 - #14 score=0.27 faiss `HOME_S12:R9`: user (Hannah Brooks): Please remember the visual details, not just the broad furniture. assistant: Understood. I'll focus on the specifics …
 - #15 score=0.25 faiss `HOME_S11:R2`: Morning light illuminates a cozy wooden table set with fresh fruit and coffee by the window.
 - #16 score=0.24 faiss `HOME_S4:R8`: user (Hannah Brooks): Please keep the details precise. assistant: Will do. I'll stay careful with the details.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`, `Home_Renovation_Interior_Design/D2_IMG_007.jpg`, `Home_Renovation_Interior_Design/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
+  - `Home_Renovation_Interior_Design/D2_IMG_007.jpg`: A modern showroom displays a variety of minimalist wooden coffee tables on a tiled floor.
+  - `Home_Renovation_Interior_Design/D4_IMG_002.jpg`: A bright, minimalist living room with light wood floors, a simple sofa, and a potted plant by the window.
 
 **Open**
 - Q: In the final living room, where is the remote on the coffee table?
@@ -2659,7 +3066,12 @@
 - #13 score=0.10 faiss `HOME_S13:R6`: The living room, viewed from the side, features cozy autumn decor with a pumpkin centerpiece.
 - #14 score=0.10 faiss `HOME_S6:R4`: The space is currently a bright, empty room with light wood floors and large sliding glass doors leading to a fenced backyard.
 - #15 score=0.10 bm25 `HOME_S9:R6`: Hannah Brooks arranged the furniture to assess its spatial feel, aiding in comparison against the minimalist living room’s tan leather sofa…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D2_IMG_007.jpg`, `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D1_IMG_002.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D2_IMG_007.jpg`: A modern showroom displays a variety of minimalist wooden coffee tables on a tiled floor.
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D1_IMG_002.jpg`: A clean, compact kitchen with wooden cabinets and white appliances.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
 
 **Clue rounds (abbrev.)**
 
@@ -2701,7 +3113,12 @@
 - #10 score=0.40 faiss `HOME_S13:R3`: user (Hannah Brooks): Same room from the other side. assistant: Thanks, I'll keep the other side too. image: image_id: image_caption: A mod…
 - #11 score=0.23 faiss `HOME_S11:R2`: Morning light illuminates a cozy wooden table set with fresh fruit and coffee by the window.
 - #12 score=0.22 faiss `HOME_S13:R5`: The living room, styled with neutral tones, natural wood, and greenery, offers a cozy, inviting atmosphere enhanced by seasonal updates.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`, `Home_Renovation_Interior_Design/D12_IMG_003.jpg`, `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
+  - `Home_Renovation_Interior_Design/D12_IMG_003.jpg`: A cozy bedside table holds stacked books, glasses, a lamp, and a charging cable ready for the night.
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D4_IMG_002.jpg`: A bright, minimalist living room with light wood floors, a simple sofa, and a potted plant by the window.
 
 **Open**
 - Q: In the seasonal living-room refresh, what slightly overlaps the lower part of the side-table lamp?
@@ -2723,7 +3140,12 @@
 - #11 score=0.11 faiss `HOME_S10:R5`: Both Hannah Brooks and the assistant agree on Option C, while the image depicts a modern coffee table in a minimalist living space.
 - #12 score=0.11 faiss `HOME_S13:R3`: Hannah Brooks suggests viewing the office space from the other side, and the assistant agrees to include that perspective.
 - #13 score=0.10 bm25 `HOME_S9:R6`: Hannah Brooks arranged the furniture to assess its spatial feel, aiding in comparison against the minimalist living room’s tan leather sofa…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D11_IMG_002.jpg`, `Home_Renovation_Interior_Design/D3_IMG_005.jpg`, `Home_Renovation_Interior_Design/D1_IMG_008.jpg`, `Home_Renovation_Interior_Design/D12_IMG_003.jpg`, `Home_Renovation_Interior_Design/D13_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D11_IMG_002.jpg`: Warm evening light fills a quiet dining nook with a bowl of oranges on the table.
+  - `Home_Renovation_Interior_Design/D3_IMG_005.jpg`: A fresh paint swatch dries on the wall beside a roller tray and painter’s tape on the floor.
+  - `Home_Renovation_Interior_Design/D1_IMG_008.jpg`: Sunlit empty room with wooden floors and neutral walls leading into an adjoining space.
+  - `Home_Renovation_Interior_Design/D12_IMG_003.jpg`: A cozy bedside table holds stacked books, glasses, a lamp, and a charging cable ready for the night.
+  - `Home_Renovation_Interior_Design/D13_IMG_005.jpg`: A cozy living room decorated with autumn colors and a pumpkin centerpiece.
 
 **Clue rounds (abbrev.)**
 
@@ -2768,7 +3190,12 @@
 - #13 score=0.28 faiss `HOME_S5:R5`: Renovation is actively progressing in the stripped-down kitchen, with only the old stove and dishwasher remaining.
 - #14 score=0.25 faiss `HOME_S12:R9`: user (Hannah Brooks): Please remember the visual details, not just the broad furniture. assistant: Understood. I'll focus on the specifics …
 - #15 score=0.24 faiss `HOME_S2:R3`: The second option offers a different style, featuring a modern dark gray sectional sofa with white and black accent pillows in a minimalist…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D11_IMG_002.jpg`, `Home_Renovation_Interior_Design/D8_IMG_006.jpg`, `Home_Renovation_Interior_Design/D8_IMG_007.jpg`, `Home_Renovation_Interior_Design/D9_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D11_IMG_002.jpg`: Warm evening light fills a quiet dining nook with a bowl of oranges on the table.
+  - `Home_Renovation_Interior_Design/D8_IMG_006.jpg`: A compact, tidy kitchen features wooden cabinets, a stainless steel gas stove, and a white refrigerator beside the sink.
+  - `Home_Renovation_Interior_Design/D8_IMG_007.jpg`: A bright, modern kitchen with wooden cabinets and a clean, white countertop surrounding a stainless steel sink.
+  - `Home_Renovation_Interior_Design/D9_IMG_002.jpg`: Minimalist bathroom vanity with a round vessel sink, black faucet, and wooden cabinet beneath a circular mirror.
 
 **Open**
 - Q: In the installed dining corner, where is the small black bowl placed on the table?
@@ -2794,7 +3221,12 @@
 - #15 score=0.10 bm25 `HOME_S2:R3`: The second option offers a different style, featuring a modern dark gray sectional sofa with white and black accent pillows in a minimalist…
 - #16 score=0.10 bm25 `HOME_S7:R8`: The image shows a small, shared home office with two minimalist workstations beside a bookshelf, illuminated by natural light from a centra…
 - #17 score=0.10 bm25 `HOME_S6:R3`: A yellow sticky note is placed on a neatly divided terracotta-colored grid background.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D11_IMG_002.jpg`, `Home_Renovation_Interior_Design/D8_IMG_006.jpg`, `Home_Renovation_Interior_Design/D10_IMG_003.jpg`, `Home_Renovation_Interior_Design/D11_IMG_006.jpg`, `Home_Renovation_Interior_Design/D8_IMG_007.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D11_IMG_002.jpg`: Warm evening light fills a quiet dining nook with a bowl of oranges on the table.
+  - `Home_Renovation_Interior_Design/D8_IMG_006.jpg`: A compact, tidy kitchen features wooden cabinets, a stainless steel gas stove, and a white refrigerator beside the sink.
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
+  - `Home_Renovation_Interior_Design/D11_IMG_006.jpg`: A minimalist breakfast nook features a round wooden table, built-in beige seating, and soft natural light from a nearby window.
+  - `Home_Renovation_Interior_Design/D8_IMG_007.jpg`: A bright, modern kitchen with wooden cabinets and a clean, white countertop surrounding a stainless steel sink.
 
 **Clue rounds (abbrev.)**
 
@@ -2838,7 +3270,12 @@
 - #12 score=0.25 faiss `HOME_S4:R6`: The demo is underway, with partial hardwood flooring removed to reveal the subfloor in a room under renovation.
 - #13 score=0.23 faiss `HOME_S12:R9`: user (Hannah Brooks): Please remember the visual details, not just the broad furniture. assistant: Understood. I'll focus on the specifics …
 - #14 score=0.23 faiss `HOME_S7:R6`: Hannah Brooks confirmed the dual-desk setup works, and the assistant noted the layout for future reference.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_007.jpg`, `Home_Renovation_Interior_Design/D6_IMG_004.jpg`, `Home_Renovation_Interior_Design/D3_IMG_002.jpg`, `Home_Renovation_Interior_Design/D5_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
+  - `Home_Renovation_Interior_Design/D3_IMG_007.jpg`: Neutral paint samples, a brush, and a tray of white paint sit ready for a fresh coat on the wall.
+  - `Home_Renovation_Interior_Design/D6_IMG_004.jpg`: A fresh terracotta paint swatch is tested on a wall beside a roller tray and matching color card.
+  - `Home_Renovation_Interior_Design/D3_IMG_002.jpg`: A hand holds a paint swatch card displaying a gradient of green shades against a neutral background.
+  - `Home_Renovation_Interior_Design/D5_IMG_006.jpg`: Tile samples display three minimalist patterns in white and gray on neutral boards.
 
 **Open**
 - Q: In the wider first-paint setup, where is the small sample card placed?
@@ -2862,7 +3299,12 @@
 - #13 score=0.09 bm25 `HOME_S2:R2`: user (Hannah Brooks): Here is the first option. assistant: Looks great! image: image_id: image_caption: A modern light blue sofa with sleek…
 - #14 score=0.08 bm25 `HOME_S11:R2`: Morning light illuminates a cozy wooden table set with fresh fruit and coffee by the window.
 - #15 score=0.08 bm25 `HOME_S11:R6`: Two beige upholstered chairs are displayed side by side, one featuring a small wooden sample on its seat.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_002.jpg`, `Home_Renovation_Interior_Design/D6_IMG_004.jpg`, `Home_Renovation_Interior_Design/D3_IMG_007.jpg`, `Home_Renovation_Interior_Design/D3_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
+  - `Home_Renovation_Interior_Design/D3_IMG_002.jpg`: A hand holds a paint swatch card displaying a gradient of green shades against a neutral background.
+  - `Home_Renovation_Interior_Design/D6_IMG_004.jpg`: A fresh terracotta paint swatch is tested on a wall beside a roller tray and matching color card.
+  - `Home_Renovation_Interior_Design/D3_IMG_007.jpg`: Neutral paint samples, a brush, and a tray of white paint sit ready for a fresh coat on the wall.
+  - `Home_Renovation_Interior_Design/D3_IMG_004.jpg`: A fresh swatch of sage green paint is being tested on a neutral wall above the baseboard.
 
 **Clue rounds (abbrev.)**
 
@@ -2902,7 +3344,12 @@
 - #8 score=0.25 faiss `HOME_S5:R7`: Three minimalist white-and-gray tile patterns are displayed on neutral boards.
 - #9 score=0.24 faiss `HOME_S1:R4`: The current state of the bedroom is bright and empty, featuring light wood floors and a large window with sheer curtains, ready for demo an…
 - #10 score=0.24 faiss `HOME_S2:R7`: user (Hannah Brooks): I may want to come back later for these choices. assistant: No problem! I'll keep track of all the options for you.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D4_IMG_005.jpg`, `Home_Renovation_Interior_Design/D6_IMG_005.jpg`, `Home_Renovation_Interior_Design/D3_IMG_006.jpg`, `Home_Renovation_Interior_Design/D5_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D4_IMG_005.jpg`: Partially removed hardwood flooring exposes the subfloor in an empty room under renovation.
+  - `Home_Renovation_Interior_Design/D6_IMG_005.jpg`: A wooden cabinet door sample is laid on the floor between a tape measure and a pencil for planning installation.
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
+  - `Home_Renovation_Interior_Design/D5_IMG_004.jpg`: A stripped-down kitchen under renovation, with only an old stove and dishwasher left in the unfinished space.
 
 **Open**
 - Q: In the demo staging photo, where is the tile sample located relative to the red tool bag and plank stack?
@@ -2921,7 +3368,12 @@
 - #8 score=0.11 faiss `HOME_S6:R6`: Hannah is verifying cabinet door placement against the floor, and the assistant will monitor the fit.
 - #9 score=0.09 bm25 `HOME_S8:R6`: A sleek brass pendant light illuminates a modern kitchen featuring wood cabinets and white subway tile.
 - #10 score=0.09 bm25 `HOME_S5:R5`: Renovation is actively progressing in the stripped-down kitchen, with only the old stove and dishwasher remaining.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D4_IMG_005.jpg`, `Home_Renovation_Interior_Design/D1_IMG_003.jpg`, `Home_Renovation_Interior_Design/D4_IMG_006.jpg`, `Home_Renovation_Interior_Design/D5_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D4_IMG_005.jpg`: Partially removed hardwood flooring exposes the subfloor in an empty room under renovation.
+  - `Home_Renovation_Interior_Design/D1_IMG_003.jpg`: Bright, empty bedroom with light wood floors and a large window framed by sheer curtains.
+  - `Home_Renovation_Interior_Design/D4_IMG_006.jpg`: Stacks of wooden floorboards and a tool bag sit ready for renovation in a worn, unfinished room.
+  - `Home_Renovation_Interior_Design/D5_IMG_006.jpg`: Tile samples display three minimalist patterns in white and gray on neutral boards.
 
 **Clue rounds (abbrev.)**
 
@@ -2970,7 +3422,12 @@
 - #17 score=0.21 faiss `HOME_S3:R9`: Hannah Brooks added another close-up after resetting the tray, capturing detailed moments of her painting prep.
 - #18 score=0.21 faiss `HOME_S10:R9`: The bedroom is now fully furnished with a bright, minimalist setup featuring a neatly made bed and matching wooden nightstands.
 - #19 score=0.20 faiss `HOME_S4:R8`: user (Hannah Brooks): Please keep the details precise. assistant: Will do. I'll stay careful with the details.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D7_IMG_002.jpg`, `Home_Renovation_Interior_Design/D5_IMG_007.jpg`, `Home_Renovation_Interior_Design/D12_IMG_002.jpg`, `Home_Renovation_Interior_Design/D13_IMG_002.jpg`, `Home_Renovation_Interior_Design/D10_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D7_IMG_002.jpg`: A modern white L-shaped desk stands in a minimalist office space.
+  - `Home_Renovation_Interior_Design/D5_IMG_007.jpg`: A neatly organized wooden tray holds labeled compartments of screws, anchors, hardware, and brass.
+  - `Home_Renovation_Interior_Design/D12_IMG_002.jpg`: A serene, neutral-toned bedroom features a neatly made bed flanked by matching wooden nightstands and lamps.
+  - `Home_Renovation_Interior_Design/D13_IMG_002.jpg`: A modern, minimalist office workspace with wooden desks, bookshelves, and large windows overlooking the city.
+  - `Home_Renovation_Interior_Design/D10_IMG_003.jpg`: A modern rectangular coffee table with a dark wood top and shelf supported by a minimalist black metal frame.
 
 **Open**
 - Q: In bedroom option B, where is the tray placed?
@@ -2996,7 +3453,12 @@
 - #15 score=0.06 bm25 `HOME_S2:R2`: user (Hannah Brooks): Here is the first option. assistant: Looks great! image: image_id: image_caption: A modern light blue sofa with sleek…
 - #16 score=0.06 bm25 `HOME_S6:R3`: A yellow sticky note is placed on a neatly divided terracotta-colored grid background.
 - #17 score=0.06 bm25 `HOME_S1:R4`: The current state of the bedroom is bright and empty, featuring light wood floors and a large window with sheer curtains, ready for demo an…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D5_IMG_007.jpg`, `Home_Renovation_Interior_Design/D7_IMG_002.jpg`, `Home_Renovation_Interior_Design/D1_IMG_004.jpg`, `Home_Renovation_Interior_Design/D13_IMG_002.jpg`, `Home_Renovation_Interior_Design/D12_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D5_IMG_007.jpg`: A neatly organized wooden tray holds labeled compartments of screws, anchors, hardware, and brass.
+  - `Home_Renovation_Interior_Design/D7_IMG_002.jpg`: A modern white L-shaped desk stands in a minimalist office space.
+  - `Home_Renovation_Interior_Design/D1_IMG_004.jpg`: Bright, empty bedroom with wood flooring, a ceiling fan, and a double-door closet.
+  - `Home_Renovation_Interior_Design/D13_IMG_002.jpg`: A modern, minimalist office workspace with wooden desks, bookshelves, and large windows overlooking the city.
+  - `Home_Renovation_Interior_Design/D12_IMG_002.jpg`: A serene, neutral-toned bedroom features a neatly made bed flanked by matching wooden nightstands and lamps.
 
 **Clue rounds (abbrev.)**
 
@@ -3045,7 +3507,12 @@
 - #15 score=0.25 faiss `HOME_S3:R5`: A close-up of a sage green paint swatch tested in daylight highlights the importance of evaluating color under different lighting condition…
 - #16 score=0.24 faiss `HOME_S4:R8`: user (Hannah Brooks): Please keep the details precise. assistant: Will do. I'll stay careful with the details.
 - #17 score=0.24 faiss `HOME_S12:R9`: user (Hannah Brooks): Please remember the visual details, not just the broad furniture. assistant: Understood. I'll focus on the specifics …
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D6_IMG_005.jpg`, `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D5_IMG_003.jpg`, `Home_Renovation_Interior_Design/D8_IMG_006.jpg`, `Home_Renovation_Interior_Design/D7_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D6_IMG_005.jpg`: A wooden cabinet door sample is laid on the floor between a tape measure and a pencil for planning installation.
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D5_IMG_003.jpg`: A neutral display board showcases labeled cabinet hardware styles, including bar pulls, a knob, and a cup pull.
+  - `Home_Renovation_Interior_Design/D8_IMG_006.jpg`: A compact, tidy kitchen features wooden cabinets, a stainless steel gas stove, and a white refrigerator beside the sink.
+  - `Home_Renovation_Interior_Design/D7_IMG_002.jpg`: A modern white L-shaped desk stands in a minimalist office space.
 
 **Open**
 - Q: In the second floor-to-cabinet comparison shot, where is the thin white cable loop?
@@ -3072,7 +3539,12 @@
 - #16 score=0.09 bm25 `HOME_S12:R4`: A cozy bedside table is neatly arranged with stacked books, glasses, a lamp, and a charging cable, ready for nighttime relaxation.
 - #17 score=0.09 bm25 `HOME_S3:R8`: A wider shot of the first paint setup shows a fresh green paint sample being tested on a beige wall alongside painting supplies and a ladde…
 - #18 score=0.09 bm25 `HOME_S9:R4`: The sleek modern bathroom vanity features a floating white cabinet, integrated sink, and backlit mirror.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D1_IMG_006.jpg`, `Home_Renovation_Interior_Design/D6_IMG_005.jpg`, `Home_Renovation_Interior_Design/D8_IMG_006.jpg`, `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D1_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D1_IMG_006.jpg`: A bright, modern hallway with light wood floors and white doors leads to a distant room.
+  - `Home_Renovation_Interior_Design/D6_IMG_005.jpg`: A wooden cabinet door sample is laid on the floor between a tape measure and a pencil for planning installation.
+  - `Home_Renovation_Interior_Design/D8_IMG_006.jpg`: A compact, tidy kitchen features wooden cabinets, a stainless steel gas stove, and a white refrigerator beside the sink.
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D1_IMG_002.jpg`: A clean, compact kitchen with wooden cabinets and white appliances.
 
 **Clue rounds (abbrev.)**
 
@@ -3114,7 +3586,12 @@
 - #8 score=0.29 faiss `HOME_S3:R6`: A fresh paint swatch drying on the wall, captured under evening light from a slightly different angle than before, offers useful visual com…
 - #9 score=0.27 faiss `HOME_S8:R7`: The kitchen offers a compact, tidy layout with wooden cabinets, a stainless steel stove, and a white refrigerator positioned beside the sin…
 - #10 score=0.25 faiss `HOME_S6:R5`: Hannah Brooks is testing a new paint direction, with a fresh terracotta swatch being evaluated alongside its color card for future referenc…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_004.jpg`, `Home_Renovation_Interior_Design/D7_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_006.jpg`, `Home_Renovation_Interior_Design/D5_IMG_004.jpg`, `Home_Renovation_Interior_Design/D6_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_004.jpg`: A fresh swatch of sage green paint is being tested on a neutral wall above the baseboard.
+  - `Home_Renovation_Interior_Design/D7_IMG_006.jpg`: A small, shared home office features two minimalist computer workstations beside a bookshelf under natural light from a central window.
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
+  - `Home_Renovation_Interior_Design/D5_IMG_004.jpg`: A stripped-down kitchen under renovation, with only an old stove and dishwasher left in the unfinished space.
+  - `Home_Renovation_Interior_Design/D6_IMG_006.jpg`: Testing a warm terracotta paint color on a living room wall.
 
 **Open**
 - Q: In the two close-up wall-test images, beside which painted patch does the loose blue tape strip appear?
@@ -3133,7 +3610,12 @@
 - #8 score=0.08 bm25 `HOME_S11:R4`: Hannah Brooks shared another styling update, which the assistant accepted and incorporated into their current set.
 - #9 score=0.08 bm25 `HOME_S9:R6`: Hannah Brooks arranged the furniture to assess its spatial feel, aiding in comparison against the minimalist living room’s tan leather sofa…
 - #10 score=0.08 bm25 `HOME_S3:R3`: Hannah Brooks proudly shows off her first paint swatch card, featuring a gradient of green shades, which the assistant praises as a nice co…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_004.jpg`, `Home_Renovation_Interior_Design/D3_IMG_007.jpg`, `Home_Renovation_Interior_Design/D7_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_004.jpg`: A fresh swatch of sage green paint is being tested on a neutral wall above the baseboard.
+  - `Home_Renovation_Interior_Design/D3_IMG_007.jpg`: Neutral paint samples, a brush, and a tray of white paint sit ready for a fresh coat on the wall.
+  - `Home_Renovation_Interior_Design/D7_IMG_006.jpg`: A small, shared home office features two minimalist computer workstations beside a bookshelf under natural light from a central window.
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
+  - `Home_Renovation_Interior_Design/D3_IMG_005.jpg`: A fresh paint swatch dries on the wall beside a roller tray and painter’s tape on the floor.
 
 **Clue rounds (abbrev.)**
 
@@ -3178,7 +3660,12 @@
 - #8 score=0.26 faiss `HOME_S11:R2`: Morning light illuminates a cozy wooden table set with fresh fruit and coffee by the window.
 - #9 score=0.24 faiss `HOME_S4:R3`: The user appreciates the minimalist living room design, noting it aligns closely with their envisioned style.
 - #10 score=0.24 faiss `HOME_S4:R8`: user (Hannah Brooks): Please keep the details precise. assistant: Will do. I'll stay careful with the details.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D10_IMG_004.jpg`, `Home_Renovation_Interior_Design/D6_IMG_001.jpg`, `Home_Renovation_Interior_Design/D5_IMG_004.jpg`, `Home_Renovation_Interior_Design/D9_IMG_007.jpg`, `Home_Renovation_Interior_Design/D10_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D10_IMG_004.jpg`: A modern round coffee table with a white marble top and a gold pedestal base stands in a minimalist living space.
+  - `Home_Renovation_Interior_Design/D6_IMG_001.jpg`: A warm, minimalist living room with earthy tones and natural textures creates a cozy, inviting atmosphere.
+  - `Home_Renovation_Interior_Design/D5_IMG_004.jpg`: A stripped-down kitchen under renovation, with only an old stove and dishwasher left in the unfinished space.
+  - `Home_Renovation_Interior_Design/D9_IMG_007.jpg`: Minimalist bathroom shelf with neatly folded towels, an amber pump bottle, and a small jar of cream.
+  - `Home_Renovation_Interior_Design/D10_IMG_002.jpg`: A minimalist round wooden coffee table with tapered legs stands on a light tiled floor.
 
 **Open**
 - Q: Compared with the terracotta inspiration image, which small tabletop item is present in the inspiration but not in the final living room?
@@ -3197,7 +3684,12 @@
 - #8 score=0.13 faiss `HOME_S13:R6`: The living room, viewed from the side, features cozy autumn decor with a pumpkin centerpiece.
 - #9 score=0.12 faiss `HOME_S12:R9`: user (Hannah Brooks): Please remember the visual details, not just the broad furniture. assistant: Understood. I'll focus on the specifics …
 - #10 score=0.12 faiss `HOME_S1:R10`: A newly renovated, minimalist living room with wooden floors and soft natural light from a single window.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D6_IMG_001.jpg`, `Home_Renovation_Interior_Design/D9_IMG_005.jpg`, `Home_Renovation_Interior_Design/D3_IMG_001.jpg`, `Home_Renovation_Interior_Design/D10_IMG_001.jpg`, `Home_Renovation_Interior_Design/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D6_IMG_001.jpg`: A warm, minimalist living room with earthy tones and natural textures creates a cozy, inviting atmosphere.
+  - `Home_Renovation_Interior_Design/D9_IMG_005.jpg`: A minimalist living room features a tan leather sofa against a warm terracotta wall beside large glass doors.
+  - `Home_Renovation_Interior_Design/D3_IMG_001.jpg`: A minimalist living room with neutral tones features a cream sofa, wooden coffee table, and simple wall art creating a calm, cozy atmosphere.
+  - `Home_Renovation_Interior_Design/D10_IMG_001.jpg`: A warm, minimalist living room features neutral furniture against a terracotta accent wall.
+  - `Home_Renovation_Interior_Design/D4_IMG_002.jpg`: A bright, minimalist living room with light wood floors, a simple sofa, and a potted plant by the window.
 
 **Clue rounds (abbrev.)**
 
@@ -3242,7 +3734,12 @@
 - #8 score=0.33 faiss `HOME_S5:R5`: Renovation is actively progressing in the stripped-down kitchen, with only the old stove and dishwasher remaining.
 - #9 score=0.32 faiss `HOME_S8:R7`: The kitchen offers a compact, tidy layout with wooden cabinets, a stainless steel stove, and a white refrigerator positioned beside the sin…
 - #10 score=0.32 faiss `HOME_S1:R11`: A sunlit, empty room with wooden floors and neutral walls, viewed from the window side, offers a clear perspective for tracking design prog…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D3_IMG_005.jpg`, `Home_Renovation_Interior_Design/D11_IMG_002.jpg`, `Home_Renovation_Interior_Design/D4_IMG_005.jpg`, `Home_Renovation_Interior_Design/D3_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D3_IMG_005.jpg`: A fresh paint swatch dries on the wall beside a roller tray and painter’s tape on the floor.
+  - `Home_Renovation_Interior_Design/D11_IMG_002.jpg`: Warm evening light fills a quiet dining nook with a bowl of oranges on the table.
+  - `Home_Renovation_Interior_Design/D4_IMG_005.jpg`: Partially removed hardwood flooring exposes the subfloor in an empty room under renovation.
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
 
 **Open**
 - Q: Across the demo staging photo and the doorway angle of the same room, which earlier material is still in the space but drops out of view because the later angle crops away the back-wall staging area?
@@ -3261,7 +3758,12 @@
 - #8 score=0.21 faiss `HOME_S4:R6`: The demo is underway, with partial hardwood flooring removed to reveal the subfloor in a room under renovation.
 - #9 score=0.19 faiss `HOME_S2:R7`: user (Hannah Brooks): I may want to come back later for these choices. assistant: No problem! I'll keep track of all the options for you.
 - #10 score=0.19 faiss `HOME_S1:R11`: A sunlit, empty room with wooden floors and neutral walls, viewed from the window side, offers a clear perspective for tracking design prog…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D11_IMG_002.jpg`, `Home_Renovation_Interior_Design/D4_IMG_007.jpg`, `Home_Renovation_Interior_Design/D3_IMG_005.jpg`, `Home_Renovation_Interior_Design/D6_IMG_006.jpg`, `Home_Renovation_Interior_Design/D8_IMG_007.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D11_IMG_002.jpg`: Warm evening light fills a quiet dining nook with a bowl of oranges on the table.
+  - `Home_Renovation_Interior_Design/D4_IMG_007.jpg`: A red tool bag sits on the floor of a bare, partially renovated room beside a stack of wooden planks.
+  - `Home_Renovation_Interior_Design/D3_IMG_005.jpg`: A fresh paint swatch dries on the wall beside a roller tray and painter’s tape on the floor.
+  - `Home_Renovation_Interior_Design/D6_IMG_006.jpg`: Testing a warm terracotta paint color on a living room wall.
+  - `Home_Renovation_Interior_Design/D8_IMG_007.jpg`: A bright, modern kitchen with wooden cabinets and a clean, white countertop surrounding a stainless steel sink.
 
 **Clue rounds (abbrev.)**
 
@@ -3312,7 +3814,12 @@
 - #14 score=0.20 faiss `HOME_S4:R10`: A red tool bag rests beside stacked wooden planks in a bare, partially renovated room.
 - #15 score=0.20 faiss `HOME_S8:R7`: The kitchen offers a compact, tidy layout with wooden cabinets, a stainless steel stove, and a white refrigerator positioned beside the sin…
 - #16 score=0.19 faiss `HOME_S4:R8`: user (Hannah Brooks): Please keep the details precise. assistant: Will do. I'll stay careful with the details.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D4_IMG_002.jpg`, `Home_Renovation_Interior_Design/D1_IMG_008.jpg`, `Home_Renovation_Interior_Design/D2_IMG_003.jpg`, `Home_Renovation_Interior_Design/D2_IMG_002.jpg`, `Home_Renovation_Interior_Design/D2_IMG_001.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D4_IMG_002.jpg`: A bright, minimalist living room with light wood floors, a simple sofa, and a potted plant by the window.
+  - `Home_Renovation_Interior_Design/D1_IMG_008.jpg`: Sunlit empty room with wooden floors and neutral walls leading into an adjoining space.
+  - `Home_Renovation_Interior_Design/D2_IMG_003.jpg`: A modern tan leather sofa with wooden frame is displayed in a bright showroom.
+  - `Home_Renovation_Interior_Design/D2_IMG_002.jpg`: A modern dark gray sectional sofa with white and black accent pillows sits in a minimalist room.
+  - `Home_Renovation_Interior_Design/D2_IMG_001.jpg`: A modern light blue sofa with sleek wooden legs is displayed in a stylish furniture showroom.
 
 **Open**
 - Q: From the side-angle living-room revisit, what partly hides the lamp from view?
@@ -3336,7 +3843,12 @@
 - #13 score=0.12 faiss `HOME_S6:R8`: user (Hannah Brooks): Here's a wider view of the same test. assistant: Thanks, that gives more context. image: image_id: image_caption: Tes…
 - #14 score=0.10 faiss `HOME_S4:R10`: A red tool bag rests beside stacked wooden planks in a bare, partially renovated room.
 - #15 score=0.10 bm25 `HOME_S13:R1`: user (Hannah Brooks): Final revisit after living here a bit. assistant: Got it. I'll treat this as a later-state update.
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D1_IMG_008.jpg`, `Home_Renovation_Interior_Design/D4_IMG_002.jpg`, `Home_Renovation_Interior_Design/D1_IMG_007.jpg`, `Home_Renovation_Interior_Design/D4_IMG_001.jpg`, `Home_Renovation_Interior_Design/D3_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D1_IMG_008.jpg`: Sunlit empty room with wooden floors and neutral walls leading into an adjoining space.
+  - `Home_Renovation_Interior_Design/D4_IMG_002.jpg`: A bright, minimalist living room with light wood floors, a simple sofa, and a potted plant by the window.
+  - `Home_Renovation_Interior_Design/D1_IMG_007.jpg`: An empty, newly renovated room with wooden floors and a single window letting in soft daylight.
+  - `Home_Renovation_Interior_Design/D4_IMG_001.jpg`: A warmly lit, traditional living room features rich wood paneling, classic furniture, and a patterned rug creating a cozy, elegant ambiance.
+  - `Home_Renovation_Interior_Design/D3_IMG_003.jpg`: Empty room with wood flooring and sliding glass doors overlooking a fenced backyard.
 
 **Clue rounds (abbrev.)**
 
@@ -3388,7 +3900,12 @@
 - #13 score=0.33 faiss `HOME_S3:R9`: Hannah Brooks added another close-up after resetting the tray, capturing detailed moments of her painting prep.
 - #14 score=0.33 faiss `HOME_S7:R5`: A three-panel wooden room divider with beige fabric has been added to the divider options.
 - #15 score=0.32 faiss `HOME_S7:R2`: user (Hannah Brooks): Here's the first option. assistant: Thanks, I'll keep it in the set. image: image_id: image_caption: Minimalist woode…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_004.jpg`, `Home_Renovation_Interior_Design/D5_IMG_001.jpg`, `Home_Renovation_Interior_Design/D6_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_005.jpg`, `Home_Renovation_Interior_Design/D6_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_004.jpg`: A fresh swatch of sage green paint is being tested on a neutral wall above the baseboard.
+  - `Home_Renovation_Interior_Design/D5_IMG_001.jpg`: Three cabinet door samples in white, natural wood, and sage green lean against a wall for color comparison.
+  - `Home_Renovation_Interior_Design/D6_IMG_006.jpg`: Testing a warm terracotta paint color on a living room wall.
+  - `Home_Renovation_Interior_Design/D3_IMG_005.jpg`: A fresh paint swatch dries on the wall beside a roller tray and painter’s tape on the floor.
+  - `Home_Renovation_Interior_Design/D6_IMG_004.jpg`: A fresh terracotta paint swatch is tested on a wall beside a roller tray and matching color card.
 
 **Open**
 - Q: Which part of the green swatch card best matches the tested wall color in the later daylight wall test?
@@ -3409,7 +3926,12 @@
 - #10 score=0.32 faiss `HOME_S1:R11`: user (Hannah Brooks): Closer view of that room from the window side. assistant: This will be helpful for tracking the design progress. imag…
 - #11 score=0.13 faiss `HOME_S12:R3`: Hannah Brooks selected bed option B, which matches the serene, neutral-toned bedroom shown in the image.
 - #12 score=0.12 faiss `HOME_S7:R2`: user (Hannah Brooks): Here's the first option. assistant: Thanks, I'll keep it in the set. image: image_id: image_caption: Minimalist woode…
-- **→ VLM (5)**: `Home_Renovation_Interior_Design/D3_IMG_004.jpg`, `Home_Renovation_Interior_Design/D6_IMG_004.jpg`, `Home_Renovation_Interior_Design/D3_IMG_002.jpg`, `Home_Renovation_Interior_Design/D6_IMG_006.jpg`, `Home_Renovation_Interior_Design/D3_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Home_Renovation_Interior_Design/D3_IMG_004.jpg`: A fresh swatch of sage green paint is being tested on a neutral wall above the baseboard.
+  - `Home_Renovation_Interior_Design/D6_IMG_004.jpg`: A fresh terracotta paint swatch is tested on a wall beside a roller tray and matching color card.
+  - `Home_Renovation_Interior_Design/D3_IMG_002.jpg`: A hand holds a paint swatch card displaying a gradient of green shades against a neutral background.
+  - `Home_Renovation_Interior_Design/D6_IMG_006.jpg`: Testing a warm terracotta paint color on a living room wall.
+  - `Home_Renovation_Interior_Design/D3_IMG_006.jpg`: A fresh green paint sample is tested on a beige wall beside a ladder and painting supplies.
 
 **Clue rounds (abbrev.)**
 
@@ -3464,7 +3986,12 @@
 - #16 score=0.38 faiss `SCENE_S11:R8`: The two stripe red capped microtubes and the bent tip forceps from the main bench now have strong cold room matches, while other cold room …
 - #17 score=0.37 faiss `SCENE_S11:R6`: The strip here is similar but not identical to the one on the main bench, so I’ll differentiate them by their liquid pattern rather than us…
 - #18 score=0.37 faiss `SCENE_S14:R4`: A close-up of the counter reveals a gold match cue among vintage vanity items—a pocket watch, pearls, cane, and blank card—on a rustic wood…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S6-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S6-IMG1.png`: A tidy entryway bench neatly stores shoes and a bag beneath a cushioned seat.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG1.png`: A black backpack, umbrella, and box of books sit neatly by the door, ready to grab on the way out.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG2.png`: A neatly packed backpack, umbrella, and box of books sit ready by the door.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`: A folded plaid scarf and a green card sit neatly on a wooden shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
 
 **Open**
 - Q: In the entryway-bench close-up, was the upright blue umbrella leaning closer to the bench frame, the wall, or the nearest pair of shoes?
@@ -3490,7 +4017,12 @@
 - #15 score=0.17 faiss `SCENE_S11:R8`: The two stripe red capped microtubes and the bent tip forceps from the main bench now have strong cold room matches, while other cold room …
 - #16 score=0.17 faiss `SCENE_S7:R4`: A torn museum label lies in front of a trilobite fossil and a blue shell display, with one blue item positioned behind the label’s damaged …
 - #17 score=0.16 faiss `SCENE_S2:R6`: The close-up image shows a red USB flash drive on a gray shelf next to a storage box and a roll of yellow labels, helping precisely identif…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S6-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S6-IMG1.png`: A tidy entryway bench neatly stores shoes and a bag beneath a cushioned seat.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG1.png`: A black backpack, umbrella, and box of books sit neatly by the door, ready to grab on the way out.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG2.png`: A neatly packed backpack, umbrella, and box of books sit ready by the door.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`: A folded plaid scarf and a green card sit neatly on a wooden shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
 
 **Clue rounds (abbrev.)**
 
@@ -3530,7 +4062,12 @@
 - #8 score=0.33 faiss `SCENE_S10:R2`: The main bench features a central yellow rack, small containers, a damaged label freezer box, and a uniquely shaped metal tool, all arrange…
 - #9 score=0.32 faiss `SCENE_S9:R5`: A close-up of the storage prep room reveals neatly arranged items—a metal spatula, red sealing wax, gray powder jar, and green pouch—highli…
 - #10 score=0.32 faiss `SCENE_S15:R7`: The black cue tag clipped to the prop table and later seen in the costume rack zone — not the loose tags elsewhere.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`: A red USB flash drive lies on a gray shelf beside a storage box and a roll of yellow labels.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG1.png`: Labeled sample vials and containers are organized on a stainless steel laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG2.png`: Laboratory vials in a yellow rack sit beside a pair of metal tweezers on a workbench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`: A gray shelf holds a storage box, a roll of yellow labels, a red USB flash drive, and a metal hook.
 
 **Open**
 - Q: On the first cold-room shelf image, was the loose barcode label placed more in front of the yellow rack, more beside the folded white towels, or midway between those regions?
@@ -3549,7 +4086,12 @@
 - #8 score=0.20 faiss `SCENE_S10:R2`: The main bench features a central yellow rack, small containers, a damaged label freezer box, and a uniquely shaped metal tool, all arrange…
 - #9 score=0.19 faiss `SCENE_S3:R4`: The gray shelf holds a storage box, yellow labels, a red USB drive, and a metal hook—key objects for precise positional tracking.
 - #10 score=0.19 faiss `SCENE_S15:R7`: The black cue tag clipped to the prop table and later seen in the costume rack zone — not the loose tags elsewhere.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG1.png`: Labeled sample vials and containers are organized on a stainless steel laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`: A red USB flash drive lies on a gray shelf beside a storage box and a roll of yellow labels.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG2.png`: Laboratory vials in a yellow rack sit beside a pair of metal tweezers on a workbench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`: Labeled sample vials rest on a lab bench beside a barcode and tissue stack, ready for analysis.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
 
 **Clue rounds (abbrev.)**
 
@@ -3594,7 +4136,12 @@
 - #8 faiss `mau_1782875150036_d0911e06` [img `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`]: user: Here is a closer crop of the cold room shelf. assistant: Got it. The close up confirms the marking pattern of the red capped tube and the material/color distinction of the green capped vial. im…
 - #9 score=0.40 faiss `SCENE_S12:R3`: I’ll categorize items by how closely they match the main bench—using liquid color, container opacity, and attachment style—to distinguish t…
 - #10 score=0.39 faiss `SCENE_S10:R3`: I’ll focus on identity cues like cap color, label markings, sticker damage, liquid appearance, and tool shape—not just container categories.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`: Labeled test tubes and vials sit beside a centrifuge on a laboratory workstation.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`: A strip of microtubes with a blue sample and metal tweezers rest on a laboratory bench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG3.png`: Laboratory setup with a sample vial, microtubes, and tweezers on a stainless steel surface.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`: Labeled sample vials rest on a lab bench beside a barcode and tissue stack, ready for analysis.
 
 **Open**
 - Q: In the centrifuge-station wide image, which of the two labeled sample vials in the foam rack sat nearer the strip of microtubes: the amber-liquid vial or the pink-liquid vial?
@@ -3613,7 +4160,12 @@
 - #8 faiss `mau_1782875150036_d0911e06` [img `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`]: user: Here is a closer crop of the cold room shelf. assistant: Got it. The close up confirms the marking pattern of the red capped tube and the material/color distinction of the green capped vial. im…
 - #9 score=0.25 faiss `SCENE_S11:R2`: The cold room shelf displays a potential reappearance of the missing red-capped tube alongside several distinct distractors, including a gr…
 - #10 score=0.21 faiss `SCENE_S12:R1`: You’re transitioning to the centrifuge station and will soon ask vague questions—I’ll track and compare earlier cues with centrifuge-relate…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`: Labeled test tubes and vials sit beside a centrifuge on a laboratory workstation.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`: A strip of microtubes with a blue sample and metal tweezers rest on a laboratory bench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG3.png`: Laboratory setup with a sample vial, microtubes, and tweezers on a stainless steel surface.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`: Labeled sample vials rest on a lab bench beside a barcode and tissue stack, ready for analysis.
 
 **Clue rounds (abbrev.)**
 
@@ -3659,7 +4211,12 @@
 - #14 score=0.29 faiss `SCENE_S8:R8`: The restoration table is the strongest candidate location for the missing left-side object due to its matching brass item’s structural feat…
 - #15 score=0.28 faiss `SCENE_S9:R8`: Relying only on color or rough category can lead to incorrect identifications—for example, mistaking a brass compass for a medallion, a blu…
 - #16 score=0.28 faiss `SCENE_S1:R4`: The front right of the desk holds a notebook, coffee mug, sticky notes, USB drive, and mouse—ready for work.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S14-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S15-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S8-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG2.png`: An old, blank parchment lies on a rustic wooden desk beside a vintage pocket watch and string of pearls.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S14-IMG2.png`: Vintage vanity items—a pocket watch, pearls, cane, and blank card—are arranged on a rustic wooden dressing table.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S15-IMG3.png`: A vintage magician’s table is set with a top hat, pocket watch, pearls, and a blank, scorched card marked as the next cue.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S8-IMG3.png`: Vintage desk tools—a compass, metal stylus, and wax seal stamp—are arranged beside a blank label on a stone surface.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG3.png`: A vintage theater dressing table is set with a top hat, fan, pearls, and a blank cue card awaiting the next performance.
 
 **Open**
 - Q: In the left-half prop-table crop, was the brass pocket watch placed closer to the singed-edged parchment or closer to the pearl necklace?
@@ -3684,7 +4241,12 @@
 - #14 score=0.18 faiss `SCENE_S8:R8`: The restoration table is the strongest candidate location for the missing left-side object due to its matching brass item’s structural feat…
 - #15 score=0.16 faiss `SCENE_S15:R7`: The black cue tag clipped to the prop table and later seen in the costume rack zone — not the loose tags elsewhere.
 - #16 score=0.16 faiss `SCENE_S12:R5`: The red-capped 1.5 mL microtube with two black diagonal stripes was moved from the front left slot of the yellow bench rack to a cold room …
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S14-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S15-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S8-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG2.png`: An old, blank parchment lies on a rustic wooden desk beside a vintage pocket watch and string of pearls.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S14-IMG2.png`: Vintage vanity items—a pocket watch, pearls, cane, and blank card—are arranged on a rustic wooden dressing table.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S15-IMG3.png`: A vintage magician’s table is set with a top hat, pocket watch, pearls, and a blank, scorched card marked as the next cue.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S8-IMG3.png`: Vintage desk tools—a compass, metal stylus, and wax seal stamp—are arranged beside a blank label on a stone surface.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S13-IMG3.png`: A vintage theater dressing table is set with a top hat, fan, pearls, and a blank cue card awaiting the next performance.
 
 **Clue rounds (abbrev.)**
 
@@ -3715,6 +4277,9 @@
   - **D**: Shifted slightly right ← GT
 - GT: `D` | Pred: `C` | debiased_em: `0.0`
 
+Q#17 — 化石室绿袋相对 slab 位移（Pred: left / MCQ: centered，GT: right）
+Clue：S7-IMG1（first）+ S7-IMG3（later）+ S7-IMG4（side）
+
 **Retrieval (MCQ, 10/20 in context)**
 - #1 faiss `mau_1782874953328_05e097e2` [img `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`]: user: Here is another fossil room image taken later that afternoon. assistant: Got it. The fossil room layout is mostly unchanged, but one of the small metal objects that had been on the left is no l…
 - #2 faiss `mau_1782874961384_8c171dc3` [img `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`]: user: Here is a side angle image of the same room. assistant: Got it. The side view confirms the pouch and right side tag placement, and the same left side absence remains. image: image_id: image_cap…
@@ -3726,7 +4291,12 @@
 - #8 score=0.33 faiss `SCENE_S8:R8`: The restoration table is the strongest candidate location for the missing left-side object due to its matching brass item’s structural feat…
 - #9 score=0.31 faiss `SCENE_S9:R5`: A close-up of the storage prep room reveals neatly arranged items—a metal spatula, red sealing wax, gray powder jar, and green pouch—highli…
 - #10 score=0.30 faiss `SCENE_S9:R8`: Relying only on color or rough category can lead to incorrect identifications—for example, mistaking a brass compass for a medallion, a blu…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`: A trilobite fossil is displayed in a museum case alongside a blue shell and an empty label.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`: A trilobite fossil and shell are displayed in a museum case with a blank label and catalog number.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`: An empty, torn museum label sits in front of a trilobite fossil and a blue shell display.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`: A trilobite fossil and a small blue fish figurine are displayed together in a museum case.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`: A trilobite fossil is displayed in a museum case alongside a brass compass and a blue shell-shaped object.
 
 **Open**
 - Q: Between the first fossil-room image and the later fossil-room image, did the green drawstring pouch appear remained unchanged, centered directly behind the rock, shifted slightly left, or shifted slightly right relative to the fossil slab?
@@ -3745,7 +4315,12 @@
 - #8 score=0.24 faiss `SCENE_S11:R7`: The cold room remains stable, with lab shelves neatly organized holding sample containers and tools for scientific analysis.
 - #9 score=0.23 faiss `SCENE_S8:R8`: The restoration table is the strongest candidate location for the missing left-side object due to its matching brass item’s structural feat…
 - #10 score=0.23 faiss `SCENE_S8:R7`: The storage prep room image displays a neatly arranged shelf of vintage desk items: a red wax stick, glass jar, metal tool, and green velve…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`: A trilobite fossil is displayed in a museum case alongside a blue shell and an empty label.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`: A trilobite fossil and a small blue fish figurine are displayed together in a museum case.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`: A trilobite fossil is displayed in a museum case alongside a brass compass and a blue shell-shaped object.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`: A trilobite fossil and shell are displayed in a museum case with a blank label and catalog number.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`: An empty, torn museum label sits in front of a trilobite fossil and a blue shell display.
 
 **Clue rounds (abbrev.)**
 
@@ -3800,7 +4375,12 @@
 - #11 score=0.44 faiss `SCENE_S12:R9`: Relying solely on color or container category can lead to misidentification, as seen in pairs like amber-green vs. clear-green vials, multi…
 - #12 score=0.43 faiss `SCENE_S11:R5`: The lower shelf holds a reappearance candidate of the earlier metal tool, alongside a conical tube and a nearly identical PCR strip, set ag…
 - #13 score=0.36 faiss `SCENE_S11:R8`: The two stripe red capped microtubes and the bent tip forceps from the main bench now have strong cold room matches, while other cold room …
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG1.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`: A strip of microtubes with a blue sample and metal tweezers rest on a laboratory bench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`: Labeled test tubes and vials sit beside a centrifuge on a laboratory workstation.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`: Colorful lab vials and containers arranged on a bench for scientific experiments.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG1.png`: Laboratory tubes and tools arranged on a bench for scientific experiments.
 
 **Open**
 - Q: Comparing the main-bench strip and the centrifuge-station strip, was the blue-filled tube in the same ordinal slot position within the strip, or not?
@@ -3822,7 +4402,12 @@
 - #11 score=0.25 faiss `SCENE_S11:R5`: The lower shelf holds a reappearance candidate of the earlier metal tool, alongside a conical tube and a nearly identical PCR strip, set ag…
 - #12 score=0.18 faiss `SCENE_S15:R3`: The gold pocket watch with an engraved star on its lid vanished from the prop table and was later found at the quick change station.
 - #13 score=0.17 faiss `SCENE_S14:R2`: The quick change station holds a golden locket—likely the missing gold item—alongside distinct objects like a pearl necklace, blue potion b…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG2.png`: A strip of microtubes with a blue sample and metal tweezers rest on a laboratory bench.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG1.png`: Labeled test tubes and vials sit beside a centrifuge on a laboratory workstation.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`: Colorful lab vials and containers arranged on a bench for scientific experiments.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S11-IMG2.png`: Labeled sample vials rest on a lab bench beside a barcode and tissue stack, ready for analysis.
 
 **Clue rounds (abbrev.)**
 
@@ -3888,7 +4473,12 @@
 - #17 score=0.37 faiss `SCENE_S7:R4`: A torn museum label lies in front of a trilobite fossil and a blue shell display, with one blue item positioned behind the label’s damaged …
 - #18 score=0.34 faiss `SCENE_S15:R3`: The gold pocket watch with an engraved star on its lid vanished from the prop table and was later found at the quick change station.
 - #19 score=0.34 faiss `SCENE_S9:R3`: The object described is a small brass compass with a glass top and visible directional needle, distinct from the solid brass medallion.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S4-IMG4.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG1.png`: A wooden desk holds a coffee mug, laptop edge, keyring, sticky notes, and a small plastic bag.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG3.png`: A tidy home office desk with a laptop, coffee mug, and monitor ready for work.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`: A tidy wooden desk holds a notebook, coffee mug, sticky notes, USB drive, and computer mouse ready for work.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG1.png`: A minimalist workspace with a laptop, coffee mug, earphones, and wallet on a wooden desk by a window.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S4-IMG4.png`: A blue coffee mug sits on a kitchen countertop beside a sink, with fruit, tea, and a pill bottle in the background.
 
 **Open**
 - Q: Which object is best supported as having changed from 'not visible in the later desk close-up' to 'present elsewhere nearby' WITHOUT relying on any assumption that two similar blue objects are identical?
@@ -3915,7 +4505,12 @@
 - #16 score=0.15 faiss `SCENE_S15:R8`: People often misidentify objects relying only on color or broad category, such as mistaking a star-engraved gold watch for a plain lid one,…
 - #17 score=0.14 faiss `SCENE_S12:R7`: The user is asking about the black sample tag attached to the staging tray in the pipette area, not the loose black barcode label found els…
 - #18 score=0.14 faiss `SCENE_S7:R5`: A trilobite fossil remains displayed in the museum case alongside a blue shell and an empty label, with no visible change to the room’s lay…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S4-IMG4.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG3.png`: A tidy home office desk with a laptop, coffee mug, and monitor ready for work.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG1.png`: A wooden desk holds a coffee mug, laptop edge, keyring, sticky notes, and a small plastic bag.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG4.png`: A tidy wooden desk with a monitor, sticky notes, and a tray of paper clips.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG1.png`: A minimalist workspace with a laptop, coffee mug, earphones, and wallet on a wooden desk by a window.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S4-IMG4.png`: A blue coffee mug sits on a kitchen countertop beside a sink, with fruit, tea, and a pill bottle in the background.
 
 **Clue rounds (abbrev.)**
 
@@ -3965,7 +4560,12 @@
 - #8 score=0.40 faiss `SCENE_S15:R5`: A close-up of the theater costume shelf labeled “CUE” reveals details of a top hat, red fan, and blue bottle—clarifying material, band colo…
 - #9 score=0.39 faiss `SCENE_S15:R3`: The gold pocket watch with an engraved star on its lid vanished from the prop table and was later found at the quick change station.
 - #10 score=0.38 faiss `SCENE_S12:R7`: The user is asking about the black sample tag attached to the staging tray in the pipette area, not the loose black barcode label found els…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`: A red USB flash drive lies on a gray shelf beside a storage box and a roll of yellow labels.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`: A gray shelf holds a storage box, a roll of yellow labels, a red USB flash drive, and a metal hook.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S5-IMG3.png`: A folded plaid scarf and a green card sit neatly on a wooden shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`: A tidy wooden desk holds a notebook, coffee mug, sticky notes, USB drive, and computer mouse ready for work.
 
 **Open**
 - Q: In the most recent cabinet image, how has the red USB drive's position on the middle shelf changed compared to its initial placement there?
@@ -3984,7 +4584,12 @@
 - #8 score=0.14 faiss `SCENE_S5:R6`: A folded plaid scarf and a green card rest neatly on a wooden shelf.
 - #9 score=0.14 faiss `SCENE_S2:R4`: The storage cabinet is a gray metal shelf holding folded linens and small office items, organized for easy identification without object co…
 - #10 score=0.13 faiss `SCENE_S12:R5`: The red-capped 1.5 mL microtube with two black diagonal stripes was moved from the front left slot of the yellow bench rack to a cold room …
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S2-IMG4.png`: A red USB flash drive lies on a gray shelf beside a storage box and a roll of yellow labels.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S3-IMG3.png`: A gray shelf holds a storage box, a roll of yellow labels, a red USB flash drive, and a metal hook.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S12-IMG3.png`: A blue box and a yellow tray with sample containers sit on a metal laboratory shelf.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S1-IMG2.png`: A tidy wooden desk holds a notebook, coffee mug, sticky notes, USB drive, and computer mouse ready for work.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S10-IMG3.png`: Colorful lab vials and containers arranged on a bench for scientific experiments.
 
 **Clue rounds (abbrev.)**
 
@@ -4025,6 +4630,8 @@
   - **D**: A-209 ← GT
 - GT: `D` | Pred: `C` | debiased_em: `0.0`
 
+S7-IMG1/3/4 + S9-IMG1
+
 **Retrieval (MCQ, 11/20 in context)**
 - #1 faiss `mau_1782874961384_8c171dc3` [img `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`]: user: Here is a side angle image of the same room. assistant: Got it. The side view confirms the pouch and right side tag placement, and the same left side absence remains. image: image_id: image_cap…
 - #2 score=0.48 faiss `SCENE_S8:R8`: user: Good. Which room so far gives the strongest candidate location for the missing left side object from the fossil case? assistant: The …
@@ -4037,7 +4644,12 @@
 - #9 score=0.41 faiss `SCENE_S7:R4`: user: Now here is a closer crop from the lower front area. assistant: Got it. The close up confirms that the front label has a distinctive …
 - #10 score=0.35 faiss `SCENE_S9:R4`: user: Good. Another one: not the blue thing shaped like an animal. I mean the other blue item with ridges that stayed by the fossil slab. W…
 - #11 score=0.16 faiss `SCENE_S15:R8`: People often misidentify objects relying only on color or broad category, such as mistaking a star-engraved gold watch for a plain lid one,…
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG4.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`: A trilobite fossil and shell are displayed in a museum case with a blank label and catalog number.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`: A trilobite fossil is displayed in a museum case alongside a blue shell and an empty label.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`: A trilobite fossil is displayed in a museum case alongside a brass compass and a blue shell-shaped object.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`: A trilobite fossil and a small blue fish figurine are displayed together in a museum case.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG4.png`: A small museum display case labeled A-209 presents a brass lid and a blue ceramic fish beside a blank description card.
 
 **Open**
 - Q: What identification tag number is currently displayed in the fossil room case?
@@ -4058,7 +4670,12 @@
 - #10 score=0.42 faiss `SCENE_S9:R4`: user: Good. Another one: not the blue thing shaped like an animal. I mean the other blue item with ridges that stayed by the fossil slab. W…
 - #11 score=0.07 bm25 `SCENE_S2:R4`: The storage cabinet is a gray metal shelf holding folded linens and small office items, organized for easy identification without object co…
 - #12 score=0.07 bm25 `SCENE_S4:R2`: The living room is tidy, featuring a wooden coffee table near the front door holding a remote, wallet, and face mask.
-- **→ VLM (5)**: `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`, `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`
+- **→ VLM (5)**:
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG3.png`: A trilobite fossil is displayed in a museum case alongside a blue shell and an empty label.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG4.png`: A trilobite fossil and shell are displayed in a museum case with a blank label and catalog number.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S9-IMG1.png`: A trilobite fossil and a small blue fish figurine are displayed together in a museum case.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG1.png`: A trilobite fossil is displayed in a museum case alongside a brass compass and a blue shell-shaped object.
+  - `Multi-Scene_Visual_Case_Archive_Assistant/S7-IMG2.png`: An empty, torn museum label sits in front of a trilobite fossil and a blue shell display.
 
 **Clue rounds (abbrev.)**
 
@@ -4106,6 +4723,10 @@
   - **D**: A small group of pedestrians steps across the lane. ← GT
 - GT: `D` | Pred: `A` | debiased_em: `0.0`
 
+Open 检索
+#1 S6_R4（夜间+cyclist）；#3 S8_R2（clue cp1）；S8_R3/R4 未进 Top5 VLM
+VLM 被 S6 夜间自行车路线 霸榜（#1 S6_R4 caption 含 bicycle rider）
+
 **Retrieval (MCQ, 16/20 in context)**
 - #1 faiss `mau_1782874928354_e3a573c3` [img `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`]: user: Here's checkpoint 4 on this route. assistant: Got it, that's checkpoint 4. image: image_id: image_caption: A wide city intersection at night has zebra crosswalks, several cars, two bicyclists i…
 - #2 faiss `mau_1782874904121_34b30dd4` [img `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`]: user: Here's checkpoint 1 on this route. assistant: Got it, that's checkpoint 1. image: image_id: image_caption: A straight city street at night has one lane in each direction with several cars, a pa…
@@ -4123,7 +4744,12 @@
 - #14 score=0.13 faiss `OUTDOOR_S4:R4`: Checkpoint 3 is located on a narrow city street lined with bollards, trees, and storefronts, where a box truck is parked in the center.
 - #15 score=0.12 faiss `OUTDOOR_S8:R5`: Checkpoint 4 is confirmed on a nighttime urban route featuring lit streets, mid-rise buildings, pedestrians, vehicles including a black tax…
 - #16 score=0.12 faiss `OUTDOOR_S3:R3`: Checkpoint 2 is located on a two-lane city street with mid-rise buildings, green traffic lights, sidewalks, and a fenced grassy area to the…
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S9_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`: A wide city intersection at night has zebra crosswalks, several cars, two bicyclists in the roadway, a green traffic light, streetlights, and multi-story storefront buildings along the sidewalks.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`: A straight city street at night has one lane in each direction with several cars, a parked white van on the left, sidewalks beside multi-story buildings, streetlights, utility poles, and green traffic lights ahead.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`: A city street at night leads to a signalized intersection with crosswalks, several cars, a bicycle rider in the lane, sidewalks with pedestrians, poles, and mid-rise buildings with lit storefronts.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S9_R2.jpg`: A two-way street intersects at a wide zebra crosswalk with sidewalks, bollards, trees, a fenced grassy area on the left, a van and parked cars ahead, bicycles on the right, and large port cranes in the background.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`: A two-lane city street at night leads to a signalized intersection with crosswalks, two dark taxis ahead, sidewalks with guardrails and utility poles, and mid-rise buildings on both sides.
 
 **Open**
 - Q: In the night route at the red-awning corner, what interrupts the car's path before the view opens down the block?
@@ -4149,7 +4775,12 @@
 - #15 score=0.06 bm25 `OUTDOOR_S9:R2`: Checkpoint 1 is marked at a busy urban intersection featuring a wide zebra crosswalk, parked vehicles, bicycles, and large port cranes in t…
 - #16 score=0.05 bm25 `OUTDOOR_S5:R4`: Checkpoint 3 is located on a straight, multi-lane city street at night, beneath a pedestrian overpass with stairs on the left, flanked by o…
 - #17 score=0.05 bm25 `OUTDOOR_S10:R5`: Checkpoint 4 is located on a straight city street lined with parked vehicles, blue road markings, tree-lined sidewalks, and tall apartment …
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S1_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R5.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`: A city street at night leads to a signalized intersection with crosswalks, several cars, a bicycle rider in the lane, sidewalks with pedestrians, poles, and mid-rise buildings with lit storefronts.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S1_R2.jpg`: A multi-lane city street lined with sidewalks, guardrails, poles, traffic lights, and mid-rise to high-rise buildings has several cars stopped ahead beneath blue directional road signs.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`: A two-lane city street at night leads to a signalized intersection with crosswalks, two dark taxis ahead, sidewalks with guardrails and utility poles, and mid-rise buildings on both sides.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`: A straight city street at night has one lane in each direction with several cars, a parked white van on the left, sidewalks beside multi-story buildings, streetlights, utility poles, and green traffic lights ahead.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R5.jpg`: A lit city street at night is lined with mid-rise buildings, sidewalks with railings and pedestrians, parked and moving cars including a black taxi in the foreground, streetlamps, and red traffic lights ahead.
 
 **Clue rounds (abbrev.)**
 
@@ -4208,7 +4839,12 @@
 - #15 score=0.19 faiss `OUTDOOR_S10:R3`: Checkpoint 2 is located on a tree-lined, two-way street with parked vehicles, railway tracks, and apartment buildings nearby.
 - #16 score=0.19 faiss `OUTDOOR_S10:R5`: Checkpoint 4 is located on a straight city street lined with parked vehicles, blue road markings, tree-lined sidewalks, and tall apartment …
 - #17 score=0.18 faiss `OUTDOOR_S9:R4`: Checkpoint 3 is located at a busy intersection with zebra crosswalks, parked vehicles, bicycles, and distant red port cranes visible beyond…
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S4_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S2_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S4_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S4_R3.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S7_R2.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S4_R5.jpg`: A narrow paved city street between mid-rise buildings has a box truck ahead with cars beside it, and a wide sidewalk on the right lined with bollards, trees, signs, and a few bicycles near the building entrances.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S2_R5.jpg`: A multi-lane street passes under a large overpass toward a signalized intersection with crosswalks, with a white box truck, a black taxi, and a gray van ahead, plus railings, a narrow divider, cyclists, and apartment buildings on the left.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S4_R2.jpg`: A narrow paved city street with one lane in each direction is lined by sidewalks, storefronts and mid-rise buildings, with a box truck and a black car ahead, pedestrians, small trees, bicycles, and green traffic lights over a crosswalk.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S4_R3.jpg`: A box truck is centered at a cobblestone intersection with zebra crosswalks, sidewalks with black bollards, overhead traffic lights and utility wires, and mid-rise shop buildings on both sides.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S7_R2.jpg`: A straight multi-lane city street lined with trees and large buildings has several cars and vans, a marked crosswalk ahead, sidewalks on both sides, and overhead traffic lights.
 
 **Open**
 - Q: At the start of the route that later reaches the wide crosswalk beside a dark construction-covered building, which vehicle pairing is visible?
@@ -4235,7 +4871,12 @@
 - #16 score=0.06 bm25 `OUTDOOR_S10:R4`: Checkpoint 3 is marked along a tree-lined city street with parked vehicles, blue lane markings, and a pedestrian on a fenced sidewalk.
 - #17 score=0.06 bm25 `OUTDOOR_S10:R2`: Checkpoint 1 is marked along a curving two-lane street lined with trees, sidewalks, railings, apartment buildings, and tall residential tow…
 - #18 score=0.06 bm25 `OUTDOOR_S6:R2`: Checkpoint 1 is marked on a straight city street at night, featuring traffic lights, parked vehicles, and urban infrastructure.
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S9_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S5_R3.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`: A wide city intersection at night has zebra crosswalks, several cars, two bicyclists in the roadway, a green traffic light, streetlights, and multi-story storefront buildings along the sidewalks.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R4.jpg`: A lit urban intersection at night has zebra crosswalks, traffic lights, several cars, pedestrians near the corner, and mid-rise buildings with signs, poles, and overhead wires along both streets.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`: A city street at night leads to a signalized intersection with crosswalks, several cars, a bicycle rider in the lane, sidewalks with pedestrians, poles, and mid-rise buildings with lit storefronts.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S9_R4.jpg`: A two-way road meets a side street at zebra crosswalks, with sidewalks, streetlights, a fenced grassy area on the left, several parked or stopped vehicles ahead, bicycles on the right, and large red port cranes visible beyond the trees.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S5_R3.jpg`: A multi-lane city street at night runs between tall buildings, with a crosswalk, guardrails, traffic lights, a pedestrian overpass with stairs on the right, and several cars ahead including one in the center lane.
 
 **Clue rounds (abbrev.)**
 
@@ -4292,7 +4933,12 @@
 - #15 score=0.19 faiss `OUTDOOR_S2:R4`: Checkpoint 3 is confirmed along a multi-lane city road passing under an overpass, with vehicles, sidewalks, and urban infrastructure visibl…
 - #16 score=0.18 faiss `OUTDOOR_S10:R3`: Checkpoint 2 is located on a tree-lined, two-way street with parked vehicles, railway tracks, and apartment buildings nearby.
 - #17 score=0.16 faiss `OUTDOOR_S2:R2`: Checkpoint 1 is marked along a two-lane road beneath an elevated roadway, flanked by sidewalks and apartment buildings.
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R3.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R5.jpg`: A wide city intersection at night has zebra crosswalks, several cars, two bicyclists in the roadway, a green traffic light, streetlights, and multi-story storefront buildings along the sidewalks.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R3.jpg`: A lit urban street at night has two marked lanes with several cars, two bicyclists, sidewalks on both sides, traffic lights ahead, utility poles, and mid-rise buildings lining the road.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R4.jpg`: A city street at night leads to a signalized intersection with crosswalks, several cars, a bicycle rider in the lane, sidewalks with pedestrians, poles, and mid-rise buildings with lit storefronts.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S6_R2.jpg`: A straight city street at night has one lane in each direction with several cars, a parked white van on the left, sidewalks beside multi-story buildings, streetlights, utility poles, and green traffic lights ahead.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R2.jpg`: A two-lane city street at night leads to a signalized intersection with crosswalks, two dark taxis ahead, sidewalks with guardrails and utility poles, and mid-rise buildings on both sides.
 
 **Open**
 - Q: Which late-stage view continues the daytime route that earlier passed red port cranes beyond a green fenced open field?
@@ -4315,7 +4961,12 @@
 - #12 score=0.10 bm25 `OUTDOOR_S9:R2`: Checkpoint 1 is marked at a busy urban intersection featuring a wide zebra crosswalk, parked vehicles, bicycles, and large port cranes in t…
 - #13 score=0.03 bm25 `OUTDOOR_S6:R5`: At night, a busy city intersection features zebra crosswalks, moving cars and bicyclists, a green light, streetlights, and storefront build…
 - #14 score=0.03 bm25 `OUTDOOR_S10:R4`: Checkpoint 3 is marked along a tree-lined city street with parked vehicles, blue lane markings, and a pedestrian on a fenced sidewalk.
-- **→ VLM (5)**: `Outdoor_Navigation_Route_Memory_Assistant/S9_R4.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S4_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S5_R2.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S8_R5.jpg`, `Outdoor_Navigation_Route_Memory_Assistant/S9_R5.jpg`
+- **→ VLM (5)**:
+  - `Outdoor_Navigation_Route_Memory_Assistant/S9_R4.jpg`: A two-way road meets a side street at zebra crosswalks, with sidewalks, streetlights, a fenced grassy area on the left, several parked or stopped vehicles ahead, bicycles on the right, and large red port cranes visible beyond the trees.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S4_R5.jpg`: A narrow paved city street between mid-rise buildings has a box truck ahead with cars beside it, and a wide sidewalk on the right lined with bollards, trees, signs, and a few bicycles near the building entrances.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S5_R2.jpg`: A multi-lane city street at night runs between tall office buildings, with lane arrows, a line of flexible bollards, parked and moving cars, sidewalks with railings and streetlights, and a pedestrian overpass beneath red traffic lights.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S8_R5.jpg`: A lit city street at night is lined with mid-rise buildings, sidewalks with railings and pedestrians, parked and moving cars including a black taxi in the foreground, streetlamps, and red traffic lights ahead.
+  - `Outdoor_Navigation_Route_Memory_Assistant/S9_R5.jpg`: A paved road curves left between sidewalks with bollard barriers, trees and bushes, a fenced grassy field on the right, streetlamps, and tall glass office buildings in the background.
 
 **Clue rounds (abbrev.)**
 
@@ -4387,7 +5038,12 @@
 - #16 score=0.20 faiss `HEALTH_S5:R2`: The first lunch option is a fresh sandwich paired with a side salad of mixed greens and cherry tomatoes, served on a white plate.
 - #17 score=0.20 faiss `HEALTH_S9:R8`: user: Please keep this with yesterday, but not as the same takeaway. assistant: Okay, I'll keep that in mind.
 - #18 score=0.20 faiss `HEALTH_S8:R4`: user: I was being a little looser today because of the earlier note. assistant: Got it, I'll keep that in context.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle impacts throughout the day.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
 
 **Open**
 - Q: Which screen among the baseline overview, the updated-note dashboard, and the final ring/card screen has four KPI cards arranged across two rows instead of one?
@@ -4411,7 +5067,12 @@
 - #13 score=0.10 faiss `HEALTH_S1:R4`: user: This is my baseline week. I mostly want to watch the pattern. assistant: Got it, I'll keep that in context.
 - #14 score=0.10 bm25 `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #15 score=0.10 bm25 `HEALTH_S7:R2`: The weekly overview includes a sleek daily glucose dashboard tracking time in range, trends, and lifestyle metrics to support personalized …
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D11_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`: Daily dashboard showing stable glucose trends with 90% time in range and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D11_IMG_004.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle responses for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -4468,7 +5129,12 @@
 - #15 score=0.23 faiss `HEALTH_S11:R4`: user: There's another follow-up note, and I want to remember it with the earlier one. assistant: Got it, I'll keep that in context.
 - #16 score=0.22 faiss `HEALTH_S12:R5`: user: I want the final summary to reflect what still seems current. assistant: Got it.
 - #17 score=0.22 faiss `HEALTH_S5:R2`: The first lunch option is a fresh sandwich paired with a side salad of mixed greens and cherry tomatoes, served on a white plate.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
 
 **Open**
 - Q: Which screen among the baseline overview, the updated-note dashboard, and the final ring/card screen has four KPI cards arranged across two rows and a lower-right ring under 50%?
@@ -4493,7 +5159,12 @@
 - #14 score=0.11 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #15 score=0.11 faiss `HEALTH_S8:R5`: The daily dashboard visually tracks glucose trends, time in range, and key response windows to support personalized health management.
 - #16 score=0.10 faiss `HEALTH_S1:R4`: user: This is my baseline week. I mostly want to watch the pattern. assistant: Got it, I'll keep that in context.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`: Daily dashboard showing stable glucose trends with 90% time in range and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -4552,7 +5223,12 @@
 - #15 score=0.22 faiss `HEALTH_S4:R7`: The daily glucose dashboard provides a personalized overview of blood sugar trends, time in range, variability, and lifestyle factors to su…
 - #16 score=0.21 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #17 score=0.21 faiss `HEALTH_S8:R3`: The sleek daily glucose dashboard offers personalized health tracking by visualizing time in range, trends, and lifestyle metrics—all updat…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`: A sleek daily dashboard visualizing glucose trends, time in range, and recovery metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
 
 **Open**
 - Q: Which screen places Focus Window in the lower middle card instead of Trend Recovery when compared to the updated-note screen?
@@ -4578,7 +5254,12 @@
 - #15 score=0.10 bm25 `HEALTH_S9:R7`: The evening glucose screen is logged into a sleek daily dashboard that tracks time in range, trends, and lifestyle factors for personalized…
 - #16 score=0.09 bm25 `HEALTH_S8:R4`: user: I was being a little looser today because of the earlier note. assistant: Got it, I'll keep that in context.
 - #17 score=0.09 bm25 `HEALTH_S10:R4`: user: I'm trying to remember which option fits better with the earlier context. assistant: Got it, I'll keep that in context.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`: A sleek daily dashboard visualizing glucose trends, time in range, and recovery metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -4629,7 +5310,12 @@
 - #16 score=0.21 faiss `HEALTH_S10:R4`: user: I'm trying to remember which option fits better with the earlier context. assistant: Got it, I'll keep that in context.
 - #17 score=0.21 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #18 score=0.21 faiss `HEALTH_S8:R5`: The daily dashboard visually tracks glucose trends, time in range, and key response windows to support personalized health management.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`: Daily glucose dashboard showing stable trends, 80% time in range, and key metrics for meals, activity, and evening patterns.
 
 **Open**
 - Q: Which dashboard among the baseline overview, the updated-note dashboard, and the provisional trend screen has Session Match as the lower-left card label?
@@ -4655,7 +5341,12 @@
 - #15 score=0.11 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #16 score=0.10 faiss `HEALTH_S8:R5`: The daily dashboard visually tracks glucose trends, time in range, and key response windows to support personalized health management.
 - #17 score=0.10 faiss `HEALTH_S4:R1`: user: Workout day today. Keep the snack and timing with the dashboard. assistant: Okay, I'll keep track as we go.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_001.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`: Daily glucose dashboard showing stable trends, 80% time in range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_001.jpg`: A sleek daily glucose dashboard visualizes time in range, variability, trends, and activity-related metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
 
 **Clue rounds (abbrev.)**
 
@@ -4711,7 +5402,12 @@
 - #14 score=0.24 faiss `HEALTH_S9:R7`: The evening glucose screen is logged into a sleek daily dashboard that tracks time in range, trends, and lifestyle factors for personalized…
 - #15 score=0.24 faiss `HEALTH_S5:R2`: The first lunch option is a fresh sandwich paired with a side salad of mixed greens and cherry tomatoes, served on a white plate.
 - #16 score=0.23 faiss `HEALTH_S12:R3`: The multi-day glucose trend shows stable levels with high time-in-range, highlighting consistent patterns across meals, activity, and eveni…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
 
 **Open**
 - Q: Which screen has the lowest Evening Drift among the baseline overview, baseline trend, baseline evening card view, and first guidance-anchor dashboard?
@@ -4734,7 +5430,12 @@
 - #12 score=0.17 faiss `HEALTH_S7:R7`: The weekend dashboard offers a sleek, personalized view of glucose metrics including time in range, meal variability, evening drift, and ac…
 - #13 score=0.13 faiss `HEALTH_S4:R4`: The image displays a daily glucose dashboard tracking key health metrics like time in range and meal variability to monitor blood sugar tre…
 - #14 score=0.11 faiss `HEALTH_S12:R7`: The final overview screen presents a sleek daily glucose dashboard tracking time in range, trends, and lifestyle metrics for personalized h…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
 
 **Clue rounds (abbrev.)**
 
@@ -4796,7 +5497,12 @@
 - #15 score=0.24 faiss `HEALTH_S11:R3`: A patient accesses a follow-up nutrition message from their doctor via the Northline Health Portal.
 - #16 score=0.23 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #17 score=0.23 faiss `HEALTH_S7:R7`: The weekend dashboard offers a sleek, personalized view of glucose metrics including time in range, meal variability, evening drift, and ac…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`: Daily dashboard visualizing Maya Patel’s glucose trends, time in range, and lifestyle metrics for April 15, 2025.
 
 **Open**
 - Q: Which raises both Meal Variability and Evening Drift relative to the other between the D5 comparison card and the D5 follow-up trend?
@@ -4821,7 +5527,12 @@
 - #14 score=0.14 faiss `HEALTH_S12:R9`: The final screen displays a daily glucose dashboard tracking time in range, meal variability, activity, and overall blood sugar trends.
 - #15 score=0.13 faiss `HEALTH_S11:R4`: user: There's another follow-up note, and I want to remember it with the earlier one. assistant: Got it, I'll keep that in context.
 - #16 score=0.13 faiss `HEALTH_S9:R3`: The dashboard tracks daily glucose trends, time in range, variability, and lifestyle factors to support personalized blood sugar management.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D5_IMG_003.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
 
 **Clue rounds (abbrev.)**
 
@@ -4871,7 +5582,12 @@
 - #13 score=0.30 faiss `HEALTH_S10:R3`: user: This is the dinner option. assistant: Okay, I've got this too. image: image_id: image_caption: A simple, hearty dinner of grilled chi…
 - #14 score=0.26 faiss `HEALTH_S4:R6`: A pre-workout snack consisting of a banana, crackers, and peanut butter was logged and stored with the rest.
 - #15 score=0.26 faiss `HEALTH_S7:R3`: The daily dashboard tracks Maya Patel’s glucose levels, time in range, and lifestyle metrics for April 15, 2025, with a comparison trend pl…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_004.jpg`: A daily glucose dashboard summarizes Maya Patel’s blood sugar trends, time in range, and lifestyle metrics for April 22, 2025.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
 
 **Open**
 - Q: On April 22, which screen, if any, shows both the highest Time In Range and the lowest Meal Variability when comparing the after-snack dashboard, after-dinner dashboard, and choice-comparison card?
@@ -4890,7 +5606,12 @@
 - #8 score=0.15 faiss `HEALTH_S5:R4`: The daily glucose dashboard tracks time in range, variability, trends, and lifestyle metrics to support personalized blood sugar management.
 - #9 score=0.14 faiss `HEALTH_S2:R4`: user: I also took a short walk after lunch, so I want to remember that with the dashboard. assistant: Got it, I'll keep that in context.
 - #10 score=0.13 faiss `HEALTH_S7:R7`: The weekend dashboard offers a sleek, personalized view of glucose metrics including time in range, meal variability, evening drift, and ac…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D10_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_004.jpg`: A daily glucose dashboard summarizes Maya Patel’s blood sugar trends, time in range, and lifestyle metrics for April 22, 2025.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_002.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -4947,7 +5668,12 @@
 - #15 score=0.25 faiss `HEALTH_S6:R1`: user: There's a new note today. Please keep it with the earlier one. assistant: Okay, I'll keep track as we go.
 - #16 score=0.25 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #17 score=0.25 faiss `HEALTH_S12:R5`: user: I want the final summary to reflect what still seems current. assistant: Got it.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`: Daily glucose dashboard showing stable trends, 80% time in range, and key metrics for meals, activity, and evening patterns.
 
 **Open**
 - Q: Which screen among the baseline overview, the updated-note dashboard, the provisional threshold-band trend, and the final ring/card screen includes Recovery Notes as a KPI card?
@@ -4971,7 +5697,12 @@
 - #13 score=0.14 faiss `HEALTH_S6:R4`: The image displays a sleek daily dashboard tracking glucose trends, time in range, and recovery metrics for personalized health insights.
 - #14 score=0.13 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #15 score=0.13 faiss `HEALTH_S7:R9`: user: I mostly want to remember which weekly screen had which layout. assistant: Got it, I've got this one too.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`: Daily glucose dashboard showing stable trends, 80% time in range, and key metrics for meals, activity, and evening patterns.
 
 **Clue rounds (abbrev.)**
 
@@ -5032,7 +5763,12 @@
 - #14 score=0.19 faiss `HEALTH_S10:R4`: user: I'm trying to remember which option fits better with the earlier context. assistant: Got it, I'll keep that in context.
 - #15 score=0.18 faiss `HEALTH_S5:R2`: The first lunch option is a fresh sandwich paired with a side salad of mixed greens and cherry tomatoes, served on a white plate.
 - #16 score=0.18 faiss `HEALTH_S8:R7`: The nightly glucose recap highlights stable blood sugar trends with 90% time in range, supported by consistent meal, activity, and evening …
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_006.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`: Daily dashboard showing stable glucose trends with 90% time in range and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_006.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
 
 **Open**
 - Q: Between the weekly scorecard and the metric panel grid, which one keeps Evening Drift under 2 hours with lower Meal Variability?
@@ -5055,7 +5791,12 @@
 - #12 score=0.15 faiss `HEALTH_S4:R4`: The image displays a daily glucose dashboard tracking key health metrics like time in range and meal variability to monitor blood sugar tre…
 - #13 score=0.13 faiss `HEALTH_S7:R9`: user: I mostly want to remember which weekly screen had which layout. assistant: Got it, I've got this one too.
 - #14 score=0.11 faiss `HEALTH_S12:R9`: The final screen displays a daily glucose dashboard tracking time in range, meal variability, activity, and overall blood sugar trends.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_003.jpg`: Daily dashboard showing stable glucose trends with 90% time in range and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_005.jpg`: A daily glucose dashboard shows stable blood sugar trends with 90% time in range and key metrics for meals, activity, and evening patterns.
 
 **Clue rounds (abbrev.)**
 
@@ -5105,7 +5846,12 @@
 - #13 score=0.32 faiss `HEALTH_S12:R5`: user: I want the final summary to reflect what still seems current. assistant: Got it.
 - #14 score=0.25 faiss `HEALTH_S9:R6`: The daily dashboard tracks glucose trends, time in range, and lifestyle impacts to provide a comprehensive overview of the day’s health met…
 - #15 score=0.24 faiss `HEALTH_S11:R6`: This compact summary screen displays a daily glucose dashboard highlighting time in range, variability, trends, and lifestyle impacts for p…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`: Daily dashboard visualizing Maya Patel’s glucose trends, time in range, and lifestyle metrics for April 15, 2025.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
 
 **Open**
 - Q: Which chart finishes lower than it starts while also keeping Evening Drift above 4 hours when comparing the weekly ring summary, the D8 nightly recap, the D9 comparison trend, and the final overview screen?
@@ -5130,7 +5876,12 @@
 - #14 score=0.14 faiss `HEALTH_S7:R2`: The weekly overview includes a sleek daily glucose dashboard tracking time in range, trends, and lifestyle metrics to support personalized …
 - #15 score=0.14 faiss `HEALTH_S7:R7`: The weekend dashboard offers a sleek, personalized view of glucose metrics including time in range, meal variability, evening drift, and ac…
 - #16 score=0.13 faiss `HEALTH_S1:R7`: user: Today's note felt more specific than the earlier guidance. assistant: Got it, I'll keep it with today's context.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`: Daily dashboard visualizing Maya Patel’s glucose trends, time in range, and lifestyle metrics for April 15, 2025.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
 
 **Clue rounds (abbrev.)**
 
@@ -5189,7 +5940,12 @@
 - #12 score=0.29 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #13 score=0.28 faiss `HEALTH_S2:R6`: The evening glucose trend is captured in a daily dashboard that tracks glucose levels, time in range, and lifestyle metrics for personalize…
 - #14 score=0.25 faiss `HEALTH_S11:R6`: This compact summary screen displays a daily glucose dashboard highlighting time in range, variability, trends, and lifestyle impacts for p…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`: A sleek daily dashboard visualizing glucose trends, time in range, and recovery metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
 
 **Open**
 - Q: Which screen among the updated-note supporting trend, the provisional threshold-band trend, and the final ring/card screen has a nonstandard middle panel and a lower-right ring above 50%?
@@ -5212,7 +5968,12 @@
 - #12 score=0.13 faiss `HEALTH_S7:R9`: user: I mostly want to remember which weekly screen had which layout. assistant: Got it, I've got this one too.
 - #13 score=0.12 faiss `HEALTH_S11:R6`: This compact summary screen displays a daily glucose dashboard highlighting time in range, variability, trends, and lifestyle impacts for p…
 - #14 score=0.12 faiss `HEALTH_S2:R6`: The evening glucose trend is captured in a daily dashboard that tracks glucose levels, time in range, and lifestyle metrics for personalize…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_002.jpg`: A sleek daily dashboard visualizing glucose trends, time in range, and recovery metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -5267,7 +6028,12 @@
 - #13 score=0.33 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #14 score=0.32 faiss `HEALTH_S9:R3`: The dashboard tracks daily glucose trends, time in range, variability, and lifestyle factors to support personalized blood sugar management.
 - #15 score=0.32 faiss `HEALTH_S12:R7`: The final overview screen presents a sleek daily glucose dashboard tracking time in range, trends, and lifestyle metrics for personalized h…
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`: Daily dashboard visualizing Maya Patel’s glucose trends, time in range, and lifestyle metrics for April 15, 2025.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
 
 **Open**
 - Q: Which pair of screens share the same 47% lower-right ring despite having different overall layouts and different middle-panel labels?
@@ -5294,7 +6060,12 @@
 - #16 score=0.06 bm25 `HEALTH_S12:R1`: user: This is the month wrap-up. Please keep it with the newer notes and screens. assistant: Okay, I'll keep track as we go.
 - #17 score=0.06 bm25 `HEALTH_S10:R4`: user: I'm trying to remember which option fits better with the earlier context. assistant: Got it, I'll keep that in context.
 - #18 score=0.06 bm25 `HEALTH_S3:R2`: A doctor’s health portal message advises continuing to pair carbs with protein or fiber, based on reviewed dashboard data.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_003.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D10_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
 
 **Clue rounds (abbrev.)**
 
@@ -5344,7 +6115,12 @@
 - #13 score=0.27 faiss `HEALTH_S4:R5`: user: I'm not sure whether the snack helped or whether I'm overreading one day. assistant: Got it.
 - #14 score=0.26 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #15 score=0.25 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_003.jpg`: Daily dashboard visualizing glucose trends, time in range, and key response windows for personalized health monitoring.
 
 **Open**
 - Q: Which screen among the baseline overview, the updated-note dashboard, the provisional threshold-band trend, and the final ring/card screen has a lower-left panel that is not Morning Response?
@@ -5368,7 +6144,12 @@
 - #13 score=0.14 faiss `HEALTH_S9:R6`: The daily dashboard tracks glucose trends, time in range, and lifestyle impacts to provide a comprehensive overview of the day’s health met…
 - #14 score=0.13 faiss `HEALTH_S3:R5`: The daily dashboard tracks glucose trends, time in range, and lifestyle metrics for personalized health insights.
 - #15 score=0.12 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D11_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_005.jpg`: A sleek daily glucose dashboard visualizes time in range, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_002.jpg`: A sleek daily glucose dashboard summarizes time in range, variability, trends, and activity-related metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D11_IMG_004.jpg`: A daily glucose dashboard visualizing time in range, variability, trends, and lifestyle responses for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -5429,7 +6210,12 @@
 - #14 score=0.30 faiss `HEALTH_S2:R7`: Today’s activity summary highlights Maya Patel’s glucose trends, time in range, and lifestyle metrics as visualized on her daily dashboard …
 - #15 score=0.29 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #16 score=0.29 faiss `HEALTH_S12:R1`: user: This is the month wrap-up. Please keep it with the newer notes and screens. assistant: Okay, I'll keep track as we go.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D9_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_002.jpg`: Daily dashboard visualizing Maya Patel’s glucose trends, time in range, and lifestyle metrics for April 15, 2025.
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D9_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle impacts throughout the day.
 
 **Open**
 - Q: Which screen combines the highest Time In Range with Evening Drift still above 4 hours among the weekly comparison trend, the provisional summary card, the bedtime subtle summary, and the month summary dashboard?
@@ -5455,7 +6241,12 @@
 - #15 score=0.18 faiss `HEALTH_S6:R5`: The daily card grid displays a stable glucose trend with 90% time in range, alongside key metrics for meals, activity, and evening patterns.
 - #16 score=0.17 faiss `HEALTH_S7:R7`: The weekend dashboard offers a sleek, personalized view of glucose metrics including time in range, meal variability, evening drift, and ac…
 - #17 score=0.17 faiss `HEALTH_S2:R7`: Today’s activity summary highlights Maya Patel’s glucose trends, time in range, and lifestyle metrics as visualized on her daily dashboard …
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`, `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D6_IMG_005.jpg`: Daily glucose dashboard showing stable trends, strong time-in-range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_004.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D3_IMG_005.jpg`: A daily glucose dashboard summarizes time in range, variability, and activity-related metrics with a stable glucose trend line.
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_002.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time-in-range, and key metrics for meals, activity, and evening patterns.
 
 **Clue rounds (abbrev.)**
 
@@ -5518,7 +6309,12 @@
 - #16 score=0.24 faiss `HEALTH_S4:R5`: user: I'm not sure whether the snack helped or whether I'm overreading one day. assistant: Got it.
 - #17 score=0.23 faiss `HEALTH_S7:R2`: The weekly overview includes a sleek daily glucose dashboard tracking time in range, trends, and lifestyle metrics to support personalized …
 - #18 score=0.22 faiss `HEALTH_S12:R5`: user: I want the final summary to reflect what still seems current. assistant: Got it.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D4_IMG_002.jpg`: Daily glucose dashboard showing stable trends, 80% time in range, and key metrics for meals, activity, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
 
 **Open**
 - Q: Which candidate's KPI row includes Recovery Notes instead of Activity Match or a standard three-card set among the baseline overview, the updated-note dashboard, and the final ring/card screen?
@@ -5544,7 +6340,12 @@
 - #15 score=0.12 faiss `HEALTH_S3:R2`: A doctor’s health portal message advises continuing to pair carbs with protein or fiber, based on reviewed dashboard data.
 - #16 score=0.11 faiss `HEALTH_S6:R4`: The image displays a sleek daily dashboard tracking glucose trends, time in range, and recovery metrics for personalized health insights.
 - #17 score=0.10 faiss `HEALTH_S1:R4`: user: This is my baseline week. I mostly want to watch the pattern. assistant: Got it, I'll keep that in context.
-- **→ VLM (5)**: `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`, `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`, `Personal_Health_Dashboard_Assistant/D7_IMG_006.jpg`, `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`, `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`
+- **→ VLM (5)**:
+  - `Personal_Health_Dashboard_Assistant/D12_IMG_007.jpg`: A daily glucose dashboard visualizing time in range, meal variability, activity, and overall blood sugar trends.
+  - `Personal_Health_Dashboard_Assistant/D1_IMG_004.jpg`: Daily Glucose Dashboard showing stable glucose trends, high time in range, and key metrics for meals, movement, and evening patterns.
+  - `Personal_Health_Dashboard_Assistant/D7_IMG_006.jpg`: Daily dashboard visualizing glucose trends, time in range, and lifestyle metrics for personalized health tracking.
+  - `Personal_Health_Dashboard_Assistant/D2_IMG_003.jpg`: A daily glucose dashboard summarizing time in range, variability, trends, and lifestyle metrics for personalized blood sugar management.
+  - `Personal_Health_Dashboard_Assistant/D8_IMG_004.jpg`: A digital daily glucose dashboard visualizes time in range, variability, trends, and lifestyle metrics for personalized health tracking.
 
 **Clue rounds (abbrev.)**
 
@@ -5598,7 +6399,12 @@
 - #8 score=0.16 faiss `CHAT_S9:R1`: Priya advises Daniel to structure PR descriptions with three clear sections and avoid pasting full stack traces, instead linking to the rel…
 - #9 score=0.14 faiss `CHAT_S26:R1`: Elena shares that Jordan, Daniel’s design partner and co-lead on a marketing project, is now working at her office, prompting Ryan to remar…
 - #10 score=0.14 faiss `CHAT_S5:R1`: user (Sam): I might be mixing up that detail. assistant: Please do not rely on that until we check the saved chats.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/B7_1.png`, `Social_Chat_Memory_Test/screenshots/B7_2.png`, `Social_Chat_Memory_Test/screenshots/B6b_1.png`, `Social_Chat_Memory_Test/screenshots/B6_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/B7_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B7_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6b_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
 
 **Open**
 - Q: Which BOSS chat was shown last in chronological order?
@@ -5617,7 +6423,12 @@
 - #8 score=0.03 bm25 `CHAT_S18:R2`: In a casual chat, Mia celebrates with a dessert emoji, Tomas thanks “mom,” and Helen responds warmly with “ok loves.”
 - #9 score=0.03 bm25 `CHAT_S35:R2`: Priya expresses interest in moving out, Sara offers to help find a replacement, and Priya promises to notify her in advance.
 - #10 score=0.03 bm25 `CHAT_S19:R2`: In the chat, Jordan suggests acting normally if they meet socially, and Elena agrees it works.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/T3_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`, `Social_Chat_Memory_Test/screenshots/R2_2.png`, `Social_Chat_Memory_Test/screenshots/B6_2.png`, `Social_Chat_Memory_Test/screenshots/R4b_1.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/T3_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R4b_1.png`: Chat screenshot. Messages in order:
 
 **Clue rounds (abbrev.)**
 
@@ -5663,7 +6474,12 @@
 - #14 score=0.06 bm25 `CHAT_S13:R1`: Daniel thanks Marcus for clarifying that PTO requests go through him, noting he doesn’t need time off soon but appreciates the heads-up.
 - #15 score=0.06 bm25 `CHAT_S22:R1`: Daniel, Jordan’s engineering co-lead, begins collaborating on a marketing site refresh project after Jordan shares a Figma link for design …
 - #16 score=0.06 bm25 `CHAT_S8:R1`: Ryan dismisses Elena’s concern about Jordan messaging him at 1am, claiming it’s work-related and telling her to stop.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/T5_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`, `Social_Chat_Memory_Test/screenshots/R2_2.png`, `Social_Chat_Memory_Test/screenshots/B6_2.png`, `Social_Chat_Memory_Test/screenshots/T6_2.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/T5_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/T6_2.png`: Chat screenshot. Messages in order:
 
 **Open**
 - Q: In how many of the 8 BOSS work chats does Daniel appear?
@@ -5687,7 +6503,12 @@
 - #13 score=0.05 bm25 `CHAT_S13:R1`: Daniel thanks Marcus for clarifying that PTO requests go through him, noting he doesn’t need time off soon but appreciates the heads-up.
 - #14 score=0.05 bm25 `CHAT_S34:R1`: To respond to harsh feedback without sounding defensive, acknowledge the point first and ask for the smallest change you can ship—even if y…
 - #15 score=0.03 bm25 `CHAT_S30:R1`: A critical bug in the component library delays the hero section’s release by two weeks, pushing the new ship date to May 15.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/T5_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`, `Social_Chat_Memory_Test/screenshots/R2_2.png`, `Social_Chat_Memory_Test/screenshots/B6_2.png`, `Social_Chat_Memory_Test/screenshots/B7_2.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/T5_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B7_2.png`: Chat screenshot. Messages in order:
 
 **Clue rounds (abbrev.)**
 
@@ -5770,7 +6591,12 @@
 - #16 score=0.04 bm25 `CHAT_S2:R2`: Priya agrees to start the new hire on the new feature for faster delivery and confirms a two-week check-in with Marcus.
 - #17 score=0.04 bm25 `CHAT_S38:R1`: Priya decides to renew her lease with Sara, who enthusiastically agrees and promises to send the lease that night.
 - #18 score=0.04 bm25 `CHAT_S28:R2`: Daniel confirms no blockers, requests final color verification with Jordan—who agrees to meet tomorrow afternoon—and Marcus notes the next …
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/B6b_1.png`, `Social_Chat_Memory_Test/screenshots/B3_1.png`, `Social_Chat_Memory_Test/screenshots/R4_2.png`, `Social_Chat_Memory_Test/screenshots/R2_2.png`, `Social_Chat_Memory_Test/screenshots/R3_1.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/B6b_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B3_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R4_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R3_1.png`: Chat screenshot. Messages in order:
 
 **Open**
 - Q: In how many distinct relationship networks does Priya appear?
@@ -5794,7 +6620,12 @@
 - #13 score=0.02 bm25 `CHAT_S2:R2`: Priya agrees to start the new hire on the new feature for faster delivery and confirms a two-week check-in with Marcus.
 - #14 score=0.02 bm25 `CHAT_S4:R2`: Daniel asks for design specs, Priya offers to DM the link (shared by Marcus last quarter), Marcus tells Daniel to listen in without shippin…
 - #15 score=0.01 bm25 `CHAT_S15:R1`: Priya promises to mute Sara’s laptop notifications after 10 PM to avoid disturbing her due to thin walls.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/R4_2.png`, `Social_Chat_Memory_Test/screenshots/B6b_1.png`, `Social_Chat_Memory_Test/screenshots/B3_1.png`, `Social_Chat_Memory_Test/screenshots/R2_2.png`, `Social_Chat_Memory_Test/screenshots/B1_1.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/R4_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6b_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B3_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/R2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B1_1.png`: Chat screenshot. Messages in order:
 
 **Clue rounds (abbrev.)**
 
@@ -5847,7 +6678,12 @@
 - #14 score=0.20 faiss `CHAT_S2:R2`: Priya agrees to start the new hire on the new feature for faster delivery and confirms a two-week check-in with Marcus.
 - #15 score=0.20 faiss `CHAT_S22:R2`: Jordan suggests syncing weekly on Mondays, which Daniel agrees to and adds to his calendar.
 - #16 score=0.17 faiss `CHAT_S8:R1`: Ryan dismisses Elena’s concern about Jordan messaging him at 1am, claiming it’s work-related and telling her to stop.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/B5_1.png`, `Social_Chat_Memory_Test/screenshots/B2_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`, `Social_Chat_Memory_Test/screenshots/B4_1.png`, `Social_Chat_Memory_Test/screenshots/B5b_1.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/B5_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B4_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B5b_1.png`: Chat screenshot. Messages in order:
 
 **Open**
 - Q: What subtitle do the chat screenshots for the sprint planning (B1) and the PTO request (B5) both display?
@@ -5871,7 +6707,12 @@
 - #13 score=0.09 bm25 `CHAT_S2:R2`: Priya agrees to start the new hire on the new feature for faster delivery and confirms a two-week check-in with Marcus.
 - #14 score=0.08 bm25 `CHAT_S36:R2`: The group coordinates gift assignments to avoid duplicates, with Elena taking the book, Ryan the wine, and Jordan the cake.
 - #15 score=0.08 bm25 `CHAT_S8:R2`: Ryan confirms he no longer has feelings for her and commits to setting a boundary that night.
-- **→ VLM (5)**: `Social_Chat_Memory_Test/screenshots/B2_1.png`, `Social_Chat_Memory_Test/screenshots/B5_1.png`, `Social_Chat_Memory_Test/screenshots/B2_2.png`, `Social_Chat_Memory_Test/screenshots/B4_1.png`, `Social_Chat_Memory_Test/screenshots/B6_1.png`
+- **→ VLM (5)**:
+  - `Social_Chat_Memory_Test/screenshots/B2_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B5_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B2_2.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B4_1.png`: Chat screenshot. Messages in order:
+  - `Social_Chat_Memory_Test/screenshots/B6_1.png`: Chat screenshot. Messages in order:
 
 **Clue rounds (abbrev.)**
 

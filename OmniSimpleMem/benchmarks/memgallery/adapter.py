@@ -110,8 +110,10 @@ class OmniMemAdapter:
         if config is None:
             config = OmniMemoryConfig.create_default()
         self._data_dir = data_dir
+        self._config = config
         self.orchestrator = OmniMemoryOrchestrator(config=config, data_dir=data_dir)
-        self.top_k: int = 20
+        self.top_k: int = 10
+        self.fixed_top_k: bool = False
 
         # BM25 index for keyword search (built lazily)
         self._bm25 = None
@@ -125,8 +127,8 @@ class OmniMemAdapter:
         self._image_bm25_texts: List[List[str]] = []
 
     def reset(self) -> None:
-        """Reset memory state."""
-        config = OmniMemoryConfig.create_default()
+        """Reset memory state, preserving the original OmniMemoryConfig."""
+        config = self._config if getattr(self, "_config", None) is not None else OmniMemoryConfig.create_default()
         try:
             if self.orchestrator is not None:
                 self.orchestrator.close()
@@ -168,7 +170,8 @@ class OmniMemAdapter:
         if not text:
             return
         try:
-            self.orchestrator.add_text(text, tags=tags or None)
+            # force=True keeps full dialogue coverage for benchmark fairness
+            self.orchestrator.add_text(text, tags=tags or None, force=True)
         except Exception:
             pass
 
@@ -288,6 +291,8 @@ class OmniMemAdapter:
 
     def _get_dynamic_top_k(self, query: str, category: Optional[str]) -> int:
         """Estimate optimal top_k based on query complexity and category."""
+        if getattr(self, "fixed_top_k", False):
+            return int(self.top_k)
         _CAT_TOP_K = {
             "AR": 10, "CD": 15, "VS": 15, "VR": 15, "TR": 20,
             "FR": 30, "KR": 20, "MR": 25, "TTL": 15,
@@ -330,7 +335,7 @@ class OmniMemAdapter:
 
         # FR list questions need broader retrieval
         is_list_question = False
-        if category == "FR":
+        if category == "FR" and not getattr(self, "fixed_top_k", False):
             q_lower = query_text.lower()
             if any(kw in q_lower for kw in ("list all", "please list", "what are all", "name all", "what were all", "how many")):
                 is_list_question = True
@@ -421,20 +426,22 @@ class OmniMemAdapter:
     def _recall_visual(self, query_text: str, category: str) -> str:
         """Retrieval for VS (Visual Search) and VR (Visual Reasoning)."""
         lines = []
+        k = int(self.top_k) if getattr(self, "fixed_top_k", False) else 15
+        image_k = int(self.top_k) if getattr(self, "fixed_top_k", False) else 30
 
         # Standard FAISS + BM25 retrieval
         try:
-            result = self.orchestrator.query(query_text, top_k=15, auto_expand=False)
+            result = self.orchestrator.query(query_text, top_k=k, auto_expand=False)
             items = getattr(result, "items", []) or []
         except Exception:
             items = []
 
         try:
             existing_ids = {item.get("id") for item in items}
-            bm25_ids = self._bm25_search(query_text, top_k=15)
+            bm25_ids = self._bm25_search(query_text, top_k=k)
             new_bm25_ids = [mid for mid in bm25_ids if mid not in existing_ids]
             if new_bm25_ids:
-                bm25_expanded = self.orchestrator.expand(new_bm25_ids[:10])
+                bm25_expanded = self.orchestrator.expand(new_bm25_ids[: min(10, k)])
                 for bm25_item in bm25_expanded.items:
                     items.append(bm25_item)
         except Exception:
@@ -447,7 +454,7 @@ class OmniMemAdapter:
                 lines.append(standard_text)
 
         # Image-specific catalog search
-        image_results = self._image_search(query_text, return_all=(category == "VR"), top_k=30)
+        image_results = self._image_search(query_text, return_all=(category == "VR"), top_k=image_k)
         if image_results:
             lines.append("")
             lines.append("=== Image Catalog ===")

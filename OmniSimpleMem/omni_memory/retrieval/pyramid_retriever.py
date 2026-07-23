@@ -27,6 +27,29 @@ from omni_memory.storage.cold_storage import ColdStorageManager
 logger = logging.getLogger(__name__)
 
 
+def limit_expansion_ids(mau_ids: List[str], max_items: int) -> List[str]:
+    """Cap MAU ids for expansion. max_items <= 0 means no cap (expand all requested)."""
+    if max_items <= 0:
+        return list(mau_ids)
+    return list(mau_ids[:max_items])
+
+
+def vision_on_demand_image_paths(mau: MultimodalAtomicUnit) -> List[str]:
+    """All on-demand image paths for a MAU (raw_pointer + region_pointers)."""
+    paths: List[str] = []
+    if mau.raw_pointer:
+        paths.append(mau.raw_pointer)
+    for pointer in mau.region_pointers or []:
+        value = str(pointer).strip()
+        if value and value not in paths:
+            paths.append(value)
+    return paths
+
+
+def mau_has_on_demand_raw(mau: MultimodalAtomicUnit) -> bool:
+    return bool(vision_on_demand_image_paths(mau))
+
+
 class RetrievalLevel(str, Enum):
     """Levels of retrieval detail."""
 
@@ -179,7 +202,13 @@ class PyramidRetriever:
 
             # Apply filters
             if modality_filter and mau.modality_type != modality_filter:
-                continue
+                # Caption-only ingest stores images as TEXT + vision_on_demand tag.
+                if not (
+                    modality_filter == ModalityType.VISUAL
+                    and mau.modality_type == ModalityType.TEXT
+                    and "vision_on_demand" in (mau.metadata.tags or [])
+                ):
+                    continue
 
             if time_range:
                 if mau.timestamp < time_range[0] or mau.timestamp > time_range[1]:
@@ -197,7 +226,7 @@ class PyramidRetriever:
                 "timestamp": mau.timestamp,
                 "score": score,
                 "tags": mau.metadata.tags,
-                "has_raw_data": mau.raw_pointer is not None,
+                "has_raw_data": mau_has_on_demand_raw(mau),
                 "metadata": mau.metadata.to_dict(),
             }
             # Include details for richer context in format_for_llm
@@ -239,7 +268,9 @@ class PyramidRetriever:
         items = []
         tokens_estimate = 0
 
-        for mau_id in request.mau_ids[: self.retrieval_config.max_expanded_items]:
+        for mau_id in limit_expansion_ids(
+            request.mau_ids, self.retrieval_config.max_expanded_items
+        ):
             mau = self.mau_store.get(mau_id)
             if not mau:
                 continue
@@ -249,6 +280,10 @@ class PyramidRetriever:
                 "summary": mau.summary,
                 "modality_type": mau.modality_type.value,
                 "timestamp": mau.timestamp,
+                # Keep preview-level fields so DETAILS expansion does not break
+                # later vision_on_demand (EVIDENCE) eligibility checks.
+                "tags": list(mau.metadata.tags or []),
+                "has_raw_data": mau_has_on_demand_raw(mau),
                 "metadata": mau.metadata.to_dict(),
             }
 
@@ -258,7 +293,7 @@ class PyramidRetriever:
                 tokens_estimate += len(str(mau.details)) // 4
 
             # Load raw content for evidence level
-            if request.level == RetrievalLevel.EVIDENCE and mau.raw_pointer:
+            if request.level == RetrievalLevel.EVIDENCE and mau_has_on_demand_raw(mau):
                 raw_content = self._load_raw_content(mau)
                 if raw_content:
                     item["raw_content"] = raw_content
@@ -278,23 +313,36 @@ class PyramidRetriever:
 
     def _load_raw_content(self, mau: MultimodalAtomicUnit) -> Optional[Dict[str, Any]]:
         """Load raw content from cold storage for a MAU."""
+        import base64
+
+        if mau.modality_type == ModalityType.TEXT and "vision_on_demand" in (
+            mau.metadata.tags or []
+        ):
+            paths = vision_on_demand_image_paths(mau)
+            if not paths:
+                return None
+            images: List[Dict[str, Any]] = []
+            for pointer in paths:
+                entry: Dict[str, Any] = {"pointer": pointer}
+                data = self.cold_storage.retrieve(pointer)
+                if data:
+                    entry["base64"] = base64.b64encode(data).decode("utf-8")
+                    images.append(entry)
+            result: Dict[str, Any] = {
+                "type": "image",
+                "pointer": paths[0],
+                "pointers": paths,
+                "token_estimate": max(1, 500 * len(paths)),
+            }
+            if images:
+                result["images"] = images
+                result["base64"] = images[0].get("base64")
+            return result
+
         if not mau.raw_pointer:
             return None
 
         result = {"pointer": mau.raw_pointer}
-
-        # On-demand image: TEXT MAU but raw_pointer points to image (caption-only embedding)
-        if mau.modality_type == ModalityType.TEXT and "vision_on_demand" in (
-            mau.metadata.tags or []
-        ):
-            result["type"] = "image"
-            result["token_estimate"] = 500
-            data = self.cold_storage.retrieve(mau.raw_pointer)
-            if data:
-                import base64
-
-                result["base64"] = base64.b64encode(data).decode("utf-8")
-            return result
 
         if mau.modality_type == ModalityType.TEXT:
             # Load text content

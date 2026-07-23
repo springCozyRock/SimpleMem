@@ -55,6 +55,7 @@ class EventManager:
         if self._llm_client is None:
             from openai import OpenAI
             import httpx
+            from omni_memory.utils.usage import wrap_openai_client
             # Only pass non-None parameters to avoid compatibility issues
             client_kwargs = {}
             if self.config.llm.api_key is not None:
@@ -67,7 +68,7 @@ class EventManager:
             http_client = httpx.Client()
             client_kwargs["http_client"] = http_client
             
-            self._llm_client = OpenAI(**client_kwargs)
+            self._llm_client = wrap_openai_client(OpenAI(**client_kwargs))
         return self._llm_client
 
     def get_or_create_event(

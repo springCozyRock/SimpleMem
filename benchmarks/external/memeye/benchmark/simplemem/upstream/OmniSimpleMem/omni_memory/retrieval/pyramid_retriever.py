@@ -200,9 +200,10 @@ class PyramidRetriever:
                 "has_raw_data": mau.raw_pointer is not None,
                 "metadata": mau.metadata.to_dict(),
             }
-            # Include details for richer context in format_for_llm
-            if mau.details and isinstance(mau.details, dict):
-                item_dict["details"] = mau.details
+            # Pyramid layer 1: summary only unless explicitly opted in.
+            if getattr(self.retrieval_config, "include_details_in_preview", True):
+                if mau.details and isinstance(mau.details, dict):
+                    item_dict["details"] = mau.details
             items.append(item_dict)
 
             if len(items) >= top_k:
@@ -239,7 +240,7 @@ class PyramidRetriever:
         items = []
         tokens_estimate = 0
 
-        for mau_id in request.mau_ids[: self.retrieval_config.max_expanded_items]:
+        for mau_id in request.mau_ids:
             mau = self.mau_store.get(mau_id)
             if not mau:
                 continue
@@ -249,6 +250,10 @@ class PyramidRetriever:
                 "summary": mau.summary,
                 "modality_type": mau.modality_type.value,
                 "timestamp": mau.timestamp,
+                # Keep preview-level fields so DETAILS expansion does not break
+                # later vision_on_demand (EVIDENCE) eligibility checks.
+                "tags": list(mau.metadata.tags or []),
+                "has_raw_data": mau.raw_pointer is not None,
                 "metadata": mau.metadata.to_dict(),
             }
 

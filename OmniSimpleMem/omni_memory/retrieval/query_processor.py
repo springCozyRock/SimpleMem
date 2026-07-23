@@ -264,6 +264,7 @@ class QueryProcessor:
             try:
                 from openai import OpenAI
                 import httpx
+                from omni_memory.utils.usage import wrap_openai_client
                 
                 client_kwargs = {}
                 if hasattr(self.config, 'llm') and self.config.llm.api_key:
@@ -273,7 +274,7 @@ class QueryProcessor:
                 
                 http_client = httpx.Client()
                 client_kwargs["http_client"] = http_client
-                self._llm_client = OpenAI(**client_kwargs)
+                self._llm_client = wrap_openai_client(OpenAI(**client_kwargs))
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM client: {e}")
                 return None

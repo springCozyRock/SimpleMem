@@ -10,12 +10,15 @@ llm_api_key_env: MEMEYE_LLM_API_KEY
 base_url: http://35.164.11.19:3887/v1
 
 retrieve_k: 20
+auto_expand_threshold: 0.4
+evidence_token_budget: 6000
+include_details_in_preview: false
 enable_hybrid_search: true
 enable_graph_traversal: true
 enable_multi_query_retrieval: false
 # Isolated from Qwen cache at runs/simplemem/<scenario>/ (legacy path).
 memory_namespace: gpt_5_4_mini_proxy
-reuse_existing_memory: false
+reuse_existing_memory: true
 
 embedding_model: all-MiniLM-L6-v2
 embedding_dim: 384

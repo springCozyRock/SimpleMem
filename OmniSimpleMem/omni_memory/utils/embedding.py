@@ -7,6 +7,7 @@ with safe-evolution (Tongyi/Doubao/CLIP multi-backend).
 Supported backends:
 - OpenAI API: text-embedding-3-large (3072-dim), text-embedding-3-small (1536-dim)
 - Local: all-MiniLM-L6-v2 (384-dim, sentence-transformers, no API needed)
+- GME: Alibaba-NLP/gme-Qwen2-VL-* (1536/3584-dim via trust_remote_code)
 - CLIP: openai/clip-vit-base-patch32 (512-dim, shared text+image space)
 - OpenVision: UCSC-VLAA/openvision-vit-large-patch14-224 (768-dim visual)
 - Tongyi/DashScope: tongyi-embedding-vision-plus (text + image same API)
@@ -16,6 +17,7 @@ Supported backends:
 import base64
 import io
 import logging
+import os
 import threading
 from typing import Optional, List
 import numpy as np
@@ -83,11 +85,22 @@ class EmbeddingService:
 
         # Local text embedding model (fallback)
         self._local_text_model = None
+        self._gme_model = None
         self._use_local_text_embeddings: Optional[bool] = None
+        self._http_client = None
 
         # Thread-safe initialization locks
         self._embedding_lock = threading.Lock()
         self._clip_lock = threading.Lock()
+        self._gme_lock = threading.Lock()
+
+        # Resolve shared embedding server from config or env.
+        cfg_url = getattr(self.embedding_config, "server_url", None)
+        env_url = (os.environ.get("OMNI_EMBEDDING_SERVER_URL") or "").strip()
+        self._server_url = (cfg_url or env_url or "").strip().rstrip("/") or None
+        self._server_timeout_s = float(
+            getattr(self.embedding_config, "server_timeout_s", 120.0) or 120.0
+        )
 
     # ---- Backend detection ----
 
@@ -103,11 +116,21 @@ class EmbeddingService:
         """Check if model name is an OpenAI embedding model."""
         return model_name in _OPENAI_EMBEDDING_MODELS
 
+    def _is_gme_model(self, model_name: str) -> bool:
+        """Detect Alibaba GME-Qwen2-VL embedding checkpoints by path/name."""
+        name = (model_name or "").lower().replace("\\", "/")
+        return "gme-qwen" in name or "/gme-" in name or name.startswith("gme-") or (
+            "gme" in name and "qwen" in name
+        )
+
     def _detect_text_backend(self) -> str:
         """Detect which backend to use for text embeddings.
 
-        Returns: "clip" | "tongyi" | "doubao" | "openai" | "local"
+        Returns: "remote" | "clip" | "tongyi" | "doubao" | "openai" | "gme" | "local"
         """
+        if self._server_url:
+            return "remote"
+
         model = self.embedding_config.model_name
 
         # Explicit CLIP model name → use CLIP
@@ -118,12 +141,40 @@ class EmbeddingService:
         if self._is_tongyi_model(model):
             return "tongyi"
 
+        # GME-Qwen2-VL (AutoModel + get_text_embeddings)
+        if self._is_gme_model(model):
+            return "gme"
+
         # OpenAI model name → try OpenAI, fall back to local
         if self._is_openai_model(model):
             return "openai"
 
         # Non-OpenAI, non-CLIP, non-Tongyi → treat as local sentence-transformers model
         return "local"
+
+    def _get_http_client(self):
+        if self._http_client is None:
+            import httpx
+
+            self._http_client = httpx.Client(timeout=self._server_timeout_s)
+        return self._http_client
+
+    def _embed_remote(self, texts: List[str]) -> List[List[float]]:
+        """Call shared embedding server (OpenAI-compatible /v1/embeddings)."""
+        if not self._server_url:
+            return []
+        if not texts:
+            return []
+        client = self._get_http_client()
+        payload = {
+            "model": self.embedding_config.model_name,
+            "input": texts if len(texts) > 1 else texts[0],
+        }
+        response = client.post(f"{self._server_url}/v1/embeddings", json=payload)
+        response.raise_for_status()
+        data = response.json()
+        items = sorted(data.get("data") or [], key=lambda x: int(x.get("index", 0)))
+        return [list(item.get("embedding") or []) for item in items]
 
     # ---- OpenAI client ----
 
@@ -142,8 +193,27 @@ class EmbeddingService:
             http_client = httpx.Client()
             client_kwargs["http_client"] = http_client
 
+            # Keep unwrapped: EmbeddingService records text-embedding usage itself.
             self._openai_client = OpenAI(**client_kwargs)
         return self._openai_client
+
+    def _local_max_seq_length(self, model) -> Optional[int]:
+        max_seq = getattr(model, "max_seq_length", None)
+        try:
+            return int(max_seq) if max_seq is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    def _count_local_embed_tokens(self, model, texts: List[str]) -> int:
+        from omni_memory.utils.usage import count_text_embedding_tokens
+
+        tokenizer = getattr(model, "tokenizer", None)
+        if tokenizer is None:
+            # Fallback: ~4 chars/token
+            return sum(max(1, len(t) // 4) for t in texts)
+        return count_text_embedding_tokens(
+            tokenizer, texts, self._local_max_seq_length(model)
+        )
 
     # ---- Local sentence-transformers ----
 
@@ -163,6 +233,8 @@ class EmbeddingService:
 
     def _should_use_local(self) -> bool:
         """Determine if we should use local embeddings (OpenAI API test or fallback)."""
+        if self._server_url:
+            return False
         if self._use_local_text_embeddings is not None:
             return self._use_local_text_embeddings
 
@@ -172,6 +244,10 @@ class EmbeddingService:
             self._use_local_text_embeddings = True
             logger.info(f"Using local text embedding model: {self.embedding_config.model_name}")
             return True
+
+        if backend == "remote":
+            self._use_local_text_embeddings = False
+            return False
 
         if backend == "openai":
             # Try OpenAI embeddings; if they fail (403 on proxy), switch to local
@@ -188,9 +264,62 @@ class EmbeddingService:
                 logger.info(f"OpenAI embeddings unavailable, falling back to local: {self.LOCAL_TEXT_MODEL}")
             return self._use_local_text_embeddings
 
-        # For clip/tongyi/doubao backends, don't use local
+        # For clip/tongyi/doubao/gme backends, don't use sentence-transformers
         self._use_local_text_embeddings = False
         return False
+
+    # ---- GME-Qwen2-VL text embeddings ----
+
+    def _get_gme_model(self):
+        """Lazy-load GME AutoModel (trust_remote_code) for text embeddings."""
+        if self._gme_model is not None:
+            return self._gme_model
+        with self._gme_lock:
+            if self._gme_model is not None:
+                return self._gme_model
+            import torch
+            from transformers import AutoModel
+
+            model_name = self.embedding_config.model_name
+            dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+            logger.info("Loading GME embedding model: %s", model_name)
+            model = AutoModel.from_pretrained(
+                model_name,
+                torch_dtype=dtype,
+                device_map="auto" if torch.cuda.is_available() else None,
+                trust_remote_code=True,
+            )
+            model.eval()
+            self._gme_model = model
+            logger.info("GME embedding model loaded")
+            return self._gme_model
+
+    def _embed_gme_texts(self, texts: List[str]) -> List[List[float]]:
+        """Encode texts with GME get_text_embeddings; L2-normalize."""
+        import time
+        import torch
+        from omni_memory.utils.usage import get_usage_tracker
+
+        cleaned = [(t or " ").strip() or " " for t in texts]
+        model = self._get_gme_model()
+        prompt_tokens = sum(max(1, len(t) // 4) for t in cleaned)
+        t0 = time.perf_counter()
+        with torch.no_grad():
+            emb = model.get_text_embeddings(texts=cleaned)
+            emb = emb / torch.norm(emb, dim=-1, keepdim=True)
+        latency_ms = (time.perf_counter() - t0) * 1000.0
+        get_usage_tracker().record_embedding(
+            prompt_tokens=prompt_tokens,
+            latency_ms=latency_ms,
+            api_calls=1,
+        )
+        if hasattr(emb, "detach"):
+            arr = emb.detach().float().cpu().numpy()
+        else:
+            arr = np.asarray(emb, dtype=np.float32)
+        if arr.ndim == 1:
+            return [arr.tolist()]
+        return [row.tolist() for row in arr]
 
     # ---- CLIP model loading (unified: supports both standard CLIP and OpenVision) ----
 
@@ -416,6 +545,9 @@ class EmbeddingService:
 
     def embed_text(self, text: str) -> List[float]:
         """Get embedding for text. Auto-detects backend from config."""
+        import time
+        from omni_memory.utils.usage import get_usage_tracker, _extract_embedding_usage
+
         backend = self._detect_text_backend()
 
         if backend == "clip":
@@ -424,11 +556,45 @@ class EmbeddingService:
         if backend == "tongyi":
             return self._embed_tongyi(text=text)
 
+        if backend == "gme":
+            try:
+                vectors = self._embed_gme_texts([text[:8000]])
+                return vectors[0] if vectors else []
+            except Exception as e:
+                logger.error(f"GME text embedding failed: {e}")
+                return []
+
+        truncated = text[:8000]
+
+        if backend == "remote":
+            try:
+                prompt_tokens = max(1, len(truncated) // 4)
+                t0 = time.perf_counter()
+                vectors = self._embed_remote([truncated])
+                latency_ms = (time.perf_counter() - t0) * 1000.0
+                get_usage_tracker().record_embedding(
+                    prompt_tokens=prompt_tokens,
+                    latency_ms=latency_ms,
+                    api_calls=1,
+                )
+                return vectors[0] if vectors else []
+            except Exception as e:
+                logger.error(f"Remote text embedding failed: {e}")
+                return []
+
         # OpenAI or local
         if self._should_use_local():
             try:
                 model = self._get_local_text_model()
-                embedding = model.encode(text[:8000], normalize_embeddings=True)
+                prompt_tokens = self._count_local_embed_tokens(model, [truncated])
+                t0 = time.perf_counter()
+                embedding = model.encode(truncated, normalize_embeddings=True)
+                latency_ms = (time.perf_counter() - t0) * 1000.0
+                get_usage_tracker().record_embedding(
+                    prompt_tokens=prompt_tokens,
+                    latency_ms=latency_ms,
+                    api_calls=1,
+                )
                 return embedding.tolist()
             except Exception as e:
                 logger.error(f"Local text embedding failed: {e}")
@@ -437,9 +603,18 @@ class EmbeddingService:
         # OpenAI API
         client = self._get_openai_client()
         try:
+            fallback_tokens = max(1, len(truncated) // 4)
+            t0 = time.perf_counter()
             response = client.embeddings.create(
                 model=self.embedding_config.model_name,
-                input=text[:8000],
+                input=truncated,
+            )
+            latency_ms = (time.perf_counter() - t0) * 1000.0
+            prompt_tokens = _extract_embedding_usage(response, fallback_tokens=fallback_tokens)
+            get_usage_tracker().record_embedding(
+                prompt_tokens=prompt_tokens,
+                latency_ms=latency_ms,
+                api_calls=1,
             )
             return response.data[0].embedding
         except Exception as e:
@@ -448,6 +623,9 @@ class EmbeddingService:
 
     def embed_texts_batch(self, texts: List[str]) -> List[List[float]]:
         """Get embeddings for multiple texts."""
+        import time
+        from omni_memory.utils.usage import get_usage_tracker, _extract_embedding_usage
+
         backend = self._detect_text_backend()
 
         if backend == "clip":
@@ -456,11 +634,48 @@ class EmbeddingService:
         if backend == "tongyi":
             return [self._embed_tongyi(text=t) for t in texts]
 
+        if backend == "gme":
+            try:
+                truncated = [t[:8000] for t in texts]
+                return self._embed_gme_texts(truncated)
+            except Exception as e:
+                logger.error(f"GME batch text embedding failed: {e}")
+                return [[] for _ in texts]
+
+        if backend == "remote":
+            try:
+                truncated = [t[:8000] for t in texts]
+                prompt_tokens = sum(max(1, len(t) // 4) for t in truncated)
+                t0 = time.perf_counter()
+                vectors = self._embed_remote(truncated)
+                latency_ms = (time.perf_counter() - t0) * 1000.0
+                get_usage_tracker().record_embedding(
+                    prompt_tokens=prompt_tokens,
+                    latency_ms=latency_ms,
+                    api_calls=1,
+                )
+                if len(vectors) != len(texts):
+                    return [[] for _ in texts]
+                return vectors
+            except Exception as e:
+                logger.error(f"Remote batch text embedding failed: {e}")
+                return [[] for _ in texts]
+
         if self._should_use_local():
             try:
                 model = self._get_local_text_model()
                 truncated = [t[:8000] for t in texts]
-                embeddings = model.encode(truncated, normalize_embeddings=True, batch_size=32)
+                prompt_tokens = self._count_local_embed_tokens(model, truncated)
+                t0 = time.perf_counter()
+                embeddings = model.encode(
+                    truncated, normalize_embeddings=True, batch_size=32
+                )
+                latency_ms = (time.perf_counter() - t0) * 1000.0
+                get_usage_tracker().record_embedding(
+                    prompt_tokens=prompt_tokens,
+                    latency_ms=latency_ms,
+                    api_calls=1,
+                )
                 return [e.tolist() for e in embeddings]
             except Exception as e:
                 logger.error(f"Local batch text embedding failed: {e}")
@@ -470,13 +685,25 @@ class EmbeddingService:
         client = self._get_openai_client()
         results = []
         batch_size = self.embedding_config.batch_size
+        tracker = get_usage_tracker()
         for i in range(0, len(texts), batch_size):
             batch = texts[i:i + batch_size]
             batch = [t[:8000] for t in batch]
             try:
+                fallback_tokens = sum(max(1, len(t) // 4) for t in batch)
+                t0 = time.perf_counter()
                 response = client.embeddings.create(
                     model=self.embedding_config.model_name,
                     input=batch,
+                )
+                latency_ms = (time.perf_counter() - t0) * 1000.0
+                prompt_tokens = _extract_embedding_usage(
+                    response, fallback_tokens=fallback_tokens
+                )
+                tracker.record_embedding(
+                    prompt_tokens=prompt_tokens,
+                    latency_ms=latency_ms,
+                    api_calls=1,
                 )
                 for item in response.data:
                     results.append(item.embedding)

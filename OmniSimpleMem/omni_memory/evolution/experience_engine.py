@@ -369,7 +369,8 @@ class ExperienceEngine:
         if self._llm_client is None:
             from openai import OpenAI
             import httpx
-            self._llm_client = OpenAI(http_client=httpx.Client())
+            from omni_memory.utils.usage import wrap_openai_client
+            self._llm_client = wrap_openai_client(OpenAI(http_client=httpx.Client()))
         return self._llm_client
 
     def _load_experiences(self) -> None:

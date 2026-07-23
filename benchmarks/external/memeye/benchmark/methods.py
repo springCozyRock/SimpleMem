@@ -371,6 +371,10 @@ def get_method(method_name: str, config: Optional[Dict[str, Any]] = None) -> His
             from .memoryos import MemoryOSMethod
 
             return MemoryOSMethod(config=config)
+        if method_name == "secom":
+            from .secom import SeComMethod
+
+            return SeComMethod(config=config)
         from .mirix import get_mirix_method
 
         return get_mirix_method(method_name, config=config)
